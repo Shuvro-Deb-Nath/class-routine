@@ -71,3 +71,16 @@ days:
         subject: "SOFTWARE ENGINEERING"
         room: "512"
         code: "DSI"
+
+# academic_events:
+#   - type: "assignment"
+#     course: "Computer Networking"
+#     title: "Assignment 1 Submission"
+#     date: "2026-01-14"
+#     time: "11:59 PM"
+
+#   - type: "exam"
+#     course: "Software Engineering"
+#     title: "Midterm Exam"
+#     date: "2026-01-18"
+#     time: "09:00 AM"
