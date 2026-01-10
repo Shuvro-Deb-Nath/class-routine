@@ -1,0 +1,46 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  - name: "routine"
+    label: "Class Routine"
+    file: "data/routine.yml"
+    fields:
+      - label: "Days"
+        name: "days"
+        widget: "list"
+        fields:
+          - label: "Day"
+            name: "day"
+            widget: "select"
+            options: ["MON", "TUE", "WED", "THU", "FRI"]
+
+          - label: "Classes"
+            name: "classes"
+            widget: "list"
+            fields:
+              - label: "Time Slot"
+                name: "time"
+                widget: "select"
+                options:
+                  - "08:45–10:05"
+                  - "10:05–11:25"
+                  - "11:25–12:45"
+                  - "01:15–02:35"
+                  - "02:35–03:55"
+
+              - label: "Course Name"
+                name: "subject"
+                widget: "string"
+
+              - label: "Room"
+                name: "room"
+                widget: "string"
+
+              - label: "Course Code"
+                name: "code"
+                widget: "string"

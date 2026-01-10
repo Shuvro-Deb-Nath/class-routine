@@ -1,0 +1,130 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f6fa;
+}
+
+/* HEADER */
+.hero {
+  background: #0a4da2;
+  color: white;
+  padding: 1.5rem 3rem; /* more horizontal spacing */
+}
+
+/* Main row */
+.hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* key line */
+  position: relative;
+}
+
+/* Left logo */
+.logo {
+  height: 80px;
+}
+
+/* Right banner */
+.banner {
+  height: 150px;
+}
+.break-header,
+.break-cell {
+  background: #0253f4;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  color: #333;
+}
+
+/* Perfectly centered title */
+.title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  font-weight: bold;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Subtitle */
+.effective {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+
+/* TABLE */
+.table-container {
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.routine-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  min-width: 900px;
+  border: #000004 2px solid;
+}
+
+.routine-table th {
+  background: #e8eef7;
+  padding: 0.9rem;
+  border: 1px solid #dcdcdc;
+  font-weight: 600;
+  border: #000004 2px solid ;
+}
+
+.routine-table td {
+  padding: 0.8rem;
+  border: 1px solid #dcdcdc;
+  text-align: center;
+  font-size: 0.9rem;
+  border: #000004 2px solid ;
+}
+
+/* Day column */
+.day {
+  font-weight: bold;
+  background: #f0f3f9;
+}
+
+/* Subject colors */
+.TLS { background: #fffb00; }
+.DSI { background: #ff0000; }
+.DMA { background: #01a2ff; }
+.TZW { background: #d000ff; }
+
+/* Today row */
+.today-row td {
+  background: #ccf7ff !important;
+}
+
+/* Current class */
+.active-class {
+  background: #c8f7dc !important;
+  border: 2px solid #01fd6a;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 rgb(0, 255, 106); }
+  50% { box-shadow: 0 0 10px rgb(2, 255, 107); }
+  100% { box-shadow: 0 0 0 rgba(3, 255, 108, 0.95); }
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 1rem;
+  background: #1b48a3;
+  margin-top: 2rem;
+  color: white;
+}

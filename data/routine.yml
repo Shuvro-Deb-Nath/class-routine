@@ -1,0 +1,73 @@
+days:
+  - day: MON
+    classes:
+
+      - time: "10:05 AM –11:25 AM"
+        subject: "ENGINEERING DRAWING "
+        room: "508"
+        code: "TLS"
+      
+      
+        
+
+      - time: "01:15 PM –02:35 PM"
+        subject: "SOFTWARE ENGINEERING"
+        room: "502"
+        code: "DSI"
+
+      - time: "02:35 PM –03:55 PM"
+        subject: "COMPUTER AND CYBER SECURITY"
+        room: "503"
+        code: "TZW"
+
+  - day: TUE
+    classes:
+      - time: "08:45 AM –10:05 AM"
+        subject: "COMPUTER NETWORKING"
+        room: "502"
+        code: "DMA"
+
+      - time: "10:05 AM –11:25 AM"
+        subject: "COMPUTER NETWORKING"
+        room: "502"
+        code: "DMA"
+
+      - time: "11:25 AM –12:45 PM"
+        subject: "SOFTWARE ENGINEERING lAB" 
+        room: "513"   
+        code: "DSI"
+      
+      - time: "01:15 PM –02:35 PM"
+        subject: "SOFTWARE ENGINEERING LAB" 
+        room: "513"   
+        code: "DSI"
+
+      - time: "02:35 PM –03:55 PM" 
+        subject: "COMPUTER AND CYBER SECURITY"  
+        room: "612"
+        code: "TZW"
+
+
+  - day: THU
+    classes:
+      
+
+      - time: "10:05 AM –11:25 AM"
+        subject: "COMPUTER NETWORKING LAB"
+        room: "513"
+        code: "DMA"
+
+      - time: "11:25 AM –12:45 PM"
+        subject: "COMPUTER NETWORKING LAB"
+        room: "513"
+        code: "DMA"
+
+      - time: "01:15 PM –02:35 PM" 
+        subject: "ENGINEERING DRAWING "
+        room: "312"
+        code: "TLS"
+      
+      - time: "02:35 PM –03:55 PM"
+        subject: "SOFTWARE ENGINEERING"
+        room: "512"
+        code: "DSI"
