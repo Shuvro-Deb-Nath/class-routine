@@ -128,3 +128,63 @@ footer {
   margin-top: 2rem;
   color: white;
 }
+/* =========================
+   MOBILE FIX (max-width: 768px)
+========================= */
+@media (max-width: 768px) {
+
+  /* HEADER */
+  .hero {
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .hero-top {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Remove absolute centering on mobile */
+  .title {
+    position: static;
+    transform: none;
+    font-size: 1.4rem;
+    white-space: normal;
+    margin: 0.5rem 0;
+  }
+
+  .logo {
+    height: 60px;
+  }
+
+  .banner {
+    height: 90px;
+  }
+
+  .effective {
+    font-size: 0.85rem;
+  }
+
+  /* TABLE */
+  .table-container {
+    padding: 0.5rem;
+  }
+
+  .routine-table {
+    min-width: 750px; /* smaller but still scrollable */
+    font-size: 0.8rem;
+  }
+
+  .routine-table th,
+  .routine-table td {
+    padding: 0.5rem;
+  }
+
+  /* FOOTER */
+  footer {
+    font-size: 0.8rem;
+    padding: 0.8rem;
+  }
+}
+
+
