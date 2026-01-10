@@ -2890,3 +2890,24 @@ footer:hover::before {
 }
 
 
+
+/* =====================================================
+   📱 FIX COUNTDOWN CUT-OFF ON MOBILE
+===================================================== */
+@media (max-width: 480px) {
+
+  .next-class {
+    position: sticky;
+    top: 8px;
+
+    left: auto;
+    transform: none;
+
+    margin: 0.8rem auto;
+    max-width: calc(100vw - 16px);
+    padding: 0.6rem 1rem;
+
+    text-align: center;
+    white-space: normal;
+  }
+}
