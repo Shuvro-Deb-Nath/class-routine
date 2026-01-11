@@ -8,27 +8,30 @@ const timeSlots = [
   "11:25 AM –12:45 PM",
   "12:45 PM –01:15 PM",
   "01:15 PM –02:35 PM",
-  "02:35 PM –03:55 PM"
+  "02:35 PM –03:55 PM",
 ];
 
 let routineDays = [];
 let academicEvents = [];
+let cancelledClasses = [];
 
 /* =========================
    FETCH DATA
 ========================= */
 
 fetch("/data/routine.yml")
-  .then(res => res.text())
-  .then(text => {
+  .then((res) => res.text())
+  .then((text) => {
     const data = jsyaml.load(text);
 
     routineDays = data.days || [];
     academicEvents = data.academic_events || [];
+    cancelledClasses = data.cancelled_classes || [];
 
     renderRoutine(routineDays);
     highlightToday();
     checkCurrentClass();
+    markCancelledClasses();
 
     setInterval(checkCurrentClass, 60000);
 
@@ -46,13 +49,13 @@ function renderRoutine(days) {
   const body = document.getElementById("routineBody");
   body.innerHTML = "";
 
-  days.forEach(d => {
+  days.forEach((d) => {
     const row = document.createElement("tr");
     row.dataset.day = d.day;
     row.innerHTML = `<td class="day">${d.day}</td>`;
 
-    timeSlots.forEach(slot => {
-      const cls = d.classes.find(c => c.time === slot);
+    timeSlots.forEach((slot) => {
+      const cls = d.classes.find((c) => c.time === slot);
       if (cls) {
         row.innerHTML += `
           <td class="${cls.code}" data-time="${slot}">
@@ -78,7 +81,7 @@ function highlightToday() {
     .toLocaleDateString("en-US", { weekday: "short" })
     .toUpperCase();
 
-  document.querySelectorAll("tr").forEach(row => {
+  document.querySelectorAll("tr").forEach((row) => {
     if (row.dataset.day === today) {
       row.classList.add("today-row");
     }
@@ -135,19 +138,64 @@ function checkCurrentClass() {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  document.querySelectorAll("td[data-time]").forEach(cell => {
+  // Get today's day name
+  const today = now
+    .toLocaleDateString("en-US", { weekday: "short" })
+    .toUpperCase();
+
+  document.querySelectorAll("td[data-time]").forEach((cell) => {
     cell.classList.remove("active-class");
+    // cell.classList.remove("upcoming-class");
 
-    const [start, end] = cell.dataset.time.split("–");
-    const s = parse12hTime(start);
-    const e = parse12hTime(end);
+    // Get the row this cell belongs to
+    const row = cell.closest("tr");
+    const dayCell = row.querySelector(".day");
 
-    const startMin = s.h * 60 + s.m;
-    const endMin = e.h * 60 + e.m;
+    // Only process if this cell is in today's row
+    if (dayCell && dayCell.textContent.trim() === today) {
+      const [start, end] = cell.dataset.time.split("–");
+      const s = parse12hTime(start);
+      const e = parse12hTime(end);
 
-    if (currentMinutes >= startMin && currentMinutes <= endMin) {
-      cell.classList.add("active-class");
+      const startMin = s.h * 60 + s.m;
+      const endMin = e.h * 60 + e.m;
+
+      // Check if current time is within this class period
+      if (currentMinutes >= startMin && currentMinutes < endMin) {
+        cell.classList.add("active-class");
+      }
+      // Check if this is the next upcoming class today
+      else if (currentMinutes < startMin) {
+  cell.classList.add("upcoming-class");
+}
+
     }
+  });
+}
+
+/* =========================
+   MARK CANCELLED CLASSES (NEW)
+========================= */
+
+function markCancelledClasses() {
+  cancelledClasses.forEach((cancelled) => {
+    document.querySelectorAll("td[data-time]").forEach((cell) => {
+      const row = cell.closest("tr");
+      const dayCell = row.querySelector(".day");
+
+      if (
+        dayCell &&
+        dayCell.textContent.trim() === cancelled.day &&
+        cell.dataset.time === cancelled.time
+      ) {
+        cell.classList.add("cancelled-class");
+
+        const reasonDiv = document.createElement("div");
+        reasonDiv.className = "cancel-reason";
+        reasonDiv.textContent = cancelled.reason || "Cancelled";
+        cell.appendChild(reasonDiv);
+      }
+    });
   });
 }
 
@@ -162,11 +210,11 @@ function updateClassCountdown() {
   const now = new Date();
   let nextClass = null;
 
-  routineDays.forEach(day => {
-    day.classes.forEach(cls => {
+  routineDays.forEach((day) => {
+    day.classes.forEach((cls) => {
       const [start] = cls.time.split("–");
 
-      const dayMap = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
+      const dayMap = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
       let diff = dayMap[day.day] - now.getDay();
       if (diff < 0) diff += 7;
 
@@ -186,7 +234,9 @@ function updateClassCountdown() {
     return;
   }
 
-  box.innerHTML = `📘 Next Class (${nextClass.subject}) in ${formatCountdown(nextClass.date - now)}`;
+  box.innerHTML = `📘 Next Class (${nextClass.subject}) in ${formatCountdown(
+    nextClass.date - now
+  )}`;
   box.classList.remove("hidden");
 }
 
@@ -201,9 +251,9 @@ function updateAssignmentCountdown() {
   const now = new Date();
 
   const next = academicEvents
-    .filter(e => e.type === "assignment")
-    .map(e => ({ ...e, dateObj: parseDateTime(e.date, e.time) }))
-    .filter(e => e.dateObj > now)
+    .filter((e) => e.type === "assignment")
+    .map((e) => ({ ...e, dateObj: parseDateTime(e.date, e.time) }))
+    .filter((e) => e.dateObj > now)
     .sort((a, b) => a.dateObj - b.dateObj)[0];
 
   if (!next) {
@@ -211,8 +261,9 @@ function updateAssignmentCountdown() {
     return;
   }
 
-  box.innerHTML =
-    `📌 Assignment (${next.course}) due in ${formatCountdown(next.dateObj - now)}`;
+  box.innerHTML = `📌 Assignment (${next.course}) due in ${formatCountdown(
+    next.dateObj - now
+  )}`;
   box.classList.remove("hidden");
 }
 
@@ -227,9 +278,9 @@ function updateExamCountdown() {
   const now = new Date();
 
   const next = academicEvents
-    .filter(e => e.type === "exam")
-    .map(e => ({ ...e, dateObj: parseDateTime(e.date, e.time) }))
-    .filter(e => e.dateObj > now)
+    .filter((e) => e.type === "exam")
+    .map((e) => ({ ...e, dateObj: parseDateTime(e.date, e.time) }))
+    .filter((e) => e.dateObj > now)
     .sort((a, b) => a.dateObj - b.dateObj)[0];
 
   if (!next) {
@@ -237,7 +288,8 @@ function updateExamCountdown() {
     return;
   }
 
-  box.innerHTML =
-    `📝 Exam (${next.course}) in ${formatCountdown(next.dateObj - now)}`;
+  box.innerHTML = `📝 Exam (${next.course}) in ${formatCountdown(
+    next.dateObj - now
+  )}`;
   box.classList.remove("hidden");
 }
