@@ -72,6 +72,32 @@ days:
         room: "512"
         code: "DSI"
 
+# Cancelled classes feature - Add classes that are cancelled for specific dates
+cancelled_classes:
+  # Example: Uncomment and edit these when you need to cancel a class
+  # - date: "2026-01-12"
+  #   day: "MON"
+  #   time: "01:15 PM –02:35 PM"
+  #   reason: "Teacher Unavailable"
+  
+  # - date: "2026-01-14"
+  #   day: "TUE"
+  #   time: "08:45 AM –10:05 AM"
+  #   reason: "Holiday"
+
+# academic_events:
+#   - type: "assignment"
+#     course: "Computer Networking"
+#     title: "Assignment 1 Submission"
+#     date: "2026-01-14"
+#     time: "11:59 PM"
+
+#   - type: "exam"
+#     course: "Software Engineering"
+#     title: "Midterm Exam"
+#     date: "2026-01-18"
+#     time: "09:00 AM"
+
 # academic_events:
 #   - type: "assignment"
 #     course: "Computer Networking"
