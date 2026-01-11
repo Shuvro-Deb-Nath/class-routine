@@ -2911,3 +2911,148 @@ footer:hover::before {
     white-space: normal;
   }
 }
+/* =========================
+   CANCELLED CLASS STYLING
+========================= */
+
+/* Cancelled class styling */
+.cancelled-class {
+  background: linear-gradient(135deg, #ffebee 0%, #ef5350 50%, #e53935 100%) !important;
+  border: 3px solid #c62828 !important;
+  position: relative;
+  overflow: visible !important;
+  opacity: 0.7;
+  animation: cancelledPulse 2s ease-in-out infinite;
+}
+
+.cancelled-class::before {
+  content: '❌ CANCELLED';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  font-size: 0.65rem;
+  background: #c62828;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  z-index: 10;
+  animation: blink 1.5s infinite;
+}
+
+.cancelled-class::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cancel-reason {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: #c62828;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+@keyframes cancelledPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 15px rgba(198, 40, 40, 0.5),
+      0 0 30px rgba(198, 40, 40, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 25px rgba(198, 40, 40, 0.8),
+      0 0 50px rgba(198, 40, 40, 0.5);
+  }
+}
+
+.cancelled-class:hover {
+  transform: scale(1.05);
+  opacity: 1;
+  box-shadow: 
+    0 0 30px rgba(198, 40, 40, 1),
+    0 0 60px rgba(198, 40, 40, 0.7);
+}
+
+/* Strong text for original class content */
+.cancelled-class strong {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.cancelled-class small {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+/* =========================
+   FORCE UPCOMING CLASS EFFECT
+========================= */
+
+td.upcoming-class {
+  position: relative !important;
+  overflow: visible !important;
+
+  background: linear-gradient(
+    135deg,
+    #fff3e0 0%,
+    #ffcc80 50%,
+    #ffb74d 100%
+  ) !important;
+
+  border: 3px solid #ff9800 !important;
+  font-weight: bold !important;
+
+  animation: upcomingPulse 1.6s infinite ease-in-out !important;
+}
+
+/* NEXT badge */
+td.upcoming-class::before {
+  content: "⏰ NEXT";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #ff9800;
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 999;
+}
+
+/* Pulse animation */
+@keyframes upcomingPulse {
+  0% {
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(255, 152, 0, 0.9),
+      0 0 40px rgba(255, 152, 0, 0.6);
+    transform: scale(1.04);
+  }
+  100% {
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+    transform: scale(1);
+  }
+}
