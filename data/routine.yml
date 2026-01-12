@@ -75,15 +75,15 @@ days:
 # Cancelled classes feature - Add classes that are cancelled for specific dates
 cancelled_classes:
   # Example: Uncomment and edit these when you need to cancel a class
-   #- date: "2026-01-12"
-     #day: "MON"
-     #time: "01:15 PM –02:35 PM"
-     #reason: "Teacher Unavailable"
-  
-  # - date: "2026-01-14"
-  #   day: "TUE"
-  #   time: "08:45 AM –10:05 AM"
-  #   reason: "Holiday"
+   - date: "2026-01-12"
+     day: "MON"
+     time: "01:15 PM –02:35 PM"
+     reason: "Teacher Unavailable"
+
+   - date: "2026-01-12"
+     day: "MON"
+     time: "01:35 AM –03:55 PM"
+     reason: "Teacher unavailable"
 
 # academic_events:
 #   - type: "assignment"
@@ -110,5 +110,6 @@ cancelled_classes:
 #     title: "Midterm Exam"
 #     date: "2026-01-18"
 #     time: "09:00 AM"
+
 
 
