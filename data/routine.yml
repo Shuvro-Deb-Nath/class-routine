@@ -75,28 +75,15 @@ days:
 # Cancelled classes feature - Add classes that are cancelled for specific dates
 cancelled_classes:
   # Example: Uncomment and edit these when you need to cancel a class
-   - date: "2026-01-12"
-     day: "MON"
-     time: "01:15 PM –02:35 PM"
-     reason: "Teacher Unavailable"
-
-   - date: "2026-01-12"
-     day: "MON"
-     time: "01:35 AM –03:55 PM"
-     reason: "Teacher unavailable"
-
-# academic_events:
-#   - type: "assignment"
-#     course: "Computer Networking"
-#     title: "Assignment 1 Submission"
-#     date: "2026-01-14"
-#     time: "11:59 PM"
-
-#   - type: "exam"
-#     course: "Software Engineering"
-#     title: "Midterm Exam"
-#     date: "2026-01-18"
-#     time: "09:00 AM"
+  - date: "2026-01-12"
+    day: "MON"
+    time: "01:15 PM –02:35 PM"
+    reason: "Teacher Unavailable"
+  
+  # - date: "2026-01-14"
+  #   day: "TUE"
+  #   time: "08:45 AM –10:05 AM"
+  #   reason: "Holiday"
 
 # academic_events:
 #   - type: "assignment"
@@ -111,5 +98,32 @@ cancelled_classes:
 #     date: "2026-01-18"
 #     time: "09:00 AM"
 
+# academic_events:
+#   - type: "assignment"
+#     course: "Computer Networking"
+#     title: "Assignment 1 Submission"
+#     date: "2026-01-14"
+#     time: "11:59 PM"
+
+#   - type: "exam"
+#     course: "Software Engineering"
+#     title: "Midterm Exam"
+#     date: "2026-01-18"
+#     time: "09:00 AM"
 
 
+
+
+# notices:
+#   - title: "Mid-Term Exams Announced"
+#     message: "Mid-term exams will start from 25th March. Check the exam schedule."
+#     type: "urgent"
+#     expires: "2026-03-25"
+
+#   - title: "Assignment Reminder"
+#     message: "Computer Networking assignment submission by Friday."
+#     type: "warning"
+
+#   - title: "Holiday Notice"
+#     message: "Campus will remain closed tomorrow due to maintenance."
+#     type: "info"
