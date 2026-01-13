@@ -114,9 +114,13 @@ function parseDateTime(dateStr, timeStr) {
 }
 
 function formatRemainingTime(mins) {
-  const m = Math.floor(mins);
-  const s = Math.floor((mins - m) * 60);
-  return `${m}m ${s}s`;
+  const totalSeconds = Math.floor(mins * 60);
+
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+
+  return `${h ? h + "h " : ""}${m}m ${s}s`;
 }
 
 function formatCountdown(ms) {
@@ -169,6 +173,15 @@ function checkCurrentClass() {
 
     if (currentMinutes >= startMin && currentMinutes < endMin) {
       cell.classList.add("active-class");
+       // Add LIVE badge if not already present
+if (!cell.querySelector(".live-badge")) {
+  const badge = document.createElement("div");
+  badge.className = "live-badge";
+  badge.innerHTML = "🔴 LIVE";
+  cell.style.position = "relative"; // IMPORTANT
+  cell.appendChild(badge);
+}
+
       row.classList.add("current-row");
 
       const cd = document.createElement("div");
@@ -203,21 +216,33 @@ function checkCurrentClass() {
    🚫 CANCELLED CLASSES
 ========================= */
 function markCancelledClasses() {
+  document.querySelectorAll(".cancelled-badge").forEach(b => b.remove());
+
   cancelledClasses.forEach(c => {
     document.querySelectorAll("td[data-time]").forEach(cell => {
       const row = cell.closest("tr");
       const day = row.querySelector(".day");
+
       if (day && day.textContent.trim() === c.day && cell.dataset.time === c.time) {
         cell.classList.add("cancelled-class");
+        cell.style.position = "relative";
 
-        const reason = document.createElement("div");
-        reason.className = "cancel-reason";
-        reason.textContent = c.reason || "Cancelled";
-        cell.appendChild(reason);
+        const badge = document.createElement("div");
+        badge.className = "cancelled-badge";
+        badge.textContent = "❌ CANCELLED";
+        cell.appendChild(badge);
+
+        if (!cell.querySelector(".cancel-reason")) {
+          const reason = document.createElement("div");
+          reason.className = "cancel-reason";
+          reason.textContent = c.reason || "Teacher Unavailable";
+          cell.appendChild(reason);
+        }
       }
     });
   });
 }
+
 function renderNotices() {
   const board = document.getElementById("noticeBoard");
   if (!board) return;
@@ -342,3 +367,4 @@ if (diffHr <= 48) box.classList.add("exam-danger");
 
   box.classList.remove("hidden");
 }
+
