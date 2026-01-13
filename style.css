@@ -1023,6 +1023,37 @@ body::after {
       inset 0 0 20px rgba(255, 193, 7, 0.25);
   }
 }
+.today-row td.active-class {
+  background: linear-gradient(
+    135deg,
+    #c8f7dc 0%,
+    #69f0ae 50%,
+    #00e676 100%
+  ) !important;
+
+  border: 3px solid #00c853 !important;
+}
+.live-badge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: #e53935;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.85; }
+  100% { transform: scale(1); opacity: 1; }
+}
 
 
 /* Current/Ongoing class - Green pulsing effect */
@@ -1682,48 +1713,30 @@ footer:hover::before {
 ========================= */
 
 /* Cancelled class styling */
-.cancelled-class {
-  background: linear-gradient(135deg, #ffebee 0%, #ef5350 50%, #e53935 100%) !important;
-  border: 3px solid #c62828 !important;
-  position: relative;
-  overflow: visible !important;
-  opacity: 0.7;
-  animation: cancelledPulse 2s ease-in-out infinite;
-}
-
-.cancelled-class::before {
-  content: '❌ CANCELLED';
+.cancelled-badge {
   position: absolute;
   top: 5px;
-  left: 5px;
-  font-size: 0.65rem;
+  left: 60px;
+  right: 60px;
+
   background: #c62828;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: bold;
-  z-index: 10;
-  animation: blink 1.5s infinite;
-}
+  color: #fff;
 
-.cancelled-class::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 10px,
-    rgba(0, 0, 0, 0.1) 10px,
-    rgba(0, 0, 0, 0.1) 20px
-  );
-  pointer-events: none;
-  z-index: 1;
-}
+  font-size: 10px;          /* 🔹 smaller text */
+  font-weight: 600;
+  padding: 1px 5px;         /* 🔹 smaller badge */
+  border-radius: 10px;
 
+  z-index: 50;
+
+  animation: cancelBlink 1.4s ease-in-out 5; /* 🔴 blink */
+}
+@keyframes cancelBlink {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+ 
 .cancel-reason {
   position: absolute;
   bottom: 5px;
@@ -1860,11 +1873,20 @@ td.upcoming-class::before {
   margin-top: 6px;
   font-size: 12px;
   font-weight: 600;
+
   color: #065f46;
   background: #d1fae5;
+
   padding: 3px 10px;
   border-radius: 14px;
   display: inline-block;
+
+  animation: doneBlink 3.2s ease-in-out 5; /* ✅ blink 5 times */
+}
+@keyframes doneBlink {
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { opacity: 0.6; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
 }
 /* =========================
    ⏳ COUNTDOWN STACK
@@ -1909,5 +1931,6 @@ td.upcoming-class::before {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
   transform: scale(1.05);
 }
+
 
 
