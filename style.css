@@ -1716,8 +1716,8 @@ footer:hover::before {
 .cancelled-badge {
   position: absolute;
   top: 5px;
-  left: 60px;
-  right: 60px;
+  left: 80px;
+  right: 80px;
 
   background: #c62828;
   color: #fff;
@@ -1881,7 +1881,7 @@ td.upcoming-class::before {
   border-radius: 14px;
   display: inline-block;
 
-  animation: doneBlink 3.2s ease-in-out 5; /* ✅ blink 5 times */
+  /* ✅ blink 5 times */
 }
 @keyframes doneBlink {
   0%   { opacity: 1; transform: scale(1); }
@@ -1931,6 +1931,7 @@ td.upcoming-class::before {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
   transform: scale(1.05);
 }
+
 
 
 
