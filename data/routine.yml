@@ -128,7 +128,7 @@ cancelled_classes:
 
 
 notices:
-  - title: "Home Worl"
+  - title: "Home WorK"
     message: "COMPUTER NETWORKING : Memories 20 protocol and its port number"
     type: "urgent"
     expires: "2026-01-16"
@@ -140,6 +140,7 @@ notices:
 #   - title: "Holiday Notice"
 #     message: "Campus will remain closed tomorrow due to maintenance."
 #     type: "info"
+
 
 
 
