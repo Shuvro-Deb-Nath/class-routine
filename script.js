@@ -135,6 +135,17 @@ function formatCountdown(ms) {
 /* =========================
    🟢 LIVE / UPCOMING / DONE
 ========================= */
+
+function getDateForDay(dayCode) {
+  const map = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
+  const now = new Date();
+  const diff = map[dayCode] - now.getDay();
+  const d = new Date(now);
+  d.setDate(now.getDate() + diff);
+  return d;
+}
+
+
 function checkCurrentClass() {
   const now = new Date();
   const currentMinutes =
@@ -162,7 +173,7 @@ function checkCurrentClass() {
 
     const row = cell.closest("tr");
     const dayCell = row.querySelector(".day");
-    if (!dayCell || dayCell.textContent.trim() !== today) return;
+    if (!dayCell) return;
 
     const [start, end] = cell.dataset.time.split("–");
     const s = parse12hTime(start);
@@ -193,15 +204,22 @@ if (!cell.querySelector(".live-badge")) {
       nextStart = startMin;
       nextCell = cell;
     }
-    else if (currentMinutes >= endMin) {
-      cell.classList.add("done-class");
+    else {
+  const classDate = getDateForDay(dayCell.textContent.trim());
+  classDate.setHours(e.h, e.m, 0, 0);
 
+  if (classDate < now) {
+    cell.classList.add("done-class");
+
+    if (!cell.querySelector(".done-label")) {
       const done = document.createElement("div");
       done.className = "done-label";
       done.textContent = "✔ Class Taken";
       cell.appendChild(done);
     }
-  });
+  }
+}
+
 
   if (nextCell) {
     nextCell.classList.add("upcoming-class");
@@ -367,4 +385,5 @@ if (diffHr <= 48) box.classList.add("exam-danger");
 
   box.classList.remove("hidden");
 }
+
 
