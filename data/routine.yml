@@ -89,6 +89,10 @@ cancelled_classes:
     day: "TUE"
     time: "01:15 PM –02:35 PM"
     reason: "Teacher Unavailable"
+ - date: "2026-01-13"
+    day: "THU"
+    time: "02:35 PM –03:55 PM"
+    reason: "Teacher Unavailable"
   # - date: "2026-01-14"
   #   day: "TUE"
   #   time: "08:45 AM –10:05 AM"
@@ -124,10 +128,10 @@ cancelled_classes:
 
 
 # notices:
-#   - title: "Mid-Term Exams Announced"
-#     message: "Mid-term exams will start from 25th March. Check the exam schedule."
-#     type: "urgent"
-#     expires: "2026-03-25"
+  - title: "Home Worl"
+    message: "COMPUTER NETWORKING : Memories 20 protocol and its port number"
+    type: "urgent"
+    expires: "2026-01-16"
 
 #   - title: "Assignment Reminder"
 #     message: "Computer Networking assignment submission by Friday."
@@ -136,4 +140,5 @@ cancelled_classes:
 #   - title: "Holiday Notice"
 #     message: "Campus will remain closed tomorrow due to maintenance."
 #     type: "info"
+
 
