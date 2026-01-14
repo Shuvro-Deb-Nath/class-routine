@@ -1067,7 +1067,7 @@ body::after {
   overflow: visible !important;
 }
 
-.active-class::before {
+/* .active-class::before {
   content: '🔴 LIVE';
   position: absolute;
   top: 5px;
@@ -1080,6 +1080,9 @@ body::after {
   font-weight: bold;
   animation: blink 1s infinite;
   z-index: 10;
+} */
+.live-badge {
+  animation: pulse 1.2s infinite;
 }
 
 .active-class::after {
@@ -1713,24 +1716,36 @@ footer:hover::before {
 ========================= */
 
 /* Cancelled class styling */
+.cancelled-class {
+  /* same dulling logic as done */
+  filter: saturate(0.6) brightness(0.9);
+
+  /* soft red overlay */
+  box-shadow: inset 0 0 0 9999px rgba(239, 68, 68, 0.18);
+
+  border: 2px dashed rgba(185, 28, 28, 0.5) !important;
+  opacity: 0.95;
+}
+.cancelled-class {
+  filter: saturate(0.7) brightness(0.92);
+}
+
 .cancelled-badge {
   position: absolute;
-  top: 5px;
-  left: 80px;
-  right: 80px;
+  top: 6px;
+  right: 6px;
 
-  background: #c62828;
+  background: rgba(220, 38, 38, 0.85);
   color: #fff;
 
-  font-size: 10px;          /* 🔹 smaller text */
+  font-size: 11px;
   font-weight: 600;
-  padding: 1px 5px;         /* 🔹 smaller badge */
-  border-radius: 10px;
+  padding: 3px 10px;
+  border-radius: 999px;
 
-  z-index: 50;
-
-  animation: cancelBlink 1.4s ease-in-out 5; /* 🔴 blink */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
+
 @keyframes cancelBlink {
   0%   { opacity: 1; }
   50%  { opacity: 0.3; }
@@ -1773,10 +1788,12 @@ footer:hover::before {
 }
 
 /* Strong text for original class content */
-.cancelled-class strong {
-  text-decoration: line-through;
+.cancelled-class strong,
+.cancelled-class small {
   opacity: 0.6;
+  text-decoration: none;
 }
+
 
 .cancelled-class small {
   text-decoration: line-through;
@@ -1845,55 +1862,59 @@ td.upcoming-class::before {
 .upcoming-class:hover .upcoming-countdown {
   animation: countdownGlow 1.5s infinite;
 }
+
 /* =========================
-   ✅ CLASS DONE (NEUTRAL)
+   ✅ CLASS DONE (SUBTLE / DULL)
 ========================= */
 .done-class {
-  background: linear-gradient(
-    135deg,
-    #f2f4f7 0%,
-    #d9dde3 50%,
-    #c0c6cf 100%
-  ) !important;
+  /* 🔹 keep original background */
+  filter: saturate(0.65) brightness(0.92);
 
-  border: 2px dashed #9aa3af !important;
-  color: #374151;
-  opacity: 0.9;
+  /* 🔹 soft overlay */
+  box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.25);
+
+  border: 2px dashed rgba(0, 0, 0, 0.25) !important;
+  opacity: 0.95;
 }
+
 
 /* Fade original course info */
 .done-class strong,
 .done-class small {
-  opacity: 0.55;
-  text-decoration: line-through;
+  opacity: 0.65;
+  text-decoration: none;
 }
+
+
 
 /* ✔ Class Taken badge */
 .done-label {
   margin-top: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
 
   color: #065f46;
-  background: #d1fae5;
+  background: rgba(209, 250, 229, 0.85);
 
   padding: 3px 10px;
-  border-radius: 14px;
+  border-radius: 999px;
   display: inline-block;
 
-  /* ✅ blink 5 times */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.done-class:hover {
+  filter: saturate(0.75) brightness(0.98);
+}
+
+.done-class:hover .done-label {
+  animation: doneBlink 1.5s infinite;
 }
 @keyframes doneBlink {
   0%   { opacity: 1; transform: scale(1); }
   50%  { opacity: 0.6; transform: scale(0.96); }
   100% { opacity: 1; transform: scale(1); }
 }
-/* =========================
-   ⏳ COUNTDOWN STACK
-========================= */
-/* =========================
-   ⏳ COUNTDOWN STACK (TOP)
-========================= */
+
 /* =========================
    ⏳ COUNTDOWN STACK (ABOVE TABLE)
 ========================= */
@@ -1931,6 +1952,7 @@ td.upcoming-class::before {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
   transform: scale(1.05);
 }
+
 
 
 
