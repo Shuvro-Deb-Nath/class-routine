@@ -219,7 +219,7 @@ if (!cell.querySelector(".live-badge")) {
     }
   }
 }
-
+ });
 
   if (nextCell) {
     nextCell.classList.add("upcoming-class");
@@ -385,5 +385,6 @@ if (diffHr <= 48) box.classList.add("exam-danger");
 
   box.classList.remove("hidden");
 }
+
 
 
