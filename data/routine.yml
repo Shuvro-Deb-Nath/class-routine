@@ -89,7 +89,7 @@ cancelled_classes:
     day: "TUE"
     time: "01:15 PM –02:35 PM"
     reason: "Teacher Unavailable"
- - date: "2026-01-13"
+ - date: "2026-01-15"
     day: "THU"
     time: "02:35 PM –03:55 PM"
     reason: "Teacher Unavailable"
@@ -140,5 +140,6 @@ cancelled_classes:
 #   - title: "Holiday Notice"
 #     message: "Campus will remain closed tomorrow due to maintenance."
 #     type: "info"
+
 
 
