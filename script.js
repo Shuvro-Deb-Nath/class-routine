@@ -19,10 +19,7 @@ let notices = [];
    FETCH DATA
 ========================= */
 fetch("/data/routine.yml")
-  .then(res => {
-    if (!res.ok) throw new Error("Failed to load routine.yml");
-    return res.text();
-  })
+  .then(res => res.text())
   .then(text => {
     const data = jsyaml.load(text);
 
@@ -38,10 +35,6 @@ fetch("/data/routine.yml")
 
     runAllTimers();
     setInterval(runAllTimers, 1000);
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Error loading routine data.");
   });
 
 /* =========================
@@ -151,8 +144,7 @@ function checkCurrentClass() {
     if (cell.classList.contains("cancelled-class")) return;
 
     const row = cell.closest("tr");
-    const dayCell = row.querySelector(".day");
-    const cellDay = dayCell.textContent.trim();
+    const cellDay = row.querySelector(".day").textContent.trim();
 
     const [start, end] = cell.dataset.time.split("–");
     const s = parse12hTime(start);
@@ -161,7 +153,7 @@ function checkCurrentClass() {
     const startMin = s.h * 60 + s.m;
     const endMin = e.h * 60 + e.m;
 
-    /* LIVE */
+    /* 🔴 LIVE */
     if (cellDay === today && currentMinutes >= startMin && currentMinutes < endMin) {
       cell.classList.add("active-class");
       row.classList.add("current-row");
@@ -178,19 +170,7 @@ function checkCurrentClass() {
       return;
     }
 
-    /* NEXT (today only) */
-    if (cellDay === today) {
-      const classDate = new Date(now);
-      classDate.setHours(s.h, s.m, 0, 0);
-
-      if (classDate > now && (!nextStart || classDate < nextStart)) {
-        nextStart = classDate;
-        nextCell = cell;
-      }
-      return;
-    }
-
-    /* DONE */
+    /* ✅ DONE (today + past days) */
     const endDate = getDateForDay(cellDay);
     endDate.setHours(e.h, e.m, 0, 0);
 
@@ -201,6 +181,18 @@ function checkCurrentClass() {
       done.className = "done-label";
       done.textContent = "✔ Class Taken";
       cell.appendChild(done);
+      return;
+    }
+
+    /* ⏰ NEXT (today only, future) */
+    if (cellDay === today) {
+      const classDate = new Date(now);
+      classDate.setHours(s.h, s.m, 0, 0);
+
+      if (classDate > now && (!nextStart || classDate < nextStart)) {
+        nextStart = classDate;
+        nextCell = cell;
+      }
     }
   });
 
@@ -266,7 +258,7 @@ function renderNotices() {
 }
 
 /* =========================
-   ⏳ NEXT CLASS (GLOBAL)
+   ⏳ GLOBAL NEXT CLASS
 ========================= */
 function updateClassCountdown() {
   const box = document.getElementById("classCountdown");
