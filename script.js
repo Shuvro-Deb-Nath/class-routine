@@ -15,7 +15,6 @@ let academicEvents = [];
 let cancelledClasses = [];
 let notices = [];
 
-
 /* =========================
    FETCH DATA
 ========================= */
@@ -36,7 +35,6 @@ fetch("/data/routine.yml")
     highlightToday();
     markCancelledClasses();
     renderNotices();
-
 
     runAllTimers();
     setInterval(runAllTimers, 1000);
@@ -106,21 +104,21 @@ function parse12hTime(str) {
   return { h, m };
 }
 
-function parseDateTime(dateStr, timeStr) {
-  const { h, m } = parse12hTime(timeStr);
-  const d = new Date(dateStr);
-  d.setHours(h, m, 0, 0);
+function getDateForDay(dayCode) {
+  const map = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
+  const now = new Date();
+  const diff = map[dayCode] - now.getDay();
+  const d = new Date(now);
+  d.setDate(now.getDate() + diff);
   return d;
 }
 
 function formatRemainingTime(mins) {
-  const totalSeconds = Math.floor(mins * 60);
-
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
-
-  return `${h ? h + "h " : ""}${m}m ${s}s`;
+  const s = Math.floor(mins * 60);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return `${h ? h + "h " : ""}${m}m ${sec}s`;
 }
 
 function formatCountdown(ms) {
@@ -133,47 +131,28 @@ function formatCountdown(ms) {
 }
 
 /* =========================
-   🟢 LIVE / UPCOMING / DONE
+   🟢 LIVE / NEXT / DONE
 ========================= */
-
-function getDateForDay(dayCode) {
-  const map = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
-  const now = new Date();
-  const diff = map[dayCode] - now.getDay();
-  const d = new Date(now);
-  d.setDate(now.getDate() + diff);
-  return d;
-}
-
-
 function checkCurrentClass() {
   const now = new Date();
-  const currentMinutes =
-    now.getHours() * 60 +
-    now.getMinutes() +
-    now.getSeconds() / 60;
-
-  const today = now
-    .toLocaleDateString("en-US", { weekday: "short" })
-    .toUpperCase();
+  const today = now.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
 
   let nextCell = null;
-  let nextStart = Infinity;
+  let nextStart = null;
 
-  document.querySelectorAll("tr").forEach(r =>
-    r.classList.remove("current-row")
-  );
+  document.querySelectorAll("tr").forEach(r => r.classList.remove("current-row"));
 
   document.querySelectorAll("td[data-time]").forEach(cell => {
     cell.classList.remove("active-class", "upcoming-class", "done-class");
-    cell.querySelectorAll(".live-countdown,.upcoming-countdown,.done-label")
+    cell.querySelectorAll(".live-badge,.live-countdown,.upcoming-countdown,.done-label")
       .forEach(e => e.remove());
 
     if (cell.classList.contains("cancelled-class")) return;
 
     const row = cell.closest("tr");
     const dayCell = row.querySelector(".day");
-    if (!dayCell) return;
+    const cellDay = dayCell.textContent.trim();
 
     const [start, end] = cell.dataset.time.split("–");
     const s = parse12hTime(start);
@@ -182,62 +161,54 @@ function checkCurrentClass() {
     const startMin = s.h * 60 + s.m;
     const endMin = e.h * 60 + e.m;
 
-    const cellDay = dayCell.textContent.trim();
+    /* LIVE */
+    if (cellDay === today && currentMinutes >= startMin && currentMinutes < endMin) {
+      cell.classList.add("active-class");
+      row.classList.add("current-row");
 
-if (
-  cellDay === today &&
-  currentMinutes >= startMin &&
-  currentMinutes < endMin
-) {
-  cell.classList.add("active-class");
-  row.classList.add("current-row");
+      const badge = document.createElement("div");
+      badge.className = "live-badge";
+      badge.textContent = "🔴 LIVE";
+      cell.appendChild(badge);
 
-  if (!cell.querySelector(".live-badge")) {
-    const badge = document.createElement("div");
-    badge.className = "live-badge";
-    badge.innerHTML = "🔴 LIVE";
-    cell.appendChild(badge);
-  }
+      const cd = document.createElement("div");
+      cd.className = "live-countdown";
+      cd.textContent = `LIVE • ${formatRemainingTime(endMin - currentMinutes)} left`;
+      cell.appendChild(cd);
+      return;
+    }
 
-  const cd = document.createElement("div");
-  cd.className = "live-countdown";
-  cd.textContent = `LIVE • ${formatRemainingTime(endMin - currentMinutes)} left`;
-  cell.appendChild(cd);
-}
+    /* NEXT (today only) */
+    if (cellDay === today) {
+      const classDate = new Date(now);
+      classDate.setHours(s.h, s.m, 0, 0);
 
-    else if (dayCell.textContent.trim() === today) {
-  const classDate = getDateForDay(dayCell.textContent.trim());
-  classDate.setHours(s.h, s.m, 0, 0);
+      if (classDate > now && (!nextStart || classDate < nextStart)) {
+        nextStart = classDate;
+        nextCell = cell;
+      }
+      return;
+    }
 
-  if (classDate > now && classDate < nextStart) {
-    nextStart = classDate;
-    nextCell = cell;
-  }
-}
+    /* DONE */
+    const endDate = getDateForDay(cellDay);
+    endDate.setHours(e.h, e.m, 0, 0);
 
-    else {
-  const classDate = getDateForDay(dayCell.textContent.trim());
-  classDate.setHours(e.h, e.m, 0, 0);
+    if (endDate < now) {
+      cell.classList.add("done-class");
 
-  if (classDate < now) {
-    cell.classList.add("done-class");
-
-    if (!cell.querySelector(".done-label")) {
       const done = document.createElement("div");
       done.className = "done-label";
       done.textContent = "✔ Class Taken";
       cell.appendChild(done);
     }
-  }
-}
- });
+  });
 
-  if (nextCell) {
+  if (nextCell && nextStart) {
     nextCell.classList.add("upcoming-class");
     const cd = document.createElement("div");
     cd.className = "upcoming-countdown";
-   const diffMin = (nextStart - now) / 60000;
-cd.textContent = `Starts in ${formatRemainingTime(diffMin)}`;
+    cd.textContent = `Starts in ${formatRemainingTime((nextStart - now) / 60000)}`;
     nextCell.appendChild(cd);
   }
 }
@@ -246,33 +217,33 @@ cd.textContent = `Starts in ${formatRemainingTime(diffMin)}`;
    🚫 CANCELLED CLASSES
 ========================= */
 function markCancelledClasses() {
-  document.querySelectorAll(".cancelled-badge").forEach(b => b.remove());
+  document.querySelectorAll(".cancelled-badge,.cancel-reason").forEach(e => e.remove());
 
   cancelledClasses.forEach(c => {
     document.querySelectorAll("td[data-time]").forEach(cell => {
       const row = cell.closest("tr");
       const day = row.querySelector(".day");
 
-      if (day && day.textContent.trim() === c.day && cell.dataset.time === c.time) {
+      if (day.textContent.trim() === c.day && cell.dataset.time === c.time) {
         cell.classList.add("cancelled-class");
-        cell.style.position = "relative";
 
         const badge = document.createElement("div");
         badge.className = "cancelled-badge";
         badge.textContent = "❌ CANCELLED";
         cell.appendChild(badge);
 
-        if (!cell.querySelector(".cancel-reason")) {
-          const reason = document.createElement("div");
-          reason.className = "cancel-reason";
-          reason.textContent = c.reason || "Teacher Unavailable";
-          cell.appendChild(reason);
-        }
+        const reason = document.createElement("div");
+        reason.className = "cancel-reason";
+        reason.textContent = c.reason || "Teacher Unavailable";
+        cell.appendChild(reason);
       }
     });
   });
 }
 
+/* =========================
+   📢 NOTICES
+========================= */
 function renderNotices() {
   const board = document.getElementById("noticeBoard");
   if (!board) return;
@@ -280,25 +251,22 @@ function renderNotices() {
   board.innerHTML = "";
   const now = new Date();
 
-  notices.forEach((n, i) => {
+  notices.forEach(n => {
     if (n.expires && new Date(n.expires) < now) return;
 
     const div = document.createElement("div");
     div.className = `notice ${n.type || "info"}`;
-
     div.innerHTML = `
       <span class="close" onclick="this.parentElement.remove()">✖</span>
       <h4>${n.title}</h4>
       <p>${n.message}</p>
     `;
-
     board.appendChild(div);
   });
 }
 
 /* =========================
-   ⏳ NEXT CLASS COUNTDOWN
-   < 15 min → ORANGE + underline
+   ⏳ NEXT CLASS (GLOBAL)
 ========================= */
 function updateClassCountdown() {
   const box = document.getElementById("classCountdown");
@@ -310,13 +278,8 @@ function updateClassCountdown() {
   routineDays.forEach(day => {
     day.classes.forEach(cls => {
       const [start] = cls.time.split("–");
-      const map = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
-      let diff = map[day.day] - now.getDay();
-      if (diff < 0) diff += 7;
-
-      const d = new Date(now);
+      const d = getDateForDay(day.day);
       const t = parse12hTime(start);
-      d.setDate(now.getDate() + diff);
       d.setHours(t.h, t.m, 0, 0);
 
       if (d > now && (!next || d < next.date)) {
@@ -327,20 +290,13 @@ function updateClassCountdown() {
 
   if (!next) return box.classList.add("hidden");
 
-  const diffMs = next.date - now;
-  const diffMin = diffMs / 60000;
-
-  box.textContent = `📘 Next Class (${next.subject}) in ${formatCountdown(diffMs)}`;
+  box.textContent = `📘 Next Class (${next.subject}) in ${formatCountdown(next.date - now)}`;
   box.className = "next-class class-countdown";
-
-  if (diffMin <= 15) box.classList.add("countdown-warning");
-
   box.classList.remove("hidden");
 }
 
 /* =========================
    📌 ASSIGNMENT COUNTDOWN
-   <24h ORANGE | <6h RED
 ========================= */
 function updateAssignmentCountdown() {
   const box = document.getElementById("assignmentCountdown");
@@ -349,28 +305,19 @@ function updateAssignmentCountdown() {
   const now = new Date();
   const next = academicEvents
     .filter(e => e.type === "assignment")
-    .map(e => ({ ...e, d: parseDateTime(e.date, e.time) }))
+    .map(e => ({ ...e, d: new Date(`${e.date} ${e.time}`) }))
     .filter(e => e.d > now)
     .sort((a, b) => a.d - b.d)[0];
 
   if (!next) return box.classList.add("hidden");
 
-  const diffMs = next.d - now;
-  const diffHr = diffMs / 3600000;
-
-  box.textContent = `📌 Assignment (${next.course}) in ${formatCountdown(diffMs)}`;
- box.className = "next-class assignment-countdown";
-
-if (diffHr <= 24) box.classList.add("assignment-warning");
-if (diffHr <= 6) box.classList.add("countdown-danger");
-
-
+  box.textContent = `📌 Assignment (${next.course}) in ${formatCountdown(next.d - now)}`;
+  box.className = "next-class assignment-countdown";
   box.classList.remove("hidden");
 }
 
 /* =========================
    📝 EXAM COUNTDOWN
-   <7d ORANGE | <48h RED
 ========================= */
 function updateExamCountdown() {
   const box = document.getElementById("examCountdown");
@@ -379,26 +326,13 @@ function updateExamCountdown() {
   const now = new Date();
   const next = academicEvents
     .filter(e => e.type === "exam")
-    .map(e => ({ ...e, d: parseDateTime(e.date, e.time) }))
+    .map(e => ({ ...e, d: new Date(`${e.date} ${e.time}`) }))
     .filter(e => e.d > now)
     .sort((a, b) => a.d - b.d)[0];
 
   if (!next) return box.classList.add("hidden");
 
-  const diffMs = next.d - now;
-  const diffHr = diffMs / 3600000;
-
-  box.textContent = `📝 Exam (${next.course}) in ${formatCountdown(diffMs)}`;
+  box.textContent = `📝 Exam (${next.course}) in ${formatCountdown(next.d - now)}`;
   box.className = "next-class exam-countdown";
-
-if (diffHr <= 168) box.classList.add("exam-warning");
-if (diffHr <= 48) box.classList.add("exam-danger");
-
-
   box.classList.remove("hidden");
 }
-
-
-
-
-
