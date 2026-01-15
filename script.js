@@ -182,24 +182,29 @@ function checkCurrentClass() {
     const startMin = s.h * 60 + s.m;
     const endMin = e.h * 60 + e.m;
 
-    if (currentMinutes >= startMin && currentMinutes < endMin) {
-      cell.classList.add("active-class");
-       // Add LIVE badge if not already present
-if (!cell.querySelector(".live-badge")) {
-  const badge = document.createElement("div");
-  badge.className = "live-badge";
-  badge.innerHTML = "🔴 LIVE";
-  cell.style.position = "relative"; // IMPORTANT
-  cell.appendChild(badge);
+    const cellDay = dayCell.textContent.trim();
+
+if (
+  cellDay === today &&
+  currentMinutes >= startMin &&
+  currentMinutes < endMin
+) {
+  cell.classList.add("active-class");
+  row.classList.add("current-row");
+
+  if (!cell.querySelector(".live-badge")) {
+    const badge = document.createElement("div");
+    badge.className = "live-badge";
+    badge.innerHTML = "🔴 LIVE";
+    cell.appendChild(badge);
+  }
+
+  const cd = document.createElement("div");
+  cd.className = "live-countdown";
+  cd.textContent = `LIVE • ${formatRemainingTime(endMin - currentMinutes)} left`;
+  cell.appendChild(cd);
 }
 
-      row.classList.add("current-row");
-
-      const cd = document.createElement("div");
-      cd.className = "live-countdown";
-      cd.textContent = `LIVE • ${formatRemainingTime(endMin - currentMinutes)} left`;
-      cell.appendChild(cd);
-    }
     else if (dayCell.textContent.trim() === today) {
   const classDate = getDateForDay(dayCell.textContent.trim());
   classDate.setHours(s.h, s.m, 0, 0);
@@ -392,6 +397,7 @@ if (diffHr <= 48) box.classList.add("exam-danger");
 
   box.classList.remove("hidden");
 }
+
 
 
 
