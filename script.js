@@ -200,10 +200,16 @@ if (!cell.querySelector(".live-badge")) {
       cd.textContent = `LIVE • ${formatRemainingTime(endMin - currentMinutes)} left`;
       cell.appendChild(cd);
     }
-    else if (currentMinutes < startMin && startMin < nextStart) {
-      nextStart = startMin;
-      nextCell = cell;
-    }
+    else if (dayCell.textContent.trim() === today) {
+  const classDate = getDateForDay(dayCell.textContent.trim());
+  classDate.setHours(s.h, s.m, 0, 0);
+
+  if (classDate > now && classDate < nextStart) {
+    nextStart = classDate;
+    nextCell = cell;
+  }
+}
+
     else {
   const classDate = getDateForDay(dayCell.textContent.trim());
   classDate.setHours(e.h, e.m, 0, 0);
@@ -225,7 +231,8 @@ if (!cell.querySelector(".live-badge")) {
     nextCell.classList.add("upcoming-class");
     const cd = document.createElement("div");
     cd.className = "upcoming-countdown";
-    cd.textContent = `Starts in ${formatRemainingTime(nextStart - currentMinutes)}`;
+   const diffMin = (nextStart - now) / 60000;
+cd.textContent = `Starts in ${formatRemainingTime(diffMin)}`;
     nextCell.appendChild(cd);
   }
 }
@@ -385,6 +392,7 @@ if (diffHr <= 48) box.classList.add("exam-danger");
 
   box.classList.remove("hidden");
 }
+
 
 
 
