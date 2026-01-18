@@ -2,12 +2,10 @@
   box-sizing: border-box;
 }
 
-/* Cursor trail effect */
 body {
   cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="%232196f3" opacity="0.6"/></svg>'), auto;
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 12px;
   height: 12px;
@@ -28,8 +26,6 @@ body {
   background: linear-gradient(180deg, #90caf9 0%, #42a5f5 100%);
   box-shadow: 0 0 20px rgba(33, 150, 243, 1);
 }
-
-
 
 body {
   margin: 0;
@@ -59,8 +55,6 @@ body::before {
   z-index: 0;
 }
 
-
-
 body::after {
   content: '';
   position: fixed;
@@ -78,22 +72,6 @@ body::after {
   pointer-events: none;
   z-index: 0;
   animation: patternSlide 20s linear infinite;
-}
-
-/* Floating stars in background */
-@keyframes floatingStar1 {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.3; }
-  50% { transform: translate(100px, -100px) rotate(180deg); opacity: 0.8; }
-}
-
-@keyframes floatingStar2 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-  50% { transform: translate(-80px, 120px) scale(1.5); opacity: 0.9; }
-}
-
-@keyframes floatingStar3 {
-  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.2; }
-  50% { transform: translate(150px, 80px) rotate(360deg) scale(1.3); opacity: 0.7; }
 }
 
 @keyframes patternSlide {
@@ -124,7 +102,6 @@ body::after {
   }
 }
 
-/* HEADER */
 .hero {
   background: linear-gradient(135deg, #0d47a1 0%, #1976d2 25%, #2196f3 50%, #42a5f5 75%, #64b5f6 100%);
   color: white;
@@ -194,7 +171,6 @@ body::after {
   100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
-/* Main row */
 .hero-top {
   display: flex;
   align-items: center;
@@ -203,7 +179,6 @@ body::after {
   z-index: 1;
 }
 
-/* Left logo */
 .logo {
   height: 80px;
   transition: transform 0.3s ease, filter 0.3s ease;
@@ -238,7 +213,6 @@ body::after {
   100% { transform: rotate(360deg); }
 }
 
-/* Right banner */
 .banner {
   height: 150px;
   transition: transform 0.3s ease, filter 0.3s ease;
@@ -336,7 +310,6 @@ body::after {
   animation: floatIcons 0.8s ease-in-out infinite;
 }
 
-/* Perfectly centered title */
 .title {
   position: absolute;
   left: 50%;
@@ -383,7 +356,6 @@ body::after {
   letter-spacing: 4px;
 }
 
-/* Subtitle */
 .effective {
   margin-top: 0.5rem;
   text-align: center;
@@ -443,13 +415,9 @@ body::after {
   padding-left: 25px;
 }
 
-
-/* TABLE */
 .table-container {
-  margin-top: 0;        /* Removes external space above the div */
-  padding-top: 0;       /* Removes internal space at the top of the div */
-  
-  /* Keep your other properties */
+  margin-top: 0;
+  padding-top: 0;
   padding-right: 1rem;
   padding-bottom: 1rem;
   padding-left: 1rem;
@@ -469,48 +437,6 @@ body::after {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.routine-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: rgba(255, 255, 255, 0.95);
-  min-width: 900px;
-  border: #000004 2px solid;
-  box-shadow: 
-    0 10px 40px rgba(13, 71, 161, 0.3),
-    0 0 30px rgba(33, 150, 243, 0.2);
-  border-radius: 8px;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-  position: relative;
-  animation: tableEntrance 1s ease-out;
-}
-
-@keyframes tableEntrance {
-  0% {
-    opacity: 0;
-    transform: rotateX(-15deg) scale(0.9);
-  }
-  100% {
-    opacity: 1;
-    transform: rotateX(0deg) scale(1);
-  }
-}
-
-.routine-table::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, #2196f3, #64b5f6, #2196f3, #1976d2);
-  background-size: 300% 300%;
-  border-radius: 8px;
-  z-index: -1;
-  animation: borderGlow 3s ease infinite;
-  opacity: 0.5;
 }
 
 .routine-table {
@@ -599,55 +525,6 @@ body::after {
     transform: scale(1.2) rotate(270deg);
     filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1)) hue-rotate(270deg);
   }
-}
-
-@keyframes borderGlow {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.routine-table th {
-  background: linear-gradient(135deg, #1976d2 0%, #2196f3 50%, #42a5f5 100%);
-  padding: 0.9rem;
-  border: 1px solid #dcdcdc;
-  font-weight: 600;
-  border: #000004 2px solid;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.routine-table th::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-}
-
-.routine-table th::after {
-  content: '⭐';
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  font-size: 0.8rem;
-  opacity: 0;
-  transform: scale(0) rotate(0deg);
-  transition: all 0.4s ease;
-}
-
-.routine-table th:hover::before {
-  left: 100%;
-}
-
-.routine-table th:hover::after {
-  opacity: 1;
-  transform: scale(1) rotate(360deg);
 }
 
 .routine-table th {
@@ -747,7 +624,6 @@ body::after {
   z-index: 10;
 }
 
-/* Magical particle effect on hover */
 .routine-table td:active {
   animation: magicBurst 0.5s ease-out;
 }
@@ -770,7 +646,6 @@ body::after {
   }
 }
 
-/* Day column */
 .day {
   font-weight: bold;
   background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
@@ -816,14 +691,13 @@ body::after {
   box-shadow: 5px 0 15px rgba(33, 150, 243, 0.3);
 }
 
-/* Subject colors */
 .TLS { 
   background: linear-gradient(135deg, #fffb00 0%, #ffed4e 50%, #fff176 100%);
   transition: all 0.3s ease;
   position: relative;
 }
 .TLS::before {
-  content: '📐';
+  content: '📚';
   position: absolute;
   top: 5px;
   left: 5px;
@@ -883,21 +757,12 @@ body::after {
   100% { transform: scale(1.3) rotate(360deg); }
 }
 
-/* =========================
-   📘 COURSE: DMA (Indigo)
-========================= */
 .DMA {
-  background: linear-gradient(
-    135deg,
-    #4338ca 0%,   /* deep indigo */
-    #6366f1 50%,
-    #a5b4fc 100%
-  );
+  background: linear-gradient(135deg, #4338ca 0%, #6366f1 50%, #a5b4fc 100%);
   transition: all 0.3s ease;
   position: relative;
 }
 
-/* Icon */
 .DMA::before {
   content: '📘';
   position: absolute;
@@ -908,14 +773,13 @@ body::after {
   transition: all 0.3s ease;
 }
 
-/* Hover */
+/* ========================================
+   CONTINUATION OF STYLE.CSS
+   Add this after the previous part
+======================================== */
+
 .DMA:hover {
-  background: linear-gradient(
-    135deg,
-    #a5b4fc 0%,
-    #6366f1 50%,
-    #4338ca 100%
-  );
+  background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 50%, #4338ca 100%);
   box-shadow:
     0 0 20px rgba(99, 102, 241, 0.55),
     0 0 45px rgba(99, 102, 241, 0.25),
@@ -923,14 +787,12 @@ body::after {
   transform: perspective(500px) rotateX(4deg) rotateY(-4deg) scale(1.04);
 }
 
-/* Icon animation */
 .DMA:hover::before {
   opacity: 0.85;
   transform: scale(1.25);
   animation: bookFloat 1.2s ease-in-out infinite;
 }
 
-/* 📘 Floating book effect */
 @keyframes bookFloat {
   0%, 100% {
     transform: scale(1.25) translateY(0);
@@ -940,19 +802,13 @@ body::after {
   }
 }
 
-
-@keyframes globeSpin {
-  0% { transform: scale(1.3) rotateY(0deg); }
-  100% { transform: scale(1.3) rotateY(360deg); }
-}
-
 .TZW { 
   background: linear-gradient(135deg, #d000ff 0%, #e056fd 50%, #f0a3ff 100%);
   transition: all 0.3s ease;
   position: relative;
 }
 .TZW::before {
-  content: '🔒';
+  content: '🔐';
   position: absolute;
   top: 5px;
   left: 5px;
@@ -979,14 +835,8 @@ body::after {
   50% { transform: scale(1.3) rotate(5deg); }
 }
 
-/* Today row - Blue glow effect */
 .today-row td {
-  background: linear-gradient(
-    135deg,
-    #fff8e1 0%,
-    #ffecb3 50%,
-    #ffd54f 100%
-  ) !important;
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 50%, #ffd54f 100%) !important;
   border: 2px solid #f9a825 !important;
   font-weight: 600;
   animation: todayGlow 2s ease-in-out infinite;
@@ -1023,16 +873,12 @@ body::after {
       inset 0 0 20px rgba(255, 193, 7, 0.25);
   }
 }
-.today-row td.active-class {
-  background: linear-gradient(
-    135deg,
-    #c8f7dc 0%,
-    #69f0ae 50%,
-    #00e676 100%
-  ) !important;
 
+.today-row td.active-class {
+  background: linear-gradient(135deg, #c8f7dc 0%, #69f0ae 50%, #00e676 100%) !important;
   border: 3px solid #00c853 !important;
 }
+
 .live-badge {
   position: absolute;
   top: 6px;
@@ -1055,8 +901,6 @@ body::after {
   100% { transform: scale(1); opacity: 1; }
 }
 
-
-/* Current/Ongoing class - Green pulsing effect */
 .active-class {
   background: linear-gradient(135deg, #c8f7dc 0%, #69f0ae 50%, #00e676 100%) !important;
   border: 3px solid #00c853 !important;
@@ -1065,24 +909,6 @@ body::after {
   position: relative;
   font-size: 1.05em !important;
   overflow: visible !important;
-}
-
-/* .active-class::before {
-  content: '🔴 LIVE';
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  font-size: 0.7rem;
-  background: #ff1744;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: bold;
-  animation: blink 1s infinite;
-  z-index: 10;
-} */
-.live-badge {
-  animation: pulse 1.2s infinite;
 }
 
 .active-class::after {
@@ -1125,11 +951,6 @@ body::after {
   }
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
 @keyframes shimmer {
   0% { filter: brightness(1); }
   50% { filter: brightness(1.1); }
@@ -1141,7 +962,6 @@ body::after {
   50% { transform: translateY(-5px); }
 }
 
-/* Upcoming class (next class after current) - Orange warning effect */
 .upcoming-class {
   background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 50%, #ffa726 100%) !important;
   border: 2px solid #ff9800 !important;
@@ -1176,7 +996,96 @@ body::after {
   }
 }
 
-/* FOOTER */
+.upcoming-countdown {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #ff9800;
+  text-shadow: 0 0 4px rgba(255, 152, 0, 0.7);
+}
+
+.done-class {
+  filter: saturate(0.65) brightness(0.92);
+  box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.25);
+  border: 2px dashed rgba(0, 0, 0, 0.25) !important;
+  opacity: 0.95;
+}
+
+.done-class strong,
+.done-class small {
+  opacity: 0.65;
+  text-decoration: none;
+}
+
+.done-label {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #065f46;
+  background: rgba(209, 250, 229, 0.85);
+  padding: 3px 10px;
+  border-radius: 999px;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.done-class:hover {
+  filter: saturate(0.75) brightness(0.98);
+}
+
+.cancelled-class {
+  filter: saturate(0.7) brightness(0.92);
+  box-shadow: inset 0 0 0 9999px rgba(239, 68, 68, 0.18);
+  border: 2px dashed rgba(185, 28, 28, 0.5) !important;
+  opacity: 0.95;
+}
+
+.cancelled-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(220, 38, 38, 0.85);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.cancel-reason {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: #c62828;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.cancelled-class:hover {
+  transform: scale(1.05);
+  opacity: 1;
+  box-shadow: 
+    0 0 30px rgba(198, 40, 40, 1),
+    0 0 60px rgba(198, 40, 40, 0.7);
+}
+
+.cancelled-class strong,
+.cancelled-class small {
+  opacity: 0.6;
+  text-decoration: none;
+}
+
+.cancelled-class small {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
 footer {
   text-align: center;
   padding: 1rem;
@@ -1214,67 +1123,6 @@ footer:hover::before {
   transform: translate(-50%, -50%) scale(3) rotate(360deg);
 }
 
-/* =========================
-   MOBILE FIX (max-width: 768px)
-========================= */
-@media (max-width: 768px) {
-
-  /* HEADER */
-  .hero {
-    padding: 1rem;
-    text-align: center;
-  }
-
-  .hero-top {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  /* Remove absolute centering on mobile */
-  .title {
-    position: static;
-    transform: none;
-    font-size: 1.4rem;
-    white-space: normal;
-    margin: 0.5rem 0;
-  }
-
-  .logo {
-    height: 60px;
-  }
-
-  .banner {
-    height: 90px;
-  }
-
-  .effective {
-    font-size: 0.85rem;
-  }
-
-  /* TABLE */
-  
-
-  .routine-table {
-    min-width: 750px;
-    font-size: 0.8rem;
-  }
-
-  .routine-table th,
-  .routine-table td {
-    padding: 0.5rem;
-  }
-
-  /* FOOTER */
-  footer {
-    font-size: 0.8rem;
-    padding: 0.8rem;
-  }
-}
-
-/* =========================
-   FEATURES INFO SECTION
-========================= */
-
 .features-info {
   max-width: 1100px;
   margin: 3rem auto 2rem;
@@ -1308,8 +1156,7 @@ footer:hover::before {
   padding: 1.5rem;
   border-radius: 15px;
   background: rgba(255, 255, 255, 0.9);
-  box-shadow: 
-    0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -1317,11 +1164,9 @@ footer:hover::before {
 
 .feature-item:hover {
   transform: translateY(-6px) scale(1.03);
-  box-shadow: 
-    0 15px 35px rgba(33, 150, 243, 0.4);
+  box-shadow: 0 15px 35px rgba(33, 150, 243, 0.4);
 }
 
-/* Feature badge */
 .feature-badge {
   display: inline-block;
   margin-bottom: 0.8rem;
@@ -1332,7 +1177,6 @@ footer:hover::before {
   color: white;
 }
 
-/* Demo styles matching table logic */
 .today-demo .feature-badge {
   background: #2196f3;
 }
@@ -1349,215 +1193,16 @@ footer:hover::before {
   background: #673ab7;
 }
 
-/* Text */
 .feature-item p {
   font-size: 0.9rem;
   line-height: 1.6;
   color: #333;
 }
+
 .feature-item:hover p {
   color: #000;
 }
 
-/* =========================
-   NEXT CLASS COUNTDOWN
-========================= */
-
-.next-class {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 6px 14px;
-  border-radius: 999px;
-
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.2;
-
-  width: fit-content;      /* 🔥 key line */
-  max-width: none;         /* 🔥 remove stretching */
-  margin: 0 auto;
-
-  white-space: nowrap;     /* no wrapping */
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-}
-
-
-
-.next-class span,
-.next-class i {
-  font-size: 15px;
-}
-/* =========================
-   ⏳ NEXT CLASS COUNTDOWN
-========================= */
-.next-class.class-countdown {
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  color: white;
-  box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
-}
-
-/* =========================
-   📌 ASSIGNMENT COUNTDOWN
-========================= */
-.next-class.assignment-countdown {
-  background: linear-gradient(135deg, #f59e0b, #fbbf24);
-  color: #422006;
-  box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
-}
-
-/* =========================
-   📝 EXAM COUNTDOWN
-========================= */
-.next-class.exam-countdown {
-  background: linear-gradient(135deg, #dc2626, #f87171);
-  color: white;
-  box-shadow: 0 0 35px rgba(220, 38, 38, 0.8);
-  animation: examPulse 1.4s infinite;
-}
-@keyframes dangerPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
-}
-
-@keyframes examPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
-}
-
-
-@keyframes countdownPulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-
-.hidden {
-  display: none;
-}
-#academicCountdown {
-  display: block !important;
-  opacity: 1 !important;
-  z-index: 99999 !important;
-}
-/* =========================
-   ⚠️ URGENCY STATES
-========================= */
-/* =========================
-   ⚠️ ASSIGNMENT WARNING
-========================= */
-.assignment-warning {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
-  color: #422006 !important;
-  text-decoration: underline;
-}
-
-/* =========================
-   ⚠️ EXAM WARNING
-========================= */
-.exam-warning {
-  background: linear-gradient(135deg, #fb7185, #e11d48) !important;
-  color: #ffffff !important;
-  text-decoration: underline;
-}
-
-/* =========================
-   🚨 EXAM DANGER
-========================= */
-.exam-danger {
-  background: linear-gradient(135deg, #b91c1c, #ef4444) !important;
-  color: #ffffff !important;
-  text-decoration: underline;
-  animation: dangerPulse 1.2s infinite;
-}
-
-
-@keyframes dangerPulse {
-  0%, 100% { transform: translateX(-50%) scale(1); }
-  50% { transform: translateX(-50%) scale(1.06); }
-}
-
-/* =========================
-   HOVER EFFECT – ONGOING CLASS
-========================= */
-.active-class:hover {
-  transform: scale(1.08) rotateZ(-1deg);
-  box-shadow:
-    0 0 20px rgba(0, 230, 118, 0.9),
-    0 0 40px rgba(0, 230, 118, 0.6),
-    0 0 60px rgba(0, 230, 118, 0.3);
-}
-
-.active-class:hover::after {
-  content: "📢 Ongoing Class";
-  position: absolute;
-  bottom: -28px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #00c853;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  white-space: nowrap;
-  animation: livePulse 1s infinite;
-  z-index: 50;
-}
-
-@keyframes livePulse {
-  0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-  50% { opacity: 0.7; transform: translateX(-50%) scale(1.1); }
-}
-
-/* =========================
-   HOVER EFFECT – NEXT CLASS
-========================= */
-.upcoming-class:hover {
-  transform: scale(1.07) rotateZ(1deg);
-  box-shadow:
-    0 0 20px rgba(255, 152, 0, 0.9),
-    0 0 40px rgba(255, 152, 0, 0.6),
-    0 0 60px rgba(255, 152, 0, 0.3);
-}
-
-.upcoming-class:hover::after {
-  content: "⏰ Next Class Incoming";
-  position: absolute;
-  bottom: -28px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ff9800;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  white-space: nowrap;
-  animation: nextBounce 0.8s infinite;
-  z-index: 50;
-}
-
-@keyframes nextBounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-5px); }
-}
-* {
-  box-sizing: border-box;
-}
-
-
-
-
-
-/* =========================
-   📢 NOTICE BOARD
-========================= */
 #noticeBoard {
   margin: 20px auto;
   max-width: 1100px;
@@ -1584,7 +1229,6 @@ footer:hover::before {
   font-size: 14px;
 }
 
-/* Types */
 .notice.info {
   background: linear-gradient(135deg, #2563eb, #3b82f6);
   color: white;
@@ -1601,7 +1245,6 @@ footer:hover::before {
   animation: urgentPulse 1.5s infinite;
 }
 
-/* Close button */
 .notice .close {
   position: absolute;
   top: 8px;
@@ -1620,340 +1263,258 @@ footer:hover::before {
   50% { box-shadow: 0 0 30px rgba(220,38,38,.9); }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =====================================================
-   📱 FIX COUNTDOWN CUT-OFF ON MOBILE
-===================================================== */
-@media (max-width: 480px) {
-
-  .next-class {
-    position: sticky;
-    top: 8px;
-
-    left: auto;
-    transform: none;
-
-    margin: 0.8rem auto;
-    max-width: calc(100vw - 16px);
-    padding: 0.6rem 1rem;
-
-    text-align: center;
-    white-space: normal;
-  }
-}
-/* =========================
-   CANCELLED CLASS STYLING
-========================= */
-
-/* Cancelled class styling */
-.cancelled-class {
-  /* same dulling logic as done */
-  filter: saturate(0.6) brightness(0.9);
-
-  /* soft red overlay */
-  box-shadow: inset 0 0 0 9999px rgba(239, 68, 68, 0.18);
-
-  border: 2px dashed rgba(185, 28, 28, 0.5) !important;
-  opacity: 0.95;
-}
-.cancelled-class {
-  filter: saturate(0.7) brightness(0.92);
-}
-
-.cancelled-badge {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-
-  background: rgba(220, 38, 38, 0.85);
-  color: #fff;
-
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 999px;
-
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-@keyframes cancelBlink {
-  0%   { opacity: 1; }
-  50%  { opacity: 0.3; }
-  100% { opacity: 1; }
-}
- 
-.cancel-reason {
-  position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.7rem;
-  color: #c62828;
-  font-weight: bold;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 2px 6px;
-  border-radius: 4px;
-  z-index: 2;
-}
-
-@keyframes cancelledPulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 15px rgba(198, 40, 40, 0.5),
-      0 0 30px rgba(198, 40, 40, 0.3);
-  }
-  50% {
-    box-shadow: 
-      0 0 25px rgba(198, 40, 40, 0.8),
-      0 0 50px rgba(198, 40, 40, 0.5);
-  }
-}
-
-.cancelled-class:hover {
-  transform: scale(1.05);
-  opacity: 1;
-  box-shadow: 
-    0 0 30px rgba(198, 40, 40, 1),
-    0 0 60px rgba(198, 40, 40, 0.7);
-}
-
-/* Strong text for original class content */
-.cancelled-class strong,
-.cancelled-class small {
-  opacity: 0.6;
-  text-decoration: none;
-}
-
-
-.cancelled-class small {
-  text-decoration: line-through;
-  opacity: 0.5;
-}
-/* =========================
-   FORCE UPCOMING CLASS EFFECT
-========================= */
-
-td.upcoming-class {
-  position: relative !important;
-  overflow: visible !important;
-
-  background: linear-gradient(
-    135deg,
-    #fff3e0 0%,
-    #ffcc80 50%,
-    #ffb74d 100%
-  ) !important;
-
-  border: 3px solid #ff9800 !important;
-  font-weight: bold !important;
-
-  animation: upcomingPulse 1.6s infinite ease-in-out !important;
-}
-
-/* NEXT badge */
-td.upcoming-class::before {
-  content: "⏰ NEXT";
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: #ff9800;
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 4px;
-  z-index: 999;
-}
-
-/* Pulse animation */
-@keyframes upcomingPulse {
-  0% {
-    box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow:
-      0 0 20px rgba(255, 152, 0, 0.9),
-      0 0 40px rgba(255, 152, 0, 0.6);
-    transform: scale(1.04);
-  }
-  100% {
-    box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
-    transform: scale(1);
-  }
-}
-.upcoming-countdown {
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: bold;
-  color: #ff9800;
-  text-shadow: 0 0 4px rgba(255, 152, 0, 0.7);
-}
-.upcoming-class:hover .upcoming-countdown {
-  animation: countdownGlow 1.5s infinite;
-}
-
-/* =========================
-   ✅ CLASS DONE (SUBTLE / DULL)
-========================= */
-.done-class {
-  /* 🔹 keep original background */
-  filter: saturate(0.65) brightness(0.92);
-
-  /* 🔹 soft overlay */
-  box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.25);
-
-  border: 2px dashed rgba(0, 0, 0, 0.25) !important;
-  opacity: 0.95;
-}
-
-
-/* Fade original course info */
-.done-class strong,
-.done-class small {
-  opacity: 0.65;
-  text-decoration: none;
-}
-
-
-
-/* ✔ Class Taken badge */
-.done-label {
-  margin-top: 6px;
-  font-size: 11px;
-  font-weight: 600;
-
-  color: #065f46;
-  background: rgba(209, 250, 229, 0.85);
-
-  padding: 3px 10px;
-  border-radius: 999px;
-  display: inline-block;
-
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-.done-class:hover {
-  filter: saturate(0.75) brightness(0.98);
-}
-
-.done-class:hover .done-label {
-  animation: doneBlink 1.5s infinite;
-}
-@keyframes doneBlink {
-  0%   { opacity: 1; transform: scale(1); }
-  50%  { opacity: 0.6; transform: scale(0.96); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-/* =========================
-   ⏳ COUNTDOWN STACK (ABOVE TABLE)
-========================= */
 #countdownStack {
   display: flex;
   flex-direction: column;
-  align-items: center;   /* 🔥 centers pills without stretching */
+  align-items: center;
   gap: 8px;
   margin: 12px auto;
 }
 
-
-
-
-.countdown-pill {
+.next-class {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-
+  gap: 8px;
   padding: 6px 14px;
   border-radius: 999px;
-
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
-
-  width: fit-content;      /* 🔥 key line */
-  max-width: none;         /* 🔥 remove stretching */
-  white-space: nowrap;     /* no wrapping */
+  width: fit-content;
+  max-width: none;
+  margin: 0 auto;
+  white-space: nowrap;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-  transition: all 0.3s ease;
 }
 
-.countdown-pill:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-  transform: scale(1.05);
+.next-class.class-countdown {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
 }
 
+.next-class.assignment-countdown {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #422006;
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
+}
 
+.next-class.exam-countdown {
+  background: linear-gradient(135deg, #dc2626, #f87171);
+  color: white;
+  box-shadow: 0 0 35px rgba(220, 38, 38, 0.8);
+  animation: examPulse 1.4s infinite;
+}
 
+@keyframes examPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
 
+.next-class.blue {
+  background: linear-gradient(120deg, #2563eb, #3b82f6, #60a5fa);
+}
 
+.next-class.orange {
+  background: linear-gradient(120deg, #f59e0b, #fbbf24, #fde68a);
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.7);
+}
+
+.next-class.red {
+  background: linear-gradient(120deg, #dc2626, #f87171, #fecaca);
+  box-shadow: 0 0 40px rgba(220, 38, 38, 0.9);
+  animation: dangerPulse 1.2s infinite;
+}
+
+@keyframes dangerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.next-class {
+  background-size: 300% 300%;
+  animation:
+    gradientMove 4s ease infinite,
+    softPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes softPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.hidden {
+  display: none;
+}
+
+/* ==========================================
+   📱 MOBILE PERFORMANCE OPTIMIZATION
+   CRITICAL: Disables animations on mobile
+========================================== */
+
+@media (max-width: 768px) {
+  
+  /* DISABLE expensive body animations */
+  body,
+  body::before,
+  body::after {
+    animation: none !important;
+    background-attachment: scroll;
+  }
+  
+  body {
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+    background-size: 100% 100%;
+  }
+  
+  /* DISABLE decorative animations */
+  .hero,
+  .hero::before,
+  .hero::after,
+  .logo,
+  .banner,
+  .title,
+  .effective,
+  .effective::before,
+  .effective::after {
+    animation: none !important;
+  }
+  
+  /* DISABLE table decorative effects */
+  .routine-table::before,
+  .routine-table::after {
+    display: none !important;
+  }
+  
+  /* SIMPLIFY hover effects */
+  .routine-table td:hover,
+  .routine-table th:hover,
+  .TLS:hover,
+  .DSI:hover,
+  .DMA:hover,
+  .TZW:hover {
+    transform: none !important;
+    animation: none !important;
+  }
+  
+  .routine-table td::after {
+    display: none !important;
+  }
+  
+  /* KEEP only essential animations */
+  .active-class {
+    animation: simplePulse 2s infinite !important;
+  }
+  
+  @keyframes simplePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.95; }
+  }
+  
+  /* REMOVE blur effects */
+  .features-info,
+  .effective {
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.95);
+  }
+  
+  /* SIMPLIFY shadows */
+  .routine-table,
+  .hero,
+  footer {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .routine-table th,
+  .routine-table td {
+    box-shadow: none !important;
+  }
+
+  /* HEADER adjustments */
+  .hero {
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .hero-top {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .title {
+    position: static;
+    transform: none;
+    font-size: 1.4rem;
+    white-space: normal;
+    margin: 0.5rem 0;
+  }
+
+  .logo {
+    height: 60px;
+  }
+
+  .banner {
+    height: 90px;
+  }
+
+  .effective {
+    font-size: 0.85rem;
+  }
+
+  .routine-table {
+    min-width: 750px;
+    font-size: 0.8rem;
+  }
+
+  .routine-table th,
+  .routine-table td {
+    padding: 0.5rem;
+  }
+
+  footer {
+    font-size: 0.8rem;
+    padding: 0.8rem;
+  }
+
+  .next-class {
+    position: sticky;
+    top: 8px;
+    left: auto;
+    transform: none;
+    margin: 0.8rem auto;
+    max-width: calc(100vw - 16px);
+    padding: 0.6rem 1rem;
+    text-align: center;
+    white-space: normal;
+  }
+}
+
+/* For very old/slow phones */
+@media (max-width: 480px) {
+  * {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+  
+  .active-class,
+  .upcoming-class,
+  .today-row td {
+    animation: none !important;
+  }
+}
+
+/* Respect user preferences for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
