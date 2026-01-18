@@ -2,23 +2,27 @@ days:
   - day: MON
     classes:
 
-      - time: "10:05 AM –11:25 AM"
-        subject: "ENGINEERING DRAWING "
-        room: "508"
-        code: "TLS"
-      
-      
-        
-
-      - time: "01:15 PM –02:35 PM"
+      - time: "08:45 AM –10:05 AM"
         subject: "SOFTWARE ENGINEERING"
-        room: "502"
+        room: "608"
         code: "DSI"
 
-      - time: "02:35 PM –03:55 PM"
-        subject: "COMPUTER AND CYBER SECURITY"
-        room: "503"
+      - time: "10:05 AM –11:25 AM"
+        subject: "ENGINEERING DRAWING"
+        room: "508"
+        code: "TLS"
+
+      - time: "11:25 AM –12:45 PM"
+        subject: "COMPUTER AND CYBER SECURITY" 
+        room: "512"   
         code: "TZW"
+      
+      - time: "01:15 PM –02:35 PM"
+        subject: "COMPUTER AND CYBER SECURITY" 
+        room: "512"   
+        code: "TZW"
+
+      
 
   - day: TUE
     classes:
@@ -32,25 +36,28 @@ days:
         room: "502"
         code: "DMA"
 
-      - time: "11:25 AM –12:45 PM"
-        subject: "SOFTWARE ENGINEERING lAB" 
-        room: "513"   
-        code: "DSI"
+      # - time: "11:25 AM –12:45 PM"
+      #   subject: "SOFTWARE ENGINEERING lAB" 
+      #   room: "513"   
+      #   code: "DSI"
       
       - time: "01:15 PM –02:35 PM"
         subject: "SOFTWARE ENGINEERING LAB" 
-        room: "513"   
+        room: "514"   
         code: "DSI"
 
       - time: "02:35 PM –03:55 PM" 
-        subject: "COMPUTER AND CYBER SECURITY"  
-        room: "612"
-        code: "TZW"
+        subject: "SOFTWARE ENGINEERING lAB" 
+        room: "514"   
+        code: "DSI"
 
 
   - day: THU
     classes:
-      
+      - time: "08:45 AM –10:05 AM"
+        subject: "SOFTWARE ENGINEERING"
+        room: "501"
+        code: "DSI"
 
       - time: "10:05 AM –11:25 AM"
         subject: "COMPUTER NETWORKING LAB"
@@ -67,49 +74,39 @@ days:
         room: "312"
         code: "TLS"
       
-      - time: "02:35 PM –03:55 PM"
-        subject: "SOFTWARE ENGINEERING"
-        room: "512"
-        code: "DSI"
+      # - time: "02:35 PM –03:55 PM"
+      #   subject: "SOFTWARE ENGINEERING"
+      #   room: "512"
+      #   code: "DSI"
 
 # Cancelled classes feature - Add classes that are cancelled for specific dates
-cancelled_classes:
-  # Example: Uncomment and edit these when you need to cancel a class
-  - date: "2026-01-12"
-    day: "MON"
-    time: "01:15 PM –02:35 PM"
-    reason: "Teacher Unavailable"
+# cancelled_classes:
+#   # Example: Uncomment and edit these when you need to cancel a class
+#   - date: "2026-01-12"
+#     day: "MON"
+#     time: "01:15 PM –02:35 PM"
+#     reason: "Teacher Unavailable"
   
-  - date: "2026-01-13"
-    day: "TUE"
-    time: "11:25 AM –12:45 PM"
-    reason: "Teacher Unavailable"
+#   - date: "2026-01-13"
+#     day: "TUE"
+#     time: "11:25 AM –12:45 PM"
+#     reason: "Teacher Unavailable"
 
-  - date: "2026-01-13"
-    day: "TUE"
-    time: "01:15 PM –02:35 PM"
-    reason: "Teacher Unavailable"
-  - date: "2026-01-15"
-    day: "THU"
-    time: "02:35 PM –03:55 PM"
-    reason: "Teacher Unavailable"
+#   - date: "2026-01-13"
+#     day: "TUE"
+#     time: "01:15 PM –02:35 PM"
+#     reason: "Teacher Unavailable"
+#   - date: "2026-01-15"
+#     day: "THU"
+#     time: "02:35 PM –03:55 PM"
+#     reason: "Teacher Unavailable"
   # - date: "2026-01-14"
   #   day: "TUE"
   #   time: "08:45 AM –10:05 AM"
   #   reason: "Holiday"
 
-# academic_events:
-#   - type: "assignment"
-#     course: "Computer Networking"
-#     title: "Assignment 1 Submission"
-#     date: "2026-01-14"
-#     time: "11:59 PM"
+# 
 
-#   - type: "exam"
-#     course: "Software Engineering"
-#     title: "Midterm Exam"
-#     date: "2026-01-18"
-#     time: "09:00 AM"
 
 # academic_events:
 #   - type: "assignment"
@@ -140,7 +137,6 @@ notices:
 #   - title: "Holiday Notice"
 #     message: "Campus will remain closed tomorrow due to maintenance."
 #     type: "info"
-
 
 
 
