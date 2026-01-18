@@ -38,10 +38,21 @@ fetch("/data/routine.yml")
   });
 
 /* =========================
-   MASTER TIMER
+   MASTER TIMER (OPTIMIZED)
 ========================= */
+let lastMinute = -1;
+
 function runAllTimers() {
-  checkCurrentClass();
+  const now = new Date();
+  const currentMinute = now.getMinutes();
+  
+  // Only update class highlights when minute changes
+  if (currentMinute !== lastMinute) {
+    checkCurrentClass();
+    lastMinute = currentMinute;
+  }
+  
+  // Update countdowns every second (they need precision)
   updateClassCountdown();
   updateAssignmentCountdown();
   updateExamCountdown();
@@ -81,7 +92,8 @@ function highlightToday() {
     .toLocaleDateString("en-US", { weekday: "short" })
     .toUpperCase();
 
-  document.querySelectorAll("tr").forEach(row => {
+document.querySelectorAll("tbody tr").forEach(row => {
+
     if (row.dataset.day === today) row.classList.add("today-row");
   });
 }
@@ -97,10 +109,25 @@ function parse12hTime(str) {
   return { h, m };
 }
 
+function getLastOrCurrentDateForDay(dayCode) {
+  const map = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
+  const now = new Date();
+
+  let diff = map[dayCode] - now.getDay();
+  const d = new Date(now);
+  d.setDate(now.getDate() + diff);
+  return d;
+}
+
 function getDateForDay(dayCode) {
   const map = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
   const now = new Date();
-  const diff = map[dayCode] - now.getDay();
+
+  let diff = map[dayCode] - now.getDay();
+
+  // 🔒 if day already passed this week, move to next week
+  if (diff < 0) diff += 7;
+
   const d = new Date(now);
   d.setDate(now.getDate() + diff);
   return d;
@@ -171,7 +198,7 @@ function checkCurrentClass() {
     }
 
     /* ✅ DONE (today + past days) */
-    const endDate = getDateForDay(cellDay);
+    const endDate = getLastOrCurrentDateForDay(cellDay);
     endDate.setHours(e.h, e.m, 0, 0);
 
     if (endDate < now) {
@@ -179,7 +206,7 @@ function checkCurrentClass() {
 
       const done = document.createElement("div");
       done.className = "done-label";
-      done.textContent = "✔ Class Taken";
+      done.textContent = "✓ Class Taken";
       cell.appendChild(done);
       return;
     }
@@ -283,7 +310,15 @@ function updateClassCountdown() {
   if (!next) return box.classList.add("hidden");
 
   box.textContent = `📘 Next Class (${next.subject}) in ${formatCountdown(next.date - now)}`;
-  box.className = "next-class class-countdown";
+  const minsLeft = (next.date - now) / 60000;
+
+  box.className = "next-class class-countdown blue";
+
+  if (minsLeft <= 5) {
+    box.classList.replace("blue", "red");
+  } else if (minsLeft <= 30) {
+    box.classList.replace("blue", "orange");
+  }
   box.classList.remove("hidden");
 }
 
