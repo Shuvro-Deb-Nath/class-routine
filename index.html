@@ -2,16 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#2196f3">
   <title>Class Routine</title>
 
   <link rel="stylesheet" href="style.css" />
-   <link
-      rel="icon"
-      href="y.png"
-      type="image/png"
-      sizes="32x32"
-    />
+  <link rel="icon" href="y.png" type="image/png" sizes="32x32" />
+
+  <!-- Performance hints -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  
+  <!-- Preload critical images -->
+  <link rel="preload" as="image" href="UULogo.webp">
+  <link rel="preload" as="image" href="y.png">
 
   <!-- YAML parser -->
   <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
@@ -20,36 +24,27 @@
 
 <div class="hero">
   <div class="hero-top">
-    <img src="UULogo.webp" class="logo" alt="Logo">
+    <img src="UULogo.webp" class="logo" alt="Logo" loading="eager" decoding="async">
 
-    <h1 class="title"> 60 A Class Routine</h1>
+    <h1 class="title">60 A Class Routine</h1>
 
-    <img src="y.png" class="banner" alt="Banner">
+    <img src="y.png" class="banner" alt="Banner" loading="eager" decoding="async">
   </div>
 
-  <p class="effective"><b>Effective from 12 JANUARY 2026</b></p>
+  <p class="effective"><b>Effective from 19 JANUARY 2026</b></p>
 </div>
-<!-- CLASS COUNTDOWN -->
-
-
-
-
-
 
 <div id="noticeBoard"></div>
 
-
 <div class="table-container"> 
   <div id="countdownStack">
-  <div id="classCountdown" class="next-class hidden"></div>
-  <div id="assignmentCountdown" class="next-class hidden"></div>
-  <div id="examCountdown" class="next-class hidden"></div>
-</div>
+    <div id="classCountdown" class="next-class hidden"></div>
+    <div id="assignmentCountdown" class="next-class hidden"></div>
+    <div id="examCountdown" class="next-class hidden"></div>
+  </div>
   
   <table class="routine-table">
-    
     <thead>
-      
       <tr>
         <th>Day</th>
         <th>08:45 AM → 10:05 AM</th>
@@ -64,16 +59,15 @@
   </table>
 </div>
 
-
 <section class="features-info">
-  <h2>🔍 How This Routine Works</h2>
+  <h2>📝 How This Routine Works</h2>
 
   <div class="feature-list">
     <div class="feature-item today-demo">
       <span class="feature-badge">📅 TODAY</span>
       <p>
-        The <b>entire row</b> for <b>today’s date</b> is automatically highlighted,
-        so you instantly know which day’s classes are relevant.
+        The <b>entire row</b> for <b>today's date</b> is automatically highlighted,
+        so you instantly know which day's classes are relevant.
       </p>
     </div>
 
@@ -96,14 +90,12 @@
     <div class="feature-item auto-demo">
       <span class="feature-badge">⚙️ AUTO</span>
       <p>
-        All highlights update <b>automatically</b> based on your device’s
+        All highlights update <b>automatically</b> based on your device's
         <b>date and time</b>. No manual refresh is needed.
       </p>
     </div>
   </div>
 </section>
-
-
 
 <footer>
   © 2026 | Class Routine | Powered by SHUVRO DEB NATH
