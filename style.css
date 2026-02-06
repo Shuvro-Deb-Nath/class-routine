@@ -1518,3 +1518,33 @@ footer:hover::before {
     transition: none !important;
   }
 }
+.install-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+  z-index: 9999;
+}
+/* =========================
+   STACK ASSIGNMENT + EXAM BOXES
+========================= */
+
+#assignmentCountdown,
+#examCountdown {
+  display: flex;
+  flex-direction: column;   /* ⭐ stack vertically */
+  gap: 10px;
+}
+
+#assignmentCountdown .next-class,
+#examCountdown .next-class {
+  width: 100%;
+}
+
