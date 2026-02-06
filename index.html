@@ -16,9 +16,32 @@
   <!-- Preload critical images -->
   <link rel="preload" as="image" href="UULogo.webp">
   <link rel="preload" as="image" href="y.png">
+<link rel="manifest" href="/manifest.json">
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDoJVuE1cZTSRCMKen3DqlInJyZjQFs4UI",
+  authDomain: "class-routine-8b46c.firebaseapp.com",
+  projectId: "class-routine-8b46c",
+  storageBucket: "class-routine-8b46c.firebasestorage.app",
+  messagingSenderId: "666402119675",
+  appId: "1:666402119675:web:8fdc82c87af8303ed1355e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.db = db; // allow other scripts to use it
+</script>
 
   <!-- YAML parser -->
-  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+
 </head>
 <body>
 
@@ -26,7 +49,7 @@
   <div class="hero-top">
     <img src="UULogo.webp" class="logo" alt="Logo" loading="eager" decoding="async">
 
-    <h1 class="title">60 A Class Routine</h1>
+    <h1 class="title">CSE  60 A Class Routine & Updates</h1>
 
     <img src="y.png" class="banner" alt="Banner" loading="eager" decoding="async">
   </div>
@@ -97,11 +120,37 @@
   </div>
 </section>
 
-<footer>
-  © 2026 | Class Routine Of 60 A| Powered by SHUVRO DEB NATH
-</footer>
 
-<script src="script.js"></script>
+<footer>
+  © 2026 | Class Routine | Powered by SHUVRO DEB NATH
+  
+</footer>
+<button id="installBtn" hidden class="install-btn">
+  📲 Install App
+</button>
+<script type="module" src="script.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker.js");
+}
+</script>
+<script>
+let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.hidden = false;
+});
+
+installBtn.addEventListener("click", async () => {
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  installBtn.hidden = true;
+});
+</script>
+
 </body>
 </html>
-
