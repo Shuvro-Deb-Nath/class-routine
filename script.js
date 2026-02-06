@@ -18,24 +18,99 @@ let notices = [];
 /* =========================
    FETCH DATA
 ========================= */
-fetch("/data/routine.yml")
-  .then(res => res.text())
-  .then(text => {
-    const data = jsyaml.load(text);
+// fetch("/data/routine.yml")
+//   .then(res => res.text())
+//   .then(text => {
+//     const data = jsyaml.load(text);
 
-    routineDays = data.days || [];
-    academicEvents = data.academic_events || [];
-    cancelledClasses = data.cancelled_classes || [];
-    notices = data.notices || [];
+//     routineDays = data.days || [];
+//     academicEvents = data.academic_events || [];
+//     cancelledClasses = data.cancelled_classes || [];
+//     notices = data.notices || [];
 
-    renderRoutine(routineDays);
-    highlightToday();
-    markCancelledClasses();
-    renderNotices();
+//     renderRoutine(routineDays);
+//     highlightToday();
+//     markCancelledClasses();
+//     renderNotices();
 
-    runAllTimers();
-    setInterval(runAllTimers, 1000);
+//     runAllTimers();
+//     setInterval(runAllTimers, 1000);
+//   });
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+async function loadRoutine() {
+  const snap = await getDocs(collection(window.db, "routine"));
+
+  routineDays = [];
+
+  snap.forEach(doc => {
+  routineDays.push(doc.data());
+});
+
+/* ⭐ FIX ORDER HERE */
+const dayOrder = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
+
+routineDays.sort(
+  (a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day)
+);
+
+renderRoutine(routineDays);
+highlightToday();
+
+}
+async function loadEvents() {
+  const snap = await getDocs(collection(window.db, "events"));
+  academicEvents = snap.docs.map(d => d.data());
+}
+
+async function loadCancelled() {
+  const snap = await getDocs(collection(window.db, "cancelled"));
+  cancelledClasses = snap.docs.map(d => d.data());
+  markCancelledClasses();
+}
+
+async function loadNotices() {
+  const board = document.getElementById("noticeBoard");
+  board.innerHTML = "";
+
+  const snap = await getDocs(collection(window.db, "notices"));
+
+  snap.forEach(doc => {
+    const n = doc.data();
+
+    const div = document.createElement("div");
+    div.className = "notice info";
+    div.innerHTML = `<h4>${n.title}</h4><p>${n.message}</p>`;
+    board.appendChild(div);
   });
+}
+
+async function init() {
+  await loadRoutine();
+  await loadCancelled();
+ await loadNotices();
+await loadEvents();
+
+
+  runAllTimers();
+  setInterval(runAllTimers, 1000);
+}
+
+init();
+import { addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+window.cancelClass = async function () {
+  await addDoc(collection(window.db, "cancelled"), {
+    day: day.value,
+    time: time.value,
+    reason: "Cancelled"
+  });
+
+  alert("Cancelled ✅");
+};
 
 /* =========================
    MASTER TIMER (OPTIMIZED)
@@ -263,26 +338,26 @@ function markCancelledClasses() {
 /* =========================
    📢 NOTICES
 ========================= */
-function renderNotices() {
-  const board = document.getElementById("noticeBoard");
-  if (!board) return;
+// function renderNotices() {
+//   const board = document.getElementById("noticeBoard");
+//   if (!board) return;
 
-  board.innerHTML = "";
-  const now = new Date();
+//   board.innerHTML = "";
+//   const now = new Date();
 
-  notices.forEach(n => {
-    if (n.expires && new Date(n.expires) < now) return;
+//   notices.forEach(n => {
+//     if (n.expires && new Date(n.expires) < now) return;
 
-    const div = document.createElement("div");
-    div.className = `notice ${n.type || "info"}`;
-    div.innerHTML = `
-      <span class="close" onclick="this.parentElement.remove()">✖</span>
-      <h4>${n.title}</h4>
-      <p>${n.message}</p>
-    `;
-    board.appendChild(div);
-  });
-}
+//     const div = document.createElement("div");
+//     div.className = `notice ${n.type || "info"}`;
+//     div.innerHTML = `
+//       <span class="close" onclick="this.parentElement.remove()">✖</span>
+//       <h4>${n.title}</h4>
+//       <p>${n.message}</p>
+//     `;
+//     board.appendChild(div);
+//   });
+// }
 
 /* =========================
    ⏳ GLOBAL NEXT CLASS
@@ -326,40 +401,78 @@ function updateClassCountdown() {
    📌 ASSIGNMENT COUNTDOWN
 ========================= */
 function updateAssignmentCountdown() {
-  const box = document.getElementById("assignmentCountdown");
-  if (!box) return;
+  const container = document.getElementById("assignmentCountdown");
+  if (!container) return;
 
   const now = new Date();
-  const next = academicEvents
+
+  container.innerHTML = "";
+
+  const assignments = academicEvents
     .filter(e => e.type === "assignment")
     .map(e => ({ ...e, d: new Date(`${e.date} ${e.time}`) }))
     .filter(e => e.d > now)
-    .sort((a, b) => a.d - b.d)[0];
+    .sort((a, b) => a.d - b.d);
 
-  if (!next) return box.classList.add("hidden");
+  if (assignments.length === 0) {
+    container.classList.add("hidden");
+    return;
+  }
 
-  box.textContent = `📌 Assignment (${next.course}) in ${formatCountdown(next.d - now)}`;
-  box.className = "next-class assignment-countdown";
-  box.classList.remove("hidden");
+  assignments.forEach(e => {
+
+    const box = document.createElement("div");
+
+    box.className = "next-class assignment-countdown";
+
+    box.textContent =
+      `📌 ${e.course} (${e.title}) in ${formatCountdown(e.d - now)}`;
+
+    container.appendChild(box);
+
+  });
+
+  container.classList.remove("hidden");
 }
+
+
 
 /* =========================
    📝 EXAM COUNTDOWN
 ========================= */
 function updateExamCountdown() {
-  const box = document.getElementById("examCountdown");
-  if (!box) return;
+  const container = document.getElementById("examCountdown");
+  if (!container) return;
 
   const now = new Date();
-  const next = academicEvents
+
+  container.innerHTML = "";
+
+  const exams = academicEvents
     .filter(e => e.type === "exam")
     .map(e => ({ ...e, d: new Date(`${e.date} ${e.time}`) }))
     .filter(e => e.d > now)
-    .sort((a, b) => a.d - b.d)[0];
+    .sort((a, b) => a.d - b.d);
 
-  if (!next) return box.classList.add("hidden");
+  if (exams.length === 0) {
+    container.classList.add("hidden");
+    return;
+  }
 
-  box.textContent = `📝 Exam (${next.course}) in ${formatCountdown(next.d - now)}`;
-  box.className = "next-class exam-countdown";
-  box.classList.remove("hidden");
+  exams.forEach(e => {
+
+    // ⭐ CREATE SEPARATE DIV FOR EACH EXAM
+    const box = document.createElement("div");
+
+    box.className = "next-class exam-countdown";
+
+    box.textContent =
+      `📝 ${e.course} (${e.title}) in ${formatCountdown(e.d - now)}`;
+
+    container.appendChild(box);
+
+  });
+
+  container.classList.remove("hidden");
 }
+
