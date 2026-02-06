@@ -1,0 +1,120 @@
+/* =========================
+   DEV CONTROL DASHBOARD
+========================= */
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+/* container */
+.admin-wrapper {
+  width: 100%;
+  max-width: 900px;
+}
+
+/* header */
+.admin-title {
+  text-align: center;
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-shadow: 0 4px 10px rgba(0,0,0,.4);
+}
+
+/* cards */
+.card {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow:
+    0 8px 30px rgba(13,71,161,.3),
+    0 0 25px rgba(33,150,243,.2);
+  animation: fadeUp .4s ease;
+}
+
+@keyframes fadeUp {
+  from {opacity:0; transform: translateY(20px);}
+  to {opacity:1; transform: translateY(0);}
+}
+
+/* headings */
+.card h3 {
+  margin: 0 0 14px;
+  color: #1565c0;
+}
+
+/* inputs */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 6px 0 10px;
+  border-radius: 10px;
+  border: 2px solid #e3f2fd;
+  font-size: 14px;
+  transition: .25s;
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #2196f3;
+  box-shadow: 0 0 10px rgba(33,150,243,.4);
+}
+
+/* textarea bigger */
+textarea {
+  min-height: 120px;
+  resize: vertical;
+  font-family: monospace;
+}
+
+/* buttons */
+button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .25s;
+  color: white;
+  margin-top: 6px;
+}
+
+/* button colors */
+.btn-blue {
+  background: linear-gradient(135deg,#1976d2,#42a5f5);
+}
+
+.btn-green {
+  background: linear-gradient(135deg,#00c853,#69f0ae);
+}
+
+.btn-orange {
+  background: linear-gradient(135deg,#f59e0b,#fbbf24);
+}
+
+.btn-red {
+  background: linear-gradient(135deg,#dc2626,#f87171);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+}
+
+/* mobile friendly */
+@media (max-width: 768px){
+  body{
+    padding: 20px 10px;
+  }
+}
