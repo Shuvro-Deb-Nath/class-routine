@@ -38,8 +38,17 @@ let notices = [];
 //   });
 import {
   getDocs,
-  collection
+  collection,
+  enableIndexedDbPersistence,
+  getFirestore
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+const db = getFirestore(window.app);
+window.db = db;
+
+enableIndexedDbPersistence(window.db)
+  .then(() => console.log("Offline cache enabled ✅"))
+  .catch(() => console.log("Offline already enabled or multi-tab"));
 
 async function loadRoutine() {
   const snap = await getDocs(collection(window.db, "routine"));
@@ -475,4 +484,5 @@ function updateExamCountdown() {
 
   container.classList.remove("hidden");
 }
+
 
