@@ -1,146 +1,156 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Dev Control</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="admin.css">
+  <head>
+    <title>Dev Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="admin-wrapper">
+      <h1 class="admin-title">⚙ Dev Control Dashboard</h1>
 
-</head>
-<body>
+      <!-- ================= NOTICE ================= -->
+      <div class="card">
+        <h3>📢 Add Notice</h3>
 
-<div class="admin-wrapper">
+        <input id="title" placeholder="Title" />
+        <textarea id="msg" placeholder="Message"></textarea>
 
-  <h1 class="admin-title">⚙ Dev Control Dashboard</h1>
+        <button class="btn-blue" onclick="addNotice()">Add Notice</button>
+        <hr />
+        <h4>Existing Notices</h4>
+        <div id="noticeList"></div>
+      </div>
 
+      <!-- ================= CANCEL CLASS ================= -->
+      <div class="card">
+        <input id="cday" placeholder="Day (MON/TUE/THU)" />
+        <input id="ctime" placeholder="Time" />
+        <input id="cdate" type="date" />
+        <input id="creason" placeholder="Reason" />
 
-  <!-- ================= NOTICE ================= -->
-  <div class="card">
-    <h3>📢 Add Notice</h3>
+        <button id="cancelToggleBtn" onclick="toggleCancel()" class="btn-red">
+          Cancel Class
+        </button>
+      </div>
 
-    <input id="title" placeholder="Title">
-    <textarea id="msg" placeholder="Message"></textarea>
+      <!-- ================= EVENTS ================= -->
+      <div class="card">
+        <h3>📘 Add Assignment / CT / Exam</h3>
 
-    <button class="btn-blue" onclick="addNotice()">Add Notice</button>
-    <hr>
-<h4>Existing Notices</h4>
-<div id="noticeList"></div>
+        <input id="etype" placeholder="assignment or exam" />
+        <input id="course" placeholder="Course name" />
+        <input id="etitle" placeholder="Title" />
 
-  </div>
+        <input id="edate" type="date" />
+        <input id="etime" type="time" />
 
+        <button class="btn-orange" onclick="addEvent()">Add Event</button>
+        <hr />
+        <h4>Existing Events</h4>
+        <div id="eventList"></div>
+      </div>
 
+      <!-- ================= ROUTINE EDITOR ================= -->
+      <div class="card">
+        <h3>🛠 Edit Routine</h3>
 
-  <!-- ================= CANCEL CLASS ================= -->
-  <div class="card">
-    <input id="cday" placeholder="Day (MON/TUE/THU)">
-<input id="ctime" placeholder="Time">
-<input id="cdate" type="date">
-<input id="creason" placeholder="Reason">
+        <select id="rday">
+          <option value="MON">MON</option>
+          <option value="TUE">TUE</option>
+          <option value="THU">THU</option>
+        </select>
 
-<button id="cancelToggleBtn" onclick="toggleCancel()" class="btn-red">
-  Cancel Class
-</button>
+        <textarea
+          id="rjson"
+          rows="10"
+          placeholder="Paste classes JSON here"
+        ></textarea>
 
+        <button class="btn-green" onclick="saveRoutine()">Save Routine</button>
+        <hr />
+        <h3>✏ Edit Single Slot</h3>
 
+        <select id="editDay">
+          <option value="MON">MON</option>
+          <option value="TUE">TUE</option>
+          <option value="THU">THU</option>
+        </select>
 
-
-  </div>
-
-
-
-  <!-- ================= EVENTS ================= -->
-  <div class="card">
-    <h3>📘 Add Assignment / CT / Exam</h3>
-
-    <input id="etype" placeholder="assignment or exam">
-    <input id="course" placeholder="Course name">
-    <input id="etitle" placeholder="Title">
-
-    <input id="edate" type="date">
-    <input id="etime" type="time">
-
-    <button class="btn-orange" onclick="addEvent()">Add Event</button>
-    <hr>
-<h4>Existing Events</h4>
-<div id="eventList"></div>
-
-  </div>
-
-
-
-  <!-- ================= ROUTINE EDITOR ================= -->
-  <div class="card">
-    <h3>🛠 Edit Routine</h3>
-
-    <select id="rday">
-      <option value="MON">MON</option>
-      <option value="TUE">TUE</option>
-      <option value="THU">THU</option>
-    </select>
-
-    <textarea id="rjson" rows="10"
-      placeholder='Paste classes JSON here'></textarea>
-
-    <button class="btn-green" onclick="saveRoutine()">Save Routine</button>
-  </div>
-<hr>
-<h3>📋 Cancelled Classes List</h3>
-<div id="cancelList"></div>
-
-</div>
+        <select id="editTime">
+  <option value="08:45 AM –10:05 AM">08:45–10:05</option>
+  <option value="10:05 AM –11:25 AM">10:05–11:25</option>
+  <option value="11:25 AM –12:45 PM">11:25–12:45</option>
+  <option value="01:15 PM –02:35 PM">01:15–02:35</option>
+  <option value="02:35 PM –03:55 PM">02:35–03:55</option>
+</select>
 
 
+        <input id="editSubject" placeholder="Subject" />
+        <input id="editRoom" placeholder="Room" />
+        <input id="editCode" placeholder="Code" />
 
-<!-- ================= FIREBASE SCRIPT (unchanged) ================= -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        <button class="btn-green" onclick="updateSlot()">Update Slot</button>
+        <button class="btn-blue" onclick="addSlot()">Add Slot</button>
 
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  deleteDoc,
-  getDocs,
-  doc
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        <button class="btn-red" onclick="deleteSlot()">Delete Slot</button>
+      </div>
+      <hr />
+      <h3>📋 Cancelled Classes List</h3>
+      <div id="cancelList"></div>
+    </div>
 
+    <!-- ================= FIREBASE SCRIPT (unchanged) ================= -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDoJVuE1cZTSRCMKen3DqlInJyZjQFs4UI",
-  authDomain: "class-routine-8b46c.firebaseapp.com",
-  projectId: "class-routine-8b46c",
-  storageBucket: "class-routine-8b46c.firebasestorage.app",
-  messagingSenderId: "666402119675",
-  appId: "1:666402119675:web:8fdc82c87af8303ed1355e"
-};
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        deleteDoc,
+        getDocs,
+        doc,
+        getDoc,
+        updateDoc,
+      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+      const firebaseConfig = {
+        apiKey: "AIzaSyDoJVuE1cZTSRCMKen3DqlInJyZjQFs4UI",
+        authDomain: "class-routine-8b46c.firebaseapp.com",
+        projectId: "class-routine-8b46c",
+        storageBucket: "class-routine-8b46c.firebasestorage.app",
+        messagingSenderId: "666402119675",
+        appId: "1:666402119675:web:8fdc82c87af8303ed1355e",
+      };
 
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
 
-/* NOTICE */
-window.addNotice = async function () {
-  await addDoc(collection(db, "notices"), {
-    title: title.value,
-    message: msg.value,
-    created: Date.now()
-  });
+      /* NOTICE */
+      window.addNotice = async function () {
+        await addDoc(collection(db, "notices"), {
+          title: title.value,
+          message: msg.value,
+          created: Date.now(),
+        });
 
-  alert("Saved ✅");
-  title.value = "";
-  msg.value = "";
-};
-async function loadNoticesList() {
-  const list = document.getElementById("noticeList");
-  list.innerHTML = "";
+        alert("Saved ✅");
+        title.value = "";
+        msg.value = "";
+      };
+      async function loadNoticesList() {
+        const list = document.getElementById("noticeList");
+        list.innerHTML = "";
 
-  const snap = await getDocs(collection(db, "notices"));
+        const snap = await getDocs(collection(db, "notices"));
 
-  snap.forEach(docSnap => {
-    const n = docSnap.data();
+        snap.forEach((docSnap) => {
+          const n = docSnap.data();
 
-    const div = document.createElement("div");
-    div.innerHTML = `
+          const div = document.createElement("div");
+          div.innerHTML = `
       <b>${n.title}</b>
       <button onclick="deleteNotice('${docSnap.id}')">❌</button>
       <br>
@@ -148,40 +158,39 @@ async function loadNoticesList() {
       <hr>
     `;
 
-    list.appendChild(div);
-  });
-}
+          list.appendChild(div);
+        });
+      }
 
-window.deleteNotice = async function(id) {
-  await deleteDoc(doc(db, "notices", id));
-  loadNoticesList();
-};
+      window.deleteNotice = async function (id) {
+        await deleteDoc(doc(db, "notices", id));
+        loadNoticesList();
+      };
 
+      /* EVENTS */
+      window.addEvent = async function () {
+        await addDoc(collection(db, "events"), {
+          type: etype.value,
+          course: course.value,
+          title: etitle.value,
+          date: edate.value,
+          time: etime.value,
+        });
 
-/* EVENTS */
-window.addEvent = async function () {
-  await addDoc(collection(db, "events"), {
-    type: etype.value,
-    course: course.value,
-    title: etitle.value,
-    date: edate.value,
-    time: etime.value
-  });
+        alert("Event added ✅");
+      };
 
-  alert("Event added ✅");
-};
+      async function loadEventList() {
+        const list = document.getElementById("eventList");
+        list.innerHTML = "";
 
-async function loadEventList() {
-  const list = document.getElementById("eventList");
-  list.innerHTML = "";
+        const snap = await getDocs(collection(db, "events"));
 
-  const snap = await getDocs(collection(db, "events"));
+        snap.forEach((docSnap) => {
+          const e = docSnap.data();
 
-  snap.forEach(docSnap => {
-    const e = docSnap.data();
-
-    const div = document.createElement("div");
-    div.innerHTML = `
+          const div = document.createElement("div");
+          div.innerHTML = `
       <b>${e.type.toUpperCase()}</b> - ${e.title}
       <button onclick="deleteEvent('${docSnap.id}')">❌</button>
       <br>
@@ -189,117 +198,115 @@ async function loadEventList() {
       <hr>
     `;
 
-    list.appendChild(div);
-  });
-}
+          list.appendChild(div);
+        });
+      }
 
-window.deleteEvent = async function(id) {
-  await deleteDoc(doc(db, "events", id));
-  loadEventList();
-};
+      window.deleteEvent = async function (id) {
+        await deleteDoc(doc(db, "events", id));
+        loadEventList();
+      };
 
-/* ROUTINE */
-window.saveRoutine = async function () {
-  try {
-    const day = rday.value;
-    const classes = JSON.parse(rjson.value);
+      /* ROUTINE */
+      window.saveRoutine = async function () {
+        try {
+          const day = rday.value;
+          const classes = JSON.parse(rjson.value);
 
-    await updateDoc(doc(db, "routine", day), {
-      day: day,
-      classes: classes
-    });
+          await updateDoc(doc(db, "routine", day), {
+            day: day,
+            classes: classes,
+          });
 
-    alert("Routine updated ✅");
-  } catch (e) {
-    alert("Invalid JSON ❌");
-  }
-};
-/* ================= SMART CANCEL TOGGLE ================= */
+          alert("Routine updated ✅");
+        } catch (e) {
+          alert("Invalid JSON ❌");
+        }
+      };
+      /* ================= SMART CANCEL TOGGLE ================= */
 
-// check if cancelled exists
-async function findCancelDoc(day, time, date) {
-  const snap = await getDocs(collection(db, "cancelled"));
+      // check if cancelled exists
+      async function findCancelDoc(day, time, date) {
+        const snap = await getDocs(collection(db, "cancelled"));
 
-  return snap.docs.find(d => {
-    const c = d.data();
-    return c.day === day && c.time === time && c.date === date;
-  });
-}
+        return snap.docs.find((d) => {
+          const c = d.data();
+          return c.day === day && c.time === time && c.date === date;
+        });
+      }
 
+      // toggle button
+      window.toggleCancel = async function () {
+        const day = cday.value;
+        const time = ctime.value;
+        const date = cdate.value;
+        const reason = creason.value || "Cancelled";
 
-// toggle button
-window.toggleCancel = async function () {
+        const found = await findCancelDoc(day, time, date);
 
-  const day = cday.value;
-  const time = ctime.value;
-  const date = cdate.value;
-  const reason = creason.value || "Cancelled";
+        if (found) {
+          await deleteDoc(doc(db, "cancelled", found.id));
+          alert("Cancel removed ✅");
+        } else {
+          await addDoc(collection(db, "cancelled"), {
+            day,
+            time,
+            date,
+            reason,
+          });
+          alert("Class cancelled ❌");
+        }
 
-  const found = await findCancelDoc(day, time, date);
+        updateToggleText();
+      };
 
-  if (found) {
-    await deleteDoc(doc(db, "cancelled", found.id));
-    alert("Cancel removed ✅");
-  } else {
-    await addDoc(collection(db, "cancelled"), {
-      day,
-      time,
-      date,
-      reason
-    });
-    alert("Class cancelled ❌");
-  }
+      // auto change button text
+      async function updateToggleText() {
+        const btn = document.getElementById("cancelToggleBtn");
 
-  updateToggleText();
-};
+        const found = await findCancelDoc(cday.value, ctime.value, cdate.value);
 
+        if (found) {
+          btn.textContent = "Undo Cancel";
+          btn.className = "btn-green";
+        } else {
+          btn.textContent = "Cancel Class";
+          btn.className = "btn-red";
+        }
+      }
 
-// auto change button text
-async function updateToggleText() {
-  const btn = document.getElementById("cancelToggleBtn");
+      // update when inputs change
+      ["cday", "ctime", "cdate"].forEach((id) => {
+        document
+          .getElementById(id)
+          .addEventListener("change", updateToggleText);
+      });
+      /* ================= LOAD CANCELLED LIST ================= */
 
-  const found = await findCancelDoc(cday.value, ctime.value, cdate.value);
+      async function loadCancelledList() {
+        const list = document.getElementById("cancelList");
+        list.innerHTML = "";
 
-  if (found) {
-    btn.textContent = "Undo Cancel";
-    btn.className = "btn-green";
-  } else {
-    btn.textContent = "Cancel Class";
-    btn.className = "btn-red";
-  }
-}
+        const snap = await getDocs(collection(db, "cancelled"));
 
+        if (snap.empty) {
+          list.innerHTML = "<p>No cancelled classes</p>";
+          return;
+        }
 
-// update when inputs change
-["cday","ctime","cdate"].forEach(id => {
-  document.getElementById(id).addEventListener("change", updateToggleText);
-});
-/* ================= LOAD CANCELLED LIST ================= */
+        snap.forEach((docSnap) => {
+          const c = docSnap.data();
 
-async function loadCancelledList() {
-  const list = document.getElementById("cancelList");
-  list.innerHTML = "";
+          const div = document.createElement("div");
 
-  const snap = await getDocs(collection(db, "cancelled"));
-
-  if (snap.empty) {
-    list.innerHTML = "<p>No cancelled classes</p>";
-    return;
-  }
-
-  snap.forEach(docSnap => {
-    const c = docSnap.data();
-
-    const div = document.createElement("div");
-
-    div.style = `
+          div.style = `
       background:#f1f5f9;
       padding:8px;
       margin:6px 0;
       border-radius:8px;
     `;
 
-    div.innerHTML = `
+          div.innerHTML = `
       <b>${c.day}</b> |
       ${c.time} |
       ${c.date} |
@@ -310,22 +317,141 @@ async function loadCancelledList() {
       </button>
     `;
 
-    list.appendChild(div);
+          list.appendChild(div);
+        });
+      }
+      window.deleteCancel = async function (id) {
+        await deleteDoc(doc(db, "cancelled", id));
+        loadCancelledList();
+      };
+
+      loadNoticesList();
+      loadEventList();
+      loadCancelledList();
+      /* ================= ROUTINE SLOT EDITOR ================= */
+
+      // load slots when day changes
+      // document.getElementById("editDay").addEventListener("change", loadSlots);
+
+      // async function loadSlots() {
+      //   const day = editDay.value;
+
+      //   const snap = await getDoc(doc(db, "routine", day));
+
+      //   const classes = snap.data().classes;
+
+      //   editTime.innerHTML = "";
+
+      //   classes.forEach((c) => {
+      //     const opt = document.createElement("option");
+      //     opt.value = c.time;
+      //     opt.textContent = c.time;
+      //     editTime.appendChild(opt);
+      //   });
+
+      //   loadSlotDetails();
+      // }
+
+      // auto fill subject/room when time changes
+      document
+        .getElementById("editTime")
+        .addEventListener("change", loadSlotDetails);
+
+      async function loadSlotDetails() {
+        const day = editDay.value;
+
+        const snap = await getDoc(doc(db, "routine", day));
+
+        const classes = snap.data().classes;
+
+        const found = classes.find((c) => c.time === editTime.value);
+
+        if (!found) return;
+
+        editSubject.value = found.subject;
+        editRoom.value = found.room;
+        editCode.value = found.code;
+      }
+
+      // update slot
+      window.updateSlot = async function () {
+        const day = editDay.value;
+
+        const snap = await getDoc(doc(db, "routine", day));
+
+        const classes = snap.data().classes;
+
+        const index = classes.findIndex((c) => c.time === editTime.value);
+
+        if (index === -1) return alert("Slot not found");
+
+        classes[index] = {
+          time: editTime.value,
+          subject: editSubject.value,
+          room: editRoom.value,
+          code: editCode.value,
+        };
+
+        await updateDoc(doc(db, "routine", day), {
+          classes: classes,
+        });
+
+        alert("Slot updated ✅");
+      };
+
+      // load initial slots
+    
+      /* ================= ADD SLOT ================= */
+window.addSlot = async function () {
+
+  const day = editDay.value;
+
+  const snap = await getDoc(doc(db, "routine", day));
+
+  const classes = snap.data().classes;
+
+  // prevent duplicate time
+  if (classes.find(c => c.time === editTime.value)) {
+    return alert("Slot already exists ❌");
+  }
+
+  classes.push({
+    time: editTime.value,
+    subject: editSubject.value,
+    room: editRoom.value,
+    code: editCode.value
   });
-}
-window.deleteCancel = async function(id) {
-  await deleteDoc(doc(db, "cancelled", id));
-  loadCancelledList();
+
+  await updateDoc(doc(db, "routine", day), {
+    classes: classes
+  });
+
+  alert("Slot added ✅");
+
+  
 };
 
 
+/* ================= DELETE SLOT ================= */
+window.deleteSlot = async function () {
 
-loadNoticesList();
-loadEventList();
-loadCancelledList();
+  const day = editDay.value;
 
-</script>
+  const snap = await getDoc(doc(db, "routine", day));
 
-</body>
+  let classes = snap.data().classes;
 
+  classes = classes.filter(c => c.time !== editTime.value);
+
+  await updateDoc(doc(db, "routine", day), {
+    classes: classes
+  });
+
+  alert("Slot removed 🗑");
+
+  
+};
+
+    </script>
+  </body>
 </html>
