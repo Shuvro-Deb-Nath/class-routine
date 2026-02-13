@@ -1,120 +1,986 @@
-/* =========================
-   DEV CONTROL DASHBOARD
-========================= */
+/* ==========================================
+   🎨 DEV CONTROL DASHBOARD
+   ✨ Glassmorphism + Neumorphism + Performance
+   🚀 Modern Admin Interface
+========================================== */
+
+/* ==========================================
+   1️⃣ BASE LAYOUT & BACKGROUND
+========================================== */
 
 body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   padding: 40px 16px;
+  
+  /* Modern gradient background */
+  background: linear-gradient(135deg, 
+    #667eea 0%, 
+    #764ba2 25%, 
+    #f093fb 50%, 
+    #4facfe 75%, 
+    #00f2fe 100%
+  );
+  background-size: 400% 400%;
+  background-attachment: fixed;
+  animation: dashboardGradient 15s ease infinite;
+  
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* container */
+/* Animated gradient background */
+@keyframes dashboardGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Glassmorphism overlay with floating particles effect */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 85% 70%, rgba(102, 126, 234, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: floatingParticles 20s ease-in-out infinite;
+}
+
+@keyframes floatingParticles {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: translate(30px, -30px) scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* Subtle dot pattern for depth */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 25px 25px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ==========================================
+   2️⃣ MAIN CONTAINER - GLASSMORPHISM
+========================================== */
+
 .admin-wrapper {
   width: 100%;
   max-width: 900px;
+  position: relative;
+  z-index: 1;
+  
+  /* Glassmorphism container */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  
+  padding: 30px;
+  
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
-/* header */
+/* ==========================================
+   3️⃣ TITLE & HEADERS - GLASSMORPHISM TEXT
+========================================== */
+
 .admin-title {
   text-align: center;
   color: white;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 25px;
-  text-shadow: 0 4px 10px rgba(0,0,0,.4);
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 15px;
+  
+  text-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 255, 255, 0.4),
+    0 0 50px rgba(102, 126, 234, 0.5);
+  
+  letter-spacing: 1px;
+  animation: titleGlow 3s ease-in-out infinite;
 }
 
-/* cards */
+@keyframes titleGlow {
+  0%, 100% {
+    text-shadow: 
+      0 4px 15px rgba(0, 0, 0, 0.5),
+      0 0 30px rgba(255, 255, 255, 0.4),
+      0 0 50px rgba(102, 126, 234, 0.5);
+  }
+  50% {
+    text-shadow: 
+      0 6px 20px rgba(0, 0, 0, 0.6),
+      0 0 40px rgba(255, 255, 255, 0.6),
+      0 0 70px rgba(102, 126, 234, 0.7);
+  }
+}
+
+/* Visit count header */
+.admin-wrapper > h3 {
+  text-align: center;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  
+  padding: 12px 24px;
+  
+  /* Glassmorphism badge */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+#visitCount {
+  color: #fbbf24;
+  font-weight: 800;
+  font-size: 1.5rem;
+  text-shadow: 
+    0 0 20px rgba(251, 191, 36, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================
+   4️⃣ CARDS - GLASSMORPHISM DESIGN
+========================================== */
+
 .card {
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(12px);
-  border-radius: 18px;
-  padding: 20px;
-  margin-bottom: 18px;
-  box-shadow:
-    0 8px 30px rgba(13,71,161,.3),
-    0 0 25px rgba(33,150,243,.2);
-  animation: fadeUp .4s ease;
+  /* Glassmorphism effect */
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  
+  padding: 24px;
+  margin-bottom: 20px;
+  
+  /* Neumorphism-inspired shadows */
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 0 60px rgba(102, 126, 234, 0.15);
+  
+  animation: fadeUp 0.5s ease;
+  
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle shine effect on cards */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.card:hover::before {
+  left: 150%;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 16px 50px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    0 0 80px rgba(102, 126, 234, 0.25);
 }
 
 @keyframes fadeUp {
-  from {opacity:0; transform: translateY(20px);}
-  to {opacity:1; transform: translateY(0);}
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* headings */
+/* ==========================================
+   5️⃣ CARD HEADINGS
+========================================== */
+
+.card h3,
+.card h4 {
+  margin: 0 0 16px;
+  color: white;
+  font-weight: 700;
+  text-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(102, 126, 234, 0.3);
+}
+
 .card h3 {
-  margin: 0 0 14px;
-  color: #1565c0;
+  font-size: 1.4rem;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-/* inputs */
+.card h4 {
+  font-size: 1.1rem;
+  margin-top: 20px;
+  color: #e0e7ff;
+}
+
+/* ==========================================
+   6️⃣ INPUT FIELDS - GLASSMORPHISM
+========================================== */
+
 input,
 select,
 textarea {
   width: 100%;
-  padding: 10px 12px;
-  margin: 6px 0 10px;
-  border-radius: 10px;
-  border: 2px solid #e3f2fd;
-  font-size: 14px;
-  transition: .25s;
+  padding: 12px 16px;
+  margin: 8px 0 12px;
+  
+  /* Glassmorphism input */
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.781);
+  
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  transition: all 0.3s ease;
   outline: none;
 }
 
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(0, 0, 0, 0.979);
+  font-weight: 400;
+}
+
+/* Focus state - stronger glow */
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: #2196f3;
-  box-shadow: 0 0 10px rgba(33,150,243,.4);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(102, 126, 234, 0.8);
+  box-shadow: 
+    0 6px 20px rgba(102, 126, 234, 0.4),
+    0 0 25px rgba(102, 126, 234, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
 }
 
-/* textarea bigger */
+/* Disabled inputs */
+input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Select dropdown styling */
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+select option {
+  background: #667eea;
+  color: rgb(0, 0, 0);
+  padding: 10px;
+}
+
+/* ==========================================
+   7️⃣ TEXTAREA - LARGER SIZE
+========================================== */
+
 textarea {
-  min-height: 120px;
+  min-height: 130px;
   resize: vertical;
-  font-family: monospace;
+  font-family: 'Consolas', 'Monaco', monospace;
+  line-height: 1.5;
 }
 
-/* buttons */
+/* ==========================================
+   8️⃣ BUTTONS - GLASSMORPHISM + NEUMORPHISM
+========================================== */
+
 button {
   width: 100%;
-  padding: 10px;
-  border-radius: 12px;
+  padding: 12px 20px;
+  
+  border-radius: 14px;
   border: none;
-  font-weight: bold;
+  
+  font-weight: 700;
+  font-size: 15px;
   cursor: pointer;
-  transition: .25s;
   color: white;
-  margin-top: 6px;
+  
+  margin-top: 8px;
+  
+  /* Neumorphism shadow */
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
 }
 
-/* button colors */
+/* Button shine effect */
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+button:hover::before {
+  left: 150%;
+}
+
+/* ==========================================
+   9️⃣ BUTTON COLOR VARIANTS
+========================================== */
+
+/* Blue - Primary Action */
 .btn-blue {
-  background: linear-gradient(135deg,#1976d2,#42a5f5);
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.9), 
+    rgba(37, 99, 235, 1)
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.btn-blue:hover {
+  background: linear-gradient(135deg, 
+    rgba(96, 165, 250, 1), 
+    rgba(59, 130, 246, 1)
+  );
+  box-shadow: 
+    0 10px 30px rgba(59, 130, 246, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Green - Success Action */
 .btn-green {
-  background: linear-gradient(135deg,#00c853,#69f0ae);
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.9), 
+    rgba(22, 163, 74, 1)
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.btn-green:hover {
+  background: linear-gradient(135deg, 
+    rgba(74, 222, 128, 1), 
+    rgba(34, 197, 94, 1)
+  );
+  box-shadow: 
+    0 10px 30px rgba(34, 197, 94, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Orange - Warning Action */
 .btn-orange {
-  background: linear-gradient(135deg,#f59e0b,#fbbf24);
+  background: linear-gradient(135deg, 
+    rgba(251, 146, 60, 0.9), 
+    rgba(249, 115, 22, 1)
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.btn-red {
-  background: linear-gradient(135deg,#dc2626,#f87171);
+.btn-orange:hover {
+  background: linear-gradient(135deg, 
+    rgba(253, 186, 116, 1), 
+    rgba(251, 146, 60, 1)
+  );
+  box-shadow: 
+    0 10px 30px rgba(251, 146, 60, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
 }
+
+/* Red - Danger Action */
+.btn-red {
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.9), 
+    rgba(220, 38, 38, 1)
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-red:hover {
+  background: linear-gradient(135deg, 
+    rgba(248, 113, 113, 1), 
+    rgba(239, 68, 68, 1)
+  );
+  box-shadow: 
+    0 10px 30px rgba(239, 68, 68, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================
+   🔟 BUTTON HOVER & ACTIVE STATES
+========================================== */
 
 button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+  transform: translateY(-3px) scale(1.02);
 }
 
-/* mobile friendly */
-@media (max-width: 768px){
-  body{
-    padding: 20px 10px;
+button:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================
+   1️⃣1️⃣ HORIZONTAL RULE - GLASSMORPHISM
+========================================== */
+
+hr {
+  margin: 20px 0;
+  border: none;
+  height: 1px;
+  
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================
+   1️⃣2️⃣ NOTICE & EVENT LISTS - GLASSMORPHISM
+========================================== */
+
+#noticeList > div,
+#eventList > div,
+#cancelList > div {
+  padding: 14px;
+  margin: 10px 0;
+  
+  /* Glassmorphism list item */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  color: white;
+  transition: all 0.3s ease;
+}
+
+#noticeList > div:hover,
+#eventList > div:hover,
+#cancelList > div:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateX(5px);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+}
+
+#noticeList > div b,
+#eventList > div b {
+  color: #fbbf24;
+  font-size: 1.05rem;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+}
+
+#noticeList > div small,
+#eventList > div small {
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 0.9rem;
+}
+
+/* Delete buttons inside lists */
+#noticeList > div button,
+#eventList > div button {
+  float: right;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.8), 
+    rgba(220, 38, 38, 0.9)
+  );
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0;
+  width: auto;
+  
+  box-shadow: 
+    0 4px 12px rgba(220, 38, 38, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  
+  transition: all 0.3s ease;
+}
+
+#noticeList > div button:hover,
+#eventList > div button:hover {
+  transform: scale(1.08);
+  box-shadow: 
+    0 6px 18px rgba(220, 38, 38, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+   1️⃣3️⃣ CANCELLED CLASSES LIST
+========================================== */
+
+#cancelList > div {
+  background: rgba(248, 113, 113, 0.2) !important;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+#cancelList > div button {
+  float: right;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  width: auto;
+  margin: 0;
+  
+  box-shadow: 
+    0 4px 12px rgba(220, 38, 38, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+#cancelList > div button:hover {
+  transform: scale(1.08);
+  box-shadow: 
+    0 6px 18px rgba(220, 38, 38, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================
+   1️⃣4️⃣ SECTION HEADERS - GLASSMORPHISM
+========================================== */
+
+.admin-wrapper > hr {
+  margin: 30px 0 20px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+}
+
+.admin-wrapper > h3:not(:first-of-type) {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+}
+
+/* ==========================================
+   1️⃣5️⃣ MOBILE OPTIMIZATION
+   🚀 Performance-first approach
+========================================== */
+
+@media (max-width: 768px) {
+  
+  /* Disable heavy animations */
+  body,
+  body::before,
+  body::after {
+    animation: none !important;
+  }
+  
+  /* Simplified background */
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-attachment: scroll;
+    padding: 20px 12px;
+  }
+  
+  /* Remove backdrop filters for performance */
+  .admin-wrapper,
+  .card,
+  input,
+  select,
+  textarea,
+  button,
+  #noticeList > div,
+  #eventList > div,
+  #cancelList > div {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  /* Simplified shadows */
+  .admin-wrapper {
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  .card {
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .admin-title {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+    animation: none !important;
+  }
+  
+  .admin-wrapper > h3 {
+    font-size: 1.1rem;
+    padding: 10px 18px;
+    margin-bottom: 20px;
+  }
+  
+  #visitCount {
+    font-size: 1.3rem;
+  }
+  
+  .card h3 {
+    font-size: 1.2rem;
+  }
+  
+  .card h4 {
+    font-size: 1rem;
+  }
+  
+  /* Inputs on mobile */
+  input,
+  select,
+  textarea {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  
+  button {
+    padding: 11px 18px;
+    font-size: 14px;
+  }
+  
+  /* Disable hover transforms on mobile */
+  .card:hover,
+  button:hover,
+  #noticeList > div:hover,
+  #eventList > div:hover {
+    transform: none !important;
+  }
+}
+
+/* Very small devices */
+@media (max-width: 480px) {
+  
+  /* Disable ALL animations and transitions */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  body {
+    padding: 15px 10px;
+  }
+  
+  .admin-wrapper {
+    padding: 15px;
+  }
+  
+  .admin-title {
+    font-size: 1.5rem;
+  }
+  
+  .card {
+    padding: 15px;
+  }
+  
+  input,
+  select,
+  textarea {
+    padding: 9px 12px;
+    margin: 6px 0 10px;
+  }
+  
+  button {
+    padding: 10px 16px;
+  }
+}
+
+/* ==========================================
+   1️⃣6️⃣ ACCESSIBILITY - REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================
+   1️⃣7️⃣ SCROLLBAR - GLASSMORPHISM STYLE
+========================================== */
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  margin: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, 
+    rgba(102, 126, 234, 0.6), 
+    rgba(118, 75, 162, 0.8)
+  );
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 4px 12px rgba(102, 126, 234, 0.4),
+    inset 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, 
+    rgba(118, 75, 162, 0.8), 
+    rgba(240, 147, 251, 0.9)
+  );
+  box-shadow: 
+    0 6px 18px rgba(102, 126, 234, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================
+   1️⃣8️⃣ UTILITY CLASSES
+========================================== */
+
+.text-center {
+  text-align: center;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+/* Loading state for buttons */
+button.loading {
+  opacity: 0.7;
+  cursor: wait;
+  pointer-events: none;
+}
+
+button.loading::after {
+  content: '...';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+/* =========================
+   🌙 ADMIN PANEL DARK MODE
+========================= */
+
+@media (prefers-color-scheme: dark) {
+  
+  /* Dark admin background */
+  body {
+    background: linear-gradient(135deg, 
+      #0a0e27 0%, 
+      #16213e 25%, 
+      #1a1a2e 50%, 
+      #0f3460 75%, 
+      #0a0e27 100%
+    ) !important;
+  }
+  
+  /* Dark overlays */
+  body::before {
+    background: 
+      radial-gradient(circle at 15% 20%, rgba(79, 172, 254, 0.1) 0%, transparent 45%),
+      radial-gradient(circle at 85% 70%, rgba(52, 152, 219, 0.15) 0%, transparent 50%);
+  }
+  
+  /* Dark wrapper */
+  .admin-wrapper {
+    background: rgba(26, 26, 46, 0.15);
+    border: 1px solid rgba(100, 181, 246, 0.3);
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(100, 181, 246, 0.15),
+      inset 0 0 0 1px rgba(100, 181, 246, 0.25);
+  }
+  
+  /* Dark cards */
+  .card {
+    background: rgba(30, 30, 50, 0.4);
+    border: 1px solid rgba(100, 181, 246, 0.3);
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(100, 181, 246, 0.2),
+      inset 0 1px 0 rgba(100, 181, 246, 0.3),
+      0 0 60px rgba(33, 150, 243, 0.1);
+  }
+  
+  .card:hover {
+    background: rgba(35, 35, 60, 0.5);
+    box-shadow: 
+      0 16px 50px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(100, 181, 246, 0.3),
+      inset 0 2px 0 rgba(100, 181, 246, 0.4),
+      0 0 80px rgba(33, 150, 243, 0.15);
+  }
+  
+  /* Dark inputs */
+  input,
+  select,
+  textarea {
+    background: rgba(20, 20, 35, 0.4);
+    border: 2px solid rgba(100, 181, 246, 0.3);
+    color: #e3f2fd;
+  }
+  
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(224, 231, 255, 0.5);
+  }
+  
+  input:focus,
+  textarea:focus,
+  select:focus {
+    background: rgba(25, 25, 40, 0.5);
+    border-color: rgba(33, 150, 243, 0.8);
+  }
+  
+  select option {
+    background: #1a1a2e;
+    color: #e3f2fd;
+  }
+  
+  /* Dark list items */
+  #noticeList > div,
+  #eventList > div,
+  #cancelList > div {
+    background: rgba(20, 20, 35, 0.3);
+    border: 1px solid rgba(100, 181, 246, 0.25);
+    color: #e3f2fd;
+  }
+  
+  #noticeList > div:hover,
+  #eventList > div:hover,
+  #cancelList > div:hover {
+    background: rgba(25, 25, 40, 0.4);
+  }
+  
+  #noticeList > div small,
+  #eventList > div small {
+    color: #bbdefb;
+  }
+  
+  /* Current slots list in dark mode */
+  #currentSlotsList {
+    color: #e3f2fd;
+  }
+  
+  #currentSlotsList > div {
+    background: rgba(20, 20, 35, 0.3) !important;
+    color: #e3f2fd !important;
   }
 }
