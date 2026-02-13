@@ -1,5 +1,4 @@
-const CACHE_NAME = "routine-v10";
-
+const CACHE_NAME = "routine-v18";
 
 const ASSETS = [
   "/",
@@ -9,10 +8,9 @@ const ASSETS = [
   "/UULogo.webp",
   "/y.png",
   "/manifest.json"
-
 ];
 
-// install → cache files
+// Install → cache files
 self.addEventListener("install", e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
@@ -20,7 +18,7 @@ self.addEventListener("install", e => {
   self.skipWaiting();
 });
 
-// activate → cleanup old cache
+// Activate → cleanup old cache
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -29,13 +27,12 @@ self.addEventListener("activate", e => {
   );
 });
 
-// fetch → offline first
+// Fetch → offline first
 self.addEventListener("fetch", e => {
-  // only cache YOUR files (same origin)
+  // Only cache YOUR files (same origin)
   if (e.request.url.startsWith(self.location.origin)) {
     e.respondWith(
       caches.match(e.request).then(res => res || fetch(e.request))
     );
   }
 });
-
