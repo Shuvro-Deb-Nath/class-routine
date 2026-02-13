@@ -12,49 +12,249 @@
   <!-- Performance hints -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-  
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+<link rel="preload" href="style.css" as="style">
   <!-- Preload critical images -->
   <link rel="preload" as="image" href="UULogo.webp">
   <link rel="preload" as="image" href="y.png">
-<link rel="manifest" href="/manifest.json">
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  <link rel="manifest" href="/manifest.json">
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDoJVuE1cZTSRCMKen3DqlInJyZjQFs4UI",
-  authDomain: "class-routine-8b46c.firebaseapp.com",
-  projectId: "class-routine-8b46c",
-  storageBucket: "class-routine-8b46c.firebasestorage.app",
-  messagingSenderId: "666402119675",
-  appId: "1:666402119675:web:8fdc82c87af8303ed1355e"
-};
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyDoJVuE1cZTSRCMKen3DqlInJyZjQFs4UI",
+      authDomain: "class-routine-8b46c.firebaseapp.com",
+      projectId: "class-routine-8b46c",
+      storageBucket: "class-routine-8b46c.firebasestorage.app",
+      messagingSenderId: "666402119675",
+      appId: "1:666402119675:web:8fdc82c87af8303ed1355e"
+    };
 
-window.db = db; // allow other scripts to use it
-</script>
-
-  <!-- YAML parser -->
-
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.app = app;
+    window.db = db; // allow other scripts to use it
+  </script>
 </head>
+<!-- Dark Mode Toggle Button -->
+<button id="darkModeToggle" class="dark-toggle-btn">🌙</button>
+
+<style>
+.dark-toggle-btn {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: linear-gradient(135deg, #1565c0, #1976d2);
+  color: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+  z-index: 9999;
+  transition: all 0.3s ease;
+}
+
+.dark-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+
+/* Force dark mode when active */
+body.manual-dark {
+  background: linear-gradient(135deg, #0a0e27 0%, #16213e 25%, #1a1a2e 50%, #0f3460 75%, #0a0e27 100%) !important;
+}
+
+body.manual-dark::before {
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(79, 172, 254, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(52, 152, 219, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(41, 128, 185, 0.2) 0%, transparent 50%) !important;
+}
+
+body.manual-dark .hero {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a237e 75%, #0d47a1 100%) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 60px rgba(33, 150, 243, 0.2), inset 0 -5px 20px rgba(255, 255, 255, 0.05) !important;
+}
+
+body.manual-dark .title {
+  color: #e3f2fd !important;
+}
+
+body.manual-dark .effective {
+  background: rgba(13, 71, 161, 0.4) !important;
+  color: #bbdefb !important;
+  border: 1px solid rgba(100, 181, 246, 0.3) !important;
+}
+
+body.manual-dark .routine-table {
+  background: rgba(26, 26, 46, 0.95) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid rgba(100, 181, 246, 0.2) !important;
+}
+
+body.manual-dark .routine-table th {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%) !important;
+  color: #e3f2fd !important;
+  border-bottom: 2px solid rgba(33, 150, 243, 0.3) !important;
+}
+
+body.manual-dark .routine-table td {
+  background: rgba(30, 30, 50, 0.8) !important;
+  color: #e3f2fd !important;
+  border: 1px solid rgba(100, 181, 246, 0.1) !important;
+}
+
+body.manual-dark .routine-table td strong {
+  color: #90caf9 !important;
+}
+
+body.manual-dark .routine-table td small {
+  color: #bbdefb !important;
+}
+
+body.manual-dark tr.today-row {
+  background: rgba(33, 150, 243, 0.25) !important;
+}
+
+body.manual-dark tr.today-row td {
+  background: rgba(30, 30, 50, 0.9) !important;
+  border-color: rgba(33, 150, 243, 0.3) !important;
+}
+
+body.manual-dark .day-date {
+  color: #90caf9 !important;
+}
+
+body.manual-dark .active-class {
+  background: linear-gradient(135deg, rgba(27, 94, 32, 0.4), rgba(46, 125, 50, 0.4)) !important;
+  border: 2px solid #66bb6a !important;
+}
+
+body.manual-dark .live-badge {
+  background: linear-gradient(135deg, #2e7d32, #43a047) !important;
+}
+
+body.manual-dark .live-countdown {
+  background: rgba(46, 125, 50, 0.3) !important;
+  color: #a5d6a7 !important;
+}
+
+body.manual-dark .upcoming-class {
+  background: linear-gradient(135deg, rgba(230, 81, 0, 0.3), rgba(245, 124, 0, 0.3)) !important;
+  border: 2px solid #ff9800 !important;
+}
+
+body.manual-dark .upcoming-countdown {
+  background: rgba(245, 124, 0, 0.3) !important;
+  color: #ffcc80 !important;
+}
+
+body.manual-dark .done-class {
+  background: rgba(30, 30, 50, 0.5) !important;
+  opacity: 0.6 !important;
+}
+
+body.manual-dark .done-label {
+  background: rgba(66, 66, 66, 0.5) !important;
+  color: #90a4ae !important;
+}
+
+body.manual-dark .cancelled-class {
+  background: linear-gradient(135deg, rgba(183, 28, 28, 0.3), rgba(211, 47, 47, 0.3)) !important;
+  border: 2px solid #e53935 !important;
+}
+
+body.manual-dark .notice {
+  background: rgba(26, 26, 46, 0.9) !important;
+  border-left: 4px solid #42a5f5 !important;
+  color: #e3f2fd !important;
+}
+
+body.manual-dark .notice h4 {
+  color: #90caf9 !important;
+}
+
+body.manual-dark .notice p {
+  color: #bbdefb !important;
+}
+
+body.manual-dark .next-class {
+  background: linear-gradient(135deg, #1a237e, #0d47a1) !important;
+  color: #e3f2fd !important;
+}
+
+body.manual-dark .features-info {
+  background: rgba(26, 26, 46, 0.95) !important;
+  border: 1px solid rgba(100, 181, 246, 0.2) !important;
+}
+
+body.manual-dark .features-info h2 {
+  color: #90caf9 !important;
+}
+
+body.manual-dark .feature-item {
+  background: rgba(30, 30, 50, 0.8) !important;
+  border: 1px solid rgba(100, 181, 246, 0.2) !important;
+}
+
+body.manual-dark .feature-item p {
+  color: #bbdefb !important;
+}
+
+body.manual-dark footer {
+  background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%) !important;
+  color: #90caf9 !important;
+  border-top: 1px solid rgba(100, 181, 246, 0.2) !important;
+}
+</style>
+
+<script>
+const darkToggle = document.getElementById('darkModeToggle');
+
+// Check saved preference
+if (localStorage.getItem('darkMode') === 'enabled') {
+  document.body.classList.add('manual-dark');
+  darkToggle.textContent = '☀️';
+}
+
+// Toggle on click
+darkToggle.addEventListener('click', () => {
+  document.body.classList.toggle('manual-dark');
+  
+  if (document.body.classList.contains('manual-dark')) {
+    darkToggle.textContent = '☀️';
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    darkToggle.textContent = '🌙';
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+</script>
 <body>
 
 <div class="hero">
   <div class="hero-top">
     <img src="UULogo.webp" class="logo" alt="Logo" loading="eager" decoding="async">
 
-    <h1 class="title">CSE 60 A Class Routine & Updates</h1>
+    <h1 class="title">
+      <span class="line1">CSE 60 A</span>
+      <span class="line2">Class Routine & Updates</span>
+    </h1>
 
     <img src="y.png" class="banner" alt="Banner" loading="eager" decoding="async">
   </div>
 
-  <p class="effective"><b>Effective from 07 FEBRUARY 2026</b></p>
+  <p class="effective"><b>Effective from 7 FEBRUARY 2026</b></p>
 </div>
 
 <div id="noticeBoard"></div>
@@ -70,12 +270,12 @@ window.db = db; // allow other scripts to use it
     <thead>
       <tr>
         <th>Day</th>
-        <th>08:45 AM → 10:05 AM</th>
-        <th>10:05 AM → 11:25 AM</th>
-        <th>11:25 AM → 12:45 PM</th>
-        <th class="break-header" rowspan="3">BREAK<br>12:45 PM → 01:15 PM</th>
-        <th>01:15 PM → 02:35 PM</th>
-        <th>02:35 PM → 03:55 PM</th>
+        <th>08:45 AM –10:05 AM</th>
+        <th>10:05 AM –11:25 AM</th>
+        <th>11:25 AM –12:45 PM</th>
+        <th class="break-header" rowspan="3">BREAK<br>12:45 PM –01:15 PM</th>
+        <th>01:15 PM –02:35 PM</th>
+        <th>02:35 PM –03:55 PM</th>
       </tr>
     </thead>
     <tbody id="routineBody"></tbody>
@@ -83,7 +283,7 @@ window.db = db; // allow other scripts to use it
 </div>
 
 <section class="features-info">
-  <h2>📝 How This Routine Works</h2>
+  <h2>📅 How This Routine Works</h2>
 
   <div class="feature-list">
     <div class="feature-item today-demo">
@@ -120,39 +320,38 @@ window.db = db; // allow other scripts to use it
   </div>
 </section>
 
-
 <footer>
-  © 2026 | Class Routine & Updates| Powered by SHUVRO DEB NATH
-  
+  © 2026 | Class Routine | Powered by SHUVRO DEB NATH
 </footer>
+
 <button id="installBtn" hidden class="install-btn">
   📲 Install App
 </button>
+
 <script type="module" src="script.js"></script>
 
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js");
-}
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
 </script>
+
 <script>
-let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
+  let deferredPrompt;
+  const installBtn = document.getElementById("installBtn");
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.hidden = false;
-});
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.hidden = false;
+  });
 
-installBtn.addEventListener("click", async () => {
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  installBtn.hidden = true;
-});
+  installBtn.addEventListener("click", async () => {
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    installBtn.hidden = true;
+  });
 </script>
 
 </body>
 </html>
-
-
