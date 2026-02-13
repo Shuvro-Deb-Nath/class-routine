@@ -5,10 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="admin.css" />
+    <link rel="icon" href="y.png" type="image/png" sizes="32x32"/> 
   </head>
   <body>
     <div class="admin-wrapper">
       <h1 class="admin-title">⚙ Dev Control Dashboard</h1>
+      
+      <!-- ================= TIME SLOT MANAGER (NEW!) ================= -->
+      <div class="card" style="border: 3px solid #fbbf24;">
+        <h3>⏰ Time Slot Manager (Ramadan / Custom Schedule)</h3>
+        <p style="color: white; margin-bottom: 15px;">
+          <b>⚠️ Important:</b> Changing time slots will affect the entire routine. 
+          Use this to switch between normal and Ramadan schedules.
+        </p>
+
+        <div style="background: rgba(251, 191, 36, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+          <h4 style="color: #fbbf24; margin-top: 0;">Current Time Slots:</h4>
+          <div id="currentSlotsList"></div>
+        </div>
+
+        <h4 style="color: white;">Add/Edit Time Slot:</h4>
+        <select id="slotPosition">
+          <option value="0">Slot 1 (First Period)</option>
+          <option value="1">Slot 2 (Second Period)</option>
+          <option value="2">Slot 3 (Third Period)</option>
+          <option value="3">Slot 4 (Break Time)</option>
+          <option value="4">Slot 5 (Fourth Period)</option>
+          <option value="5">Slot 6 (Fifth Period)</option>
+        </select>
+
+        <label style="color: white; display: block; margin-top: 10px;">Start Time:</label>
+        <input id="slotStartTime" type="time" value="08:45" />
+
+        <label style="color: white; display: block; margin-top: 10px;">End Time:</label>
+        <input id="slotEndTime" type="time" value="10:05" />
+
+        <button class="btn-orange" onclick="updateTimeSlot()">💾 Update Time Slot</button>
+        
+        <hr />
+        
+        <h4 style="color: white;">Quick Presets:</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <button class="btn-blue" onclick="loadNormalSchedule()">
+            📅 Normal Schedule<br>
+            <small>(08:45-10:05 format)</small>
+          </button>
+          <button class="btn-orange" onclick="loadRamadanSchedule()">
+            🌙 Ramadan Schedule<br>
+            <small>(09:00-10:00 format)</small>
+          </button>
+        </div>
+      </div>
 
       <!-- ================= NOTICE ================= -->
       <div class="card">
@@ -25,9 +72,24 @@
 
       <!-- ================= CANCEL CLASS ================= -->
       <div class="card">
-        <input id="cday" placeholder="Day (MON/TUE/THU)" />
-        <input id="ctime" placeholder="Time" />
+        <h3>❌ Cancel Class</h3>
+        
+        <select id="cday">
+          <option value="MON">MON</option>
+          <option value="TUE">TUE</option>
+          <option value="WED">WED</option>
+          <option value="THU">THU</option>
+          <option value="FRI">FRI</option>
+          <option value="SAT">SAT</option>
+          <option value="SUN">SUN</option>
+        </select>
+
+        <select id="ctime"></select>
+
+        <input id="csubject" placeholder="Subject" disabled />
+
         <input id="cdate" type="date" />
+
         <input id="creason" placeholder="Reason" />
 
         <button id="cancelToggleBtn" onclick="toggleCancel()" class="btn-red">
@@ -56,36 +118,17 @@
       <div class="card">
         <h3>🛠 Edit Routine</h3>
 
-        <select id="rday">
-          <option value="MON">MON</option>
-          <option value="TUE">TUE</option>
-          <option value="THU">THU</option>
-        </select>
-
-        <textarea
-          id="rjson"
-          rows="10"
-          placeholder="Paste classes JSON here"
-        ></textarea>
-
-        <button class="btn-green" onclick="saveRoutine()">Save Routine</button>
-        <hr />
-        <h3>✏ Edit Single Slot</h3>
-
         <select id="editDay">
           <option value="MON">MON</option>
           <option value="TUE">TUE</option>
+          <option value="WED">WED</option>
           <option value="THU">THU</option>
+          <option value="FRI">FRI</option>
+          <option value="SAT">SAT</option>
+          <option value="SUN">SUN</option>
         </select>
 
-        <select id="editTime">
-  <option value="08:45 AM –10:05 AM">08:45–10:05</option>
-  <option value="10:05 AM –11:25 AM">10:05–11:25</option>
-  <option value="11:25 AM –12:45 PM">11:25–12:45</option>
-  <option value="01:15 PM –02:35 PM">01:15–02:35</option>
-  <option value="02:35 PM –03:55 PM">02:35–03:55</option>
-</select>
-
+        <select id="editTime"></select>
 
         <input id="editSubject" placeholder="Subject" />
         <input id="editRoom" placeholder="Room" />
@@ -93,18 +136,17 @@
 
         <button class="btn-green" onclick="updateSlot()">Update Slot</button>
         <button class="btn-blue" onclick="addSlot()">Add Slot</button>
-
         <button class="btn-red" onclick="deleteSlot()">Delete Slot</button>
       </div>
+      
       <hr />
       <h3>📋 Cancelled Classes List</h3>
       <div id="cancelList"></div>
     </div>
 
-    <!-- ================= FIREBASE SCRIPT (unchanged) ================= -->
+    <!-- ================= FIREBASE SCRIPT ================= -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-
       import {
         getFirestore,
         collection,
@@ -114,6 +156,7 @@
         doc,
         getDoc,
         updateDoc,
+        setDoc,
       } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -128,35 +171,207 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      /* NOTICE */
+      /* ================= TIME SLOT MANAGEMENT ================= */
+      
+      // Convert 24h time to 12h format
+      function formatTime12h(time24) {
+        const [h, m] = time24.split(':').map(Number);
+        const period = h >= 12 ? 'PM' : 'AM';
+        const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+        return `${String(h12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${period}`;
+      }
+
+      // Load and display current time slots
+      async function loadCurrentTimeSlots() {
+        const list = document.getElementById('currentSlotsList');
+        list.innerHTML = '<div style="color: white;">Loading...</div>';
+
+        try {
+          const snap = await getDoc(doc(db, "settings", "timeSlots"));
+          
+          if (snap.exists()) {
+            const slots = snap.data().slots || [];
+            list.innerHTML = '';
+            
+            slots.forEach((slot, index) => {
+              const div = document.createElement('div');
+              div.style = 'background: rgba(255,255,255,0.1); padding: 8px; margin: 5px 0; border-radius: 6px; color: white;';
+              div.innerHTML = `<b>Slot ${index + 1}:</b> ${slot}`;
+              list.appendChild(div);
+            });
+          } else {
+            list.innerHTML = '<div style="color: #fbbf24;">⚠️ No time slots configured. Set up default schedule below.</div>';
+          }
+        } catch (e) {
+          list.innerHTML = '<div style="color: #ef4444;">❌ Error loading slots</div>';
+          console.error(e);
+        }
+      }
+
+      // Update a single time slot
+      window.updateTimeSlot = async function() {
+        const position = parseInt(slotPosition.value);
+        const startTime = slotStartTime.value;
+        const endTime = slotEndTime.value;
+
+        if (!startTime || !endTime) {
+          alert('⚠️ Please select both start and end times');
+          return;
+        }
+
+        // Format to 12h
+        const formatted = `${formatTime12h(startTime)} –${formatTime12h(endTime)}`;
+
+        try {
+          // Get current slots
+          const snap = await getDoc(doc(db, "settings", "timeSlots"));
+          let slots = snap.exists() ? snap.data().slots : [];
+
+          // Ensure array has enough slots
+          while (slots.length <= position) {
+            slots.push('');
+          }
+
+          // Update specific slot
+          slots[position] = formatted;
+
+          // Save back
+          await setDoc(doc(db, "settings", "timeSlots"), { slots });
+
+          alert(`✅ Time Slot ${position + 1} updated to: ${formatted}`);
+          loadCurrentTimeSlots();
+          loadEditTimeDropdown();
+          loadCancelSlots();
+        } catch (e) {
+          alert('❌ Error updating time slot');
+          console.error(e);
+        }
+      };
+
+      // Load normal schedule preset
+      window.loadNormalSchedule = async function() {
+        const slots = [
+          "08:45 AM –10:05 AM",
+          "10:05 AM –11:25 AM",
+          "11:25 AM –12:45 PM",
+          "12:45 PM –01:15 PM",
+          "01:15 PM –02:35 PM",
+          "02:35 PM –03:55 PM"
+        ];
+
+        if (!confirm('🔄 This will replace all current time slots with normal schedule. Continue?')) {
+          return;
+        }
+
+        try {
+          await setDoc(doc(db, "settings", "timeSlots"), { slots });
+          alert('✅ Normal schedule loaded!');
+          loadCurrentTimeSlots();
+          loadEditTimeDropdown();
+          loadCancelSlots();
+        } catch (e) {
+          alert('❌ Error loading preset');
+          console.error(e);
+        }
+      };
+
+      // Load Ramadan schedule preset
+      window.loadRamadanSchedule = async function() {
+        const slots = [
+          "09:00 AM –10:00 AM",
+          "10:00 AM –11:00 AM",
+          "11:00 AM –12:00 PM",
+          "12:00 PM –12:30 PM",
+          "12:30 PM –01:30 PM",
+          "01:30 PM –02:30 PM"
+        ];
+
+        if (!confirm('🌙 This will replace all current time slots with Ramadan schedule. Continue?')) {
+          return;
+        }
+
+        try {
+          await setDoc(doc(db, "settings", "timeSlots"), { slots });
+          alert('✅ Ramadan schedule loaded!');
+          loadCurrentTimeSlots();
+          loadEditTimeDropdown();
+          loadCancelSlots();
+        } catch (e) {
+          alert('❌ Error loading preset');
+          console.error(e);
+        }
+      };
+
+      // Load time slots into edit dropdown
+      async function loadEditTimeDropdown() {
+        const dropdown = document.getElementById('editTime');
+        dropdown.innerHTML = '<option>Loading...</option>';
+
+        try {
+          const snap = await getDoc(doc(db, "settings", "timeSlots"));
+          
+          if (snap.exists()) {
+            const slots = snap.data().slots || [];
+            dropdown.innerHTML = '';
+            
+            slots.forEach(slot => {
+              if (slot) {
+                const opt = document.createElement('option');
+                opt.value = slot;
+                opt.textContent = slot;
+                dropdown.appendChild(opt);
+              }
+            });
+          } else {
+            dropdown.innerHTML = '<option>No slots configured</option>';
+          }
+        } catch (e) {
+          dropdown.innerHTML = '<option>Error loading slots</option>';
+          console.error(e);
+        }
+      }
+
+      /* ================= NOTICE FUNCTIONS ================= */
       window.addNotice = async function () {
+        if (!title.value || !msg.value) {
+          alert("⚠️ Please fill in title and message");
+          return;
+        }
+
         await addDoc(collection(db, "notices"), {
           title: title.value,
           message: msg.value,
           created: Date.now(),
         });
 
-        alert("Saved ✅");
+        alert("✅ Notice saved");
         title.value = "";
         msg.value = "";
+        loadNoticesList();
       };
+
       async function loadNoticesList() {
         const list = document.getElementById("noticeList");
         list.innerHTML = "";
 
         const snap = await getDocs(collection(db, "notices"));
 
+        if (snap.empty) {
+          list.innerHTML = "<p>No notices</p>";
+          return;
+        }
+
         snap.forEach((docSnap) => {
           const n = docSnap.data();
 
           const div = document.createElement("div");
           div.innerHTML = `
-      <b>${n.title}</b>
-      <button onclick="deleteNotice('${docSnap.id}')">❌</button>
-      <br>
-      <small>${n.message}</small>
-      <hr>
-    `;
+            <b>${n.title}</b>
+            <button onclick="deleteNotice('${docSnap.id}')">❌</button>
+            <br>
+            <small>${n.message}</small>
+            <hr>
+          `;
 
           list.appendChild(div);
         });
@@ -167,17 +382,28 @@
         loadNoticesList();
       };
 
-      /* EVENTS */
+      /* ================= EVENT FUNCTIONS ================= */
       window.addEvent = async function () {
+        if (!etype.value || !course.value || !etitle.value || !edate.value || !etime.value) {
+          alert("⚠️ Please fill all fields");
+          return;
+        }
+
         await addDoc(collection(db, "events"), {
-          type: etype.value,
+          type: etype.value.toLowerCase(),
           course: course.value,
           title: etitle.value,
           date: edate.value,
           time: etime.value,
         });
 
-        alert("Event added ✅");
+        alert("✅ Event added");
+        etype.value = "";
+        course.value = "";
+        etitle.value = "";
+        edate.value = "";
+        etime.value = "";
+        loadEventList();
       };
 
       async function loadEventList() {
@@ -186,17 +412,22 @@
 
         const snap = await getDocs(collection(db, "events"));
 
+        if (snap.empty) {
+          list.innerHTML = "<p>No events</p>";
+          return;
+        }
+
         snap.forEach((docSnap) => {
           const e = docSnap.data();
 
           const div = document.createElement("div");
           div.innerHTML = `
-      <b>${e.type.toUpperCase()}</b> - ${e.title}
-      <button onclick="deleteEvent('${docSnap.id}')">❌</button>
-      <br>
-      <small>${e.course} | ${e.date} ${e.time}</small>
-      <hr>
-    `;
+            <b>${e.type.toUpperCase()}</b> - ${e.title}
+            <button onclick="deleteEvent('${docSnap.id}')">❌</button>
+            <br>
+            <small>${e.course} | ${e.date} ${e.time}</small>
+            <hr>
+          `;
 
           list.appendChild(div);
         });
@@ -207,25 +438,7 @@
         loadEventList();
       };
 
-      /* ROUTINE */
-      window.saveRoutine = async function () {
-        try {
-          const day = rday.value;
-          const classes = JSON.parse(rjson.value);
-
-          await updateDoc(doc(db, "routine", day), {
-            day: day,
-            classes: classes,
-          });
-
-          alert("Routine updated ✅");
-        } catch (e) {
-          alert("Invalid JSON ❌");
-        }
-      };
-      /* ================= SMART CANCEL TOGGLE ================= */
-
-      // check if cancelled exists
+      /* ================= CANCEL CLASS TOGGLE ================= */
       async function findCancelDoc(day, time, date) {
         const snap = await getDocs(collection(db, "cancelled"));
 
@@ -235,18 +448,22 @@
         });
       }
 
-      // toggle button
       window.toggleCancel = async function () {
         const day = cday.value;
         const time = ctime.value;
         const date = cdate.value;
         const reason = creason.value || "Cancelled";
 
+        if (!date) {
+          alert("⚠️ Please select a date");
+          return;
+        }
+
         const found = await findCancelDoc(day, time, date);
 
         if (found) {
           await deleteDoc(doc(db, "cancelled", found.id));
-          alert("Cancel removed ✅");
+          alert("✅ Cancel removed");
         } else {
           await addDoc(collection(db, "cancelled"), {
             day,
@@ -254,17 +471,24 @@
             date,
             reason,
           });
-          alert("Class cancelled ❌");
+          alert("❌ Class cancelled");
         }
 
         updateToggleText();
+        loadCancelledList();
       };
 
-      // auto change button text
       async function updateToggleText() {
         const btn = document.getElementById("cancelToggleBtn");
+        const date = cdate.value;
 
-        const found = await findCancelDoc(cday.value, ctime.value, cdate.value);
+        if (!date) {
+          btn.textContent = "Cancel Class";
+          btn.className = "btn-red";
+          return;
+        }
+
+        const found = await findCancelDoc(cday.value, ctime.value, date);
 
         if (found) {
           btn.textContent = "Undo Cancel";
@@ -275,14 +499,11 @@
         }
       }
 
-      // update when inputs change
       ["cday", "ctime", "cdate"].forEach((id) => {
-        document
-          .getElementById(id)
-          .addEventListener("change", updateToggleText);
+        document.getElementById(id).addEventListener("change", updateToggleText);
       });
-      /* ================= LOAD CANCELLED LIST ================= */
 
+      /* ================= CANCELLED CLASSES LIST ================= */
       async function loadCancelledList() {
         const list = document.getElementById("cancelList");
         list.innerHTML = "";
@@ -298,92 +519,76 @@
           const c = docSnap.data();
 
           const div = document.createElement("div");
-
           div.style = `
-      background:#f1f5f9;
-      padding:8px;
-      margin:6px 0;
-      border-radius:8px;
-    `;
+            background:#f1f5f9;
+            padding:8px;
+            margin:6px 0;
+            border-radius:8px;
+          `;
 
           div.innerHTML = `
-      <b>${c.day}</b> |
-      ${c.time} |
-      ${c.date} |
-      ${c.reason}
+            <b>${c.day}</b> |
+            ${c.time} |
+            ${c.date} |
+            ${c.reason}
 
-      <button onclick="deleteCancel('${docSnap.id}')" style="float:right;background:#dc2626;color:white;border:none;border-radius:6px;padding:4px 8px">
-        ❌ Delete
-      </button>
-    `;
+            <button onclick="deleteCancel('${docSnap.id}')" style="float:right;background:#dc2626;color:white;border:none;border-radius:6px;padding:4px 8px">
+              ❌ Delete
+            </button>
+          `;
 
           list.appendChild(div);
         });
       }
+
       window.deleteCancel = async function (id) {
         await deleteDoc(doc(db, "cancelled", id));
         loadCancelledList();
       };
 
-      loadNoticesList();
-      loadEventList();
-      loadCancelledList();
       /* ================= ROUTINE SLOT EDITOR ================= */
-
-      // load slots when day changes
-      // document.getElementById("editDay").addEventListener("change", loadSlots);
-
-      // async function loadSlots() {
-      //   const day = editDay.value;
-
-      //   const snap = await getDoc(doc(db, "routine", day));
-
-      //   const classes = snap.data().classes;
-
-      //   editTime.innerHTML = "";
-
-      //   classes.forEach((c) => {
-      //     const opt = document.createElement("option");
-      //     opt.value = c.time;
-      //     opt.textContent = c.time;
-      //     editTime.appendChild(opt);
-      //   });
-
-      //   loadSlotDetails();
-      // }
-
-      // auto fill subject/room when time changes
-      document
-        .getElementById("editTime")
-        .addEventListener("change", loadSlotDetails);
+      document.getElementById("editTime").addEventListener("change", loadSlotDetails);
+      document.getElementById("editDay").addEventListener("change", loadEditTimeDropdown);
 
       async function loadSlotDetails() {
         const day = editDay.value;
 
         const snap = await getDoc(doc(db, "routine", day));
 
-        const classes = snap.data().classes;
+        if (!snap.exists()) return;
 
+        const classes = snap.data().classes;
         const found = classes.find((c) => c.time === editTime.value);
 
-        if (!found) return;
+        if (!found) {
+          editSubject.value = "";
+          editRoom.value = "";
+          editCode.value = "";
+          return;
+        }
 
         editSubject.value = found.subject;
         editRoom.value = found.room;
         editCode.value = found.code;
       }
 
-      // update slot
       window.updateSlot = async function () {
         const day = editDay.value;
 
         const snap = await getDoc(doc(db, "routine", day));
 
-        const classes = snap.data().classes;
+        if (!snap.exists()) {
+          alert("❌ Day not found");
+          return;
+        }
 
+        const classes = snap.data().classes;
         const index = classes.findIndex((c) => c.time === editTime.value);
 
-        if (index === -1) return alert("Slot not found");
+        if (index === -1) {
+          alert("❌ Slot not found");
+          return;
+        }
 
         classes[index] = {
           time: editTime.value,
@@ -396,62 +601,108 @@
           classes: classes,
         });
 
-        alert("Slot updated ✅");
+        alert("✅ Slot updated");
       };
 
-      // load initial slots
-    
-      /* ================= ADD SLOT ================= */
-window.addSlot = async function () {
+      window.addSlot = async function () {
+        const day = editDay.value;
 
-  const day = editDay.value;
+        const snap = await getDoc(doc(db, "routine", day));
 
-  const snap = await getDoc(doc(db, "routine", day));
+        if (!snap.exists()) {
+          alert("❌ Day not found");
+          return;
+        }
 
-  const classes = snap.data().classes;
+        const classes = snap.data().classes;
 
-  // prevent duplicate time
-  if (classes.find(c => c.time === editTime.value)) {
-    return alert("Slot already exists ❌");
-  }
+        if (classes.find((c) => c.time === editTime.value)) {
+          alert("❌ Slot already exists");
+          return;
+        }
 
-  classes.push({
-    time: editTime.value,
-    subject: editSubject.value,
-    room: editRoom.value,
-    code: editCode.value
-  });
+        classes.push({
+          time: editTime.value,
+          subject: editSubject.value,
+          room: editRoom.value,
+          code: editCode.value,
+        });
 
-  await updateDoc(doc(db, "routine", day), {
-    classes: classes
-  });
+        await updateDoc(doc(db, "routine", day), {
+          classes: classes,
+        });
 
-  alert("Slot added ✅");
+        alert("✅ Slot added");
+      };
 
-  
-};
+      window.deleteSlot = async function () {
+        const day = editDay.value;
 
+        const snap = await getDoc(doc(db, "routine", day));
 
-/* ================= DELETE SLOT ================= */
-window.deleteSlot = async function () {
+        if (!snap.exists()) {
+          alert("❌ Day not found");
+          return;
+        }
 
-  const day = editDay.value;
+        let classes = snap.data().classes;
+        classes = classes.filter((c) => c.time !== editTime.value);
 
-  const snap = await getDoc(doc(db, "routine", day));
+        await updateDoc(doc(db, "routine", day), {
+          classes: classes,
+        });
 
-  let classes = snap.data().classes;
+        alert("🗑 Slot removed");
+      };
 
-  classes = classes.filter(c => c.time !== editTime.value);
+      /* ================= SMART CANCEL UI ================= */
+      document.getElementById("cday").addEventListener("change", loadCancelSlots);
 
-  await updateDoc(doc(db, "routine", day), {
-    classes: classes
-  });
+      async function loadCancelSlots() {
+        const day = cday.value;
 
-  alert("Slot removed 🗑");
+        const snap = await getDoc(doc(db, "routine", day));
 
-  
-};
+        if (!snap.exists()) return;
 
+        const classes = snap.data().classes;
+
+        ctime.innerHTML = "";
+
+        classes.forEach((c) => {
+          const opt = document.createElement("option");
+          opt.value = c.time;
+          opt.textContent = c.time;
+          ctime.appendChild(opt);
+        });
+
+        fillCancelSubject();
+      }
+
+      document.getElementById("ctime").addEventListener("change", fillCancelSubject);
+
+      async function fillCancelSubject() {
+        const day = cday.value;
+
+        const snap = await getDoc(doc(db, "routine", day));
+
+        if (!snap.exists()) return;
+
+        const classes = snap.data().classes;
+        const found = classes.find((c) => c.time === ctime.value);
+
+        if (found) {
+          csubject.value = found.subject + " (" + found.room + ")";
+        }
+      }
+
+      // Load on page start
+      loadCurrentTimeSlots();
+      loadNoticesList();
+      loadEventList();
+      loadCancelledList();
+      loadCancelSlots();
+      loadEditTimeDropdown();
     </script>
   </body>
 </html>
