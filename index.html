@@ -47,26 +47,477 @@
 <button id="darkModeToggle" class="dark-toggle-btn">🌙</button>
 
 <style>
+/* Install Banner */
+.install-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #1565c0, #1976d2);
+  color: white;
+  padding: 12px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100000;
+  transform: translateY(-100%);
+  transition: transform 0.4s ease-in-out;
+}
+
+.install-banner:not(.hidden) {
+  transform: translateY(0);
+}
+
+.install-banner.hidden {
+  display: block;
+  transform: translateY(-100%);
+}
+
+.install-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.install-banner-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.install-banner-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.install-banner-text strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 3px;
+}
+
+.install-banner-text p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.install-banner-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.banner-install-btn,
+.banner-dismiss-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.banner-install-btn {
+  background: white;
+  color: #1565c0;
+}
+
+.banner-install-btn:hover {
+  background: #f5f5f5;
+  transform: scale(1.05);
+}
+
+.banner-dismiss-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.banner-dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .install-banner-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .install-banner-text strong {
+    font-size: 15px;
+  }
+  
+  .install-banner-text p {
+    font-size: 12px;
+  }
+  
+  .install-banner-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .banner-install-btn,
+  .banner-dismiss-btn {
+    flex: 1;
+    max-width: 150px;
+  }
+}
+
+/* Today's Date Section */
+.today-date-section {
+  background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #2196f3 100%);
+  color: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 
+    0 8px 24px rgba(21, 101, 192, 0.3),
+    0 0 40px rgba(33, 150, 243, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.today-date-section::before {
+  content: '📅';
+  position: absolute;
+  font-size: 120px;
+  opacity: 0.1;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.date-content {
+  position: relative;
+  z-index: 1;
+}
+
+.date-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.date-separator {
+  opacity: 0.6;
+  font-weight: normal;
+}
+
+.date-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 16px;
+  opacity: 0.95;
+  flex-wrap: wrap;
+}
+
+#bengaliDate {
+  font-weight: 600;
+}
+
+.special-event {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: none;
+}
+
+.special-event:not(:empty) {
+  display: inline-block;
+}
+
+/* Mobile responsive for date section */
+@media (max-width: 768px) {
+  .today-date-section {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .date-main {
+    font-size: 18px;
+    gap: 10px;
+  }
+  
+  .date-secondary {
+    font-size: 14px;
+    gap: 8px;
+  }
+  
+  .special-event {
+    font-size: 12px;
+    padding: 3px 10px;
+  }
+  
+  .today-date-section::before {
+    font-size: 80px;
+  }
+}
+
+/* Dark mode for date section */
+body.manual-dark .today-date-section {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #1565c0 100%);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(33, 150, 243, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  .today-date-section {
+    background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #1565c0 100%);
+    box-shadow: 
+      0 8px 24px rgba(0, 0, 0, 0.5),
+      0 0 40px rgba(33, 150, 243, 0.3);
+  }
+}
+
+/* Class Duration Timer */
+.class-duration-timer {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+  color: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 
+    0 10px 30px rgba(22, 163, 74, 0.4),
+    0 0 50px rgba(34, 197, 94, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: timerPulse 2s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+  0%, 100% {
+    box-shadow: 
+      0 10px 30px rgba(22, 163, 74, 0.4),
+      0 0 50px rgba(34, 197, 94, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 12px 35px rgba(22, 163, 74, 0.5),
+      0 0 60px rgba(34, 197, 94, 0.3);
+  }
+}
+
+.class-duration-timer.ending-soon {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  animation: urgentPulse 1s ease-in-out infinite;
+}
+
+@keyframes urgentPulse {
+  0%, 100% {
+    box-shadow: 
+      0 10px 30px rgba(220, 38, 38, 0.5),
+      0 0 50px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 15px 40px rgba(220, 38, 38, 0.7),
+      0 0 70px rgba(239, 68, 68, 0.5);
+  }
+}
+
+.timer-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.timer-icon {
+  font-size: 40px;
+  animation: iconBounce 2s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.timer-info h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.timer-info p {
+  margin: 3px 0 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.timer-body {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 15px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.timer-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+#timerStatus {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 5px;
+}
+
+#timerMinutes {
+  font-size: 32px;
+  font-weight: bold;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #fff 0%, #dcfce7 100%);
+  border-radius: 10px;
+  transition: width 1s linear;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  position: relative;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.timer-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* Mobile responsive for timer */
+@media (max-width: 768px) {
+  .class-duration-timer {
+    padding: 15px;
+  }
+  
+  .timer-icon {
+    font-size: 32px;
+  }
+  
+  .timer-info h3 {
+    font-size: 18px;
+  }
+  
+  #timerMinutes {
+    font-size: 24px;
+  }
+  
+  .timer-details {
+    font-size: 11px;
+  }
+}
+
+/* Dark mode for timer */
+body.manual-dark .class-duration-timer {
+  background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+}
+
+body.manual-dark .class-duration-timer.ending-soon {
+  background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .class-duration-timer {
+    background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+  }
+  
+  .class-duration-timer.ending-soon {
+    background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .install-banner-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .install-banner-text strong {
+    font-size: 15px;
+  }
+  
+  .install-banner-text p {
+    font-size: 12px;
+  }
+  
+  .install-banner-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .banner-install-btn,
+  .banner-dismiss-btn {
+    flex: 1;
+    max-width: 150px;
+  }
+}
+
 .dark-toggle-btn {
   position: fixed;
-  top: 80px;
-  right: 20px;
+  top: 10px;
+  right: 10px;
   background: linear-gradient(135deg, #1565c0, #1976d2);
   color: white;
   border: none;
-  width: 50px;
-  height: 50px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
-  font-size: 24px;
+  font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0,0,0,.3);
-  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+  z-index: 99999;
   transition: all 0.3s ease;
 }
 
 .dark-toggle-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  box-shadow: 0 6px 16px rgba(0,0,0,.4);
 }
 
 /* Force dark mode when active */
@@ -242,24 +693,81 @@ darkToggle.addEventListener('click', () => {
 </script>
 <body>
 
+<!-- Install App Banner -->
+<div id="installBanner" class="install-banner hidden">
+  <div class="install-banner-content">
+    <div class="install-banner-icon">📲</div>
+    <div class="install-banner-text">
+      <strong>Install Class Routine App</strong>
+      <p>Quick access to your schedule - works offline!</p>
+    </div>
+    <div class="install-banner-actions">
+      <button id="bannerInstallBtn" class="banner-install-btn">Install Now</button>
+      <button id="bannerDismissBtn" class="banner-dismiss-btn">Maybe Later</button>
+    </div>
+  </div>
+</div>
+
 <div class="hero">
   <div class="hero-top">
     <img src="UULogo.webp" class="logo" alt="Logo" loading="eager" decoding="async">
 
     <h1 class="title">
       <span class="line1">CSE 60 A</span>
-      <span class="line2">Class Routine & Updates</span>
+      <span class="line2">Class Routine & Updates (Spring 2026)</span>
     </h1>
 
     <img src="y.png" class="banner" alt="Banner" loading="eager" decoding="async">
   </div>
 
-  <p class="effective"><b>Effective from 7 FEBRUARY 2026</b></p>
+  <p class="effective"><b>Effective from <span id="effectiveFromDate">7 FEBRUARY 2026</span></b></p>
 </div>
 
-<div id="noticeBoard"></div>
 
-<div class="table-container"> 
+
+<div class="table-container">
+  <!-- Today's Date Section -->
+  <div id="todayDate" class="today-date-section">
+    <div class="date-content">
+      <div class="date-main">
+        <span id="englishDate">14 February 2026</span>
+        <span class="date-separator">|</span>
+        <span id="dayName">SATURDAY</span>
+      </div>
+      <div class="date-secondary">
+        <span id="bengaliDate">১লা ফাল্গুন ১৪৩২</span>
+        <span id="specialEvent" class="special-event"></span>
+      </div>
+    </div>
+  </div>
+  <div id="noticeBoard"></div>
+  <!-- Class Duration Timer -->
+  <div id="classDurationTimer" class="class-duration-timer hidden">
+    <div class="timer-header">
+      <span class="timer-icon">⏱️</span>
+      <div class="timer-info">
+        <h3 id="timerClassName">Current Class</h3>
+        <p id="timerRoom">Room 301</p>
+      </div>
+    </div>
+    
+    <div class="timer-body">
+      <div class="timer-countdown">
+        <span id="timerStatus">Class ends in</span>
+        <span id="timerMinutes">35 minutes</span>
+      </div>
+      
+      <div class="progress-bar-container">
+        <div id="timerProgressBar" class="progress-bar"></div>
+      </div>
+      
+      <div class="timer-details">
+        <span id="timerStartTime">Started: 10:05 AM</span>
+        <span id="timerEndTime">Ends: 11:25 AM</span>
+      </div>
+    </div>
+  </div>
+  
   <div id="countdownStack">
     <div id="classCountdown" class="next-class hidden"></div>
     <div id="assignmentCountdown" class="next-class hidden"></div>
@@ -321,7 +829,7 @@ darkToggle.addEventListener('click', () => {
 </section>
 
 <footer>
-  © 2026 | Class Routine & Updates | Powered by SHUVRO DEB NATH
+  © 2026 | Class Routine | Powered by SHUVRO DEB NATH
 </footer>
 
 <button id="installBtn" hidden class="install-btn">
@@ -329,6 +837,406 @@ darkToggle.addEventListener('click', () => {
 </button>
 
 <script type="module" src="script.js"></script>
+
+<script type="module">
+  // Load effective date from Firebase
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  
+  async function loadEffectiveDate() {
+    try {
+      const db = window.db; // Use the db initialized in head
+      const snap = await getDoc(doc(db, "settings", "effectiveDate"));
+      
+      if (snap.exists()) {
+        document.getElementById("effectiveFromDate").textContent = snap.data().date;
+      }
+      // If doesn't exist, keep default "7 FEBRUARY 2026"
+    } catch (error) {
+      console.error("Error loading effective date:", error);
+      // Keep default on error
+    }
+  }
+  
+  loadEffectiveDate();
+</script>
+
+<script>
+  // Bengali number conversion
+  const bengaliNumbers = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  const toBengaliNumber = (num) => String(num).split('').map(d => bengaliNumbers[d]).join('');
+  
+  // Bengali months
+  const bengaliMonths = [
+    'বৈশাখ', 'জ্যৈষ্ঠ', 'আষাঢ়', 'শ্রাবণ', 'ভাদ্র', 'আশ্বিন',
+    'কার্তিক', 'অগ্রহায়ণ', 'পৌষ', 'মাঘ', 'ফাল্গুন', 'চৈত্র'
+  ];
+  
+  // Bengali date suffixes
+  const getBengaliDateSuffix = (day) => {
+    if (day === 1) return 'লা';
+    if (day === 2 || day === 3) return 'রা';
+    if (day === 4) return 'ঠা';
+    if (day === 5 || day === 6) return 'ই';
+    return 'ই';
+  };
+  
+  // Convert Gregorian to Bengali calendar (approximation)
+  function toBengaliDate(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    
+    // Bengali year is roughly Gregorian year - 593/594
+    // Bengali new year starts around April 14-15
+    let bengaliYear = year - 593;
+    
+    // Month mapping (approximate)
+    const monthStart = [
+      { g: 3, d: 14 }, // Baishakh starts ~April 14
+      { g: 4, d: 15 }, // Jyoishtho starts ~May 15
+      { g: 5, d: 15 }, // Asharh starts ~June 15
+      { g: 6, d: 16 }, // Shravan starts ~July 16
+      { g: 7, d: 16 }, // Bhadro starts ~Aug 16
+      { g: 8, d: 16 }, // Ashwin starts ~Sep 16
+      { g: 9, d: 16 }, // Kartik starts ~Oct 16
+      { g: 10, d: 15 }, // Ogrohayon starts ~Nov 15
+      { g: 11, d: 15 }, // Poush starts ~Dec 15
+      { g: 0, d: 14 }, // Magh starts ~Jan 14
+      { g: 1, d: 14 }, // Falgun starts ~Feb 14
+      { g: 2, d: 14 }  // Choitro starts ~Mar 14
+    ];
+    
+    let bengaliMonth = 0;
+    let bengaliDay = 0;
+    
+    for (let i = 0; i < monthStart.length; i++) {
+      const nextMonth = (i + 1) % 12;
+      const currentStart = monthStart[i];
+      const nextStart = monthStart[nextMonth];
+      
+      let currentDate = new Date(year, currentStart.g, currentStart.d);
+      let nextDate = new Date(year, nextStart.g, nextStart.d);
+      
+      // Adjust year for months that wrap around
+      if (nextStart.g < currentStart.g) {
+        nextDate = new Date(year + 1, nextStart.g, nextStart.d);
+      }
+      if (currentStart.g === 0 && month > 6) {
+        currentDate = new Date(year + 1, currentStart.g, currentStart.d);
+        nextDate = new Date(year + 1, nextStart.g, nextStart.d);
+      }
+      
+      if (date >= currentDate && date < nextDate) {
+        bengaliMonth = i;
+        const diffTime = date - currentDate;
+        bengaliDay = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        break;
+      }
+    }
+    
+    // Adjust year if we're in months before Baishakh
+    if (bengaliMonth >= 9) {
+      bengaliYear = year - 594;
+    }
+    
+    const suffix = getBengaliDateSuffix(bengaliDay);
+    return `${toBengaliNumber(bengaliDay)}${suffix} ${bengaliMonths[bengaliMonth]} ${toBengaliNumber(bengaliYear)}`;
+  }
+  
+  // Special events calendar
+  const specialEvents = {
+    // Bangladesh National Days
+    '2-21': 'International Mother Language Day 🇧🇩',
+    '3-17': 'Sheikh Mujibur Rahman\'s Birthday 🇧🇩',
+    '3-26': 'Independence Day 🇧🇩',
+    '4-14': 'Pohela Boishakh (Bengali New Year) 🎊',
+    '5-1': 'May Day',
+    '8-15': 'National Mourning Day 🇧🇩',
+    '11-7': 'National Revolution & Solidarity Day 🇧🇩',
+    '12-16': 'Victory Day 🇧🇩',
+    
+    // Religious Holidays 2026 (Islamic Calendar - approximate)
+    '2-28': 'Shab-e-Barat 🌙',
+    '3-1': 'Eid-ul-Fitr 🌙 (Day 1)',
+    '3-2': 'Eid-ul-Fitr 🌙 (Day 2)',
+    '3-3': 'Eid-ul-Fitr 🌙 (Day 3)',
+    '5-7': 'Eid-ul-Adha 🐑 (Day 1)',
+    '5-8': 'Eid-ul-Adha 🐑 (Day 2)',
+    '5-9': 'Eid-ul-Adha 🐑 (Day 3)',
+    '5-28': 'Muharram (Ashura) 🌙',
+    '7-6': 'Milad-un-Nabi 🌙',
+    
+    // Hindu Festivals 2026
+    '2-3': 'Saraswati Puja 📚',
+    '3-14': 'Holi (Festival of Colors) 🎨',
+    '4-6': 'Ram Navami',
+    '5-5': 'Buddha Purnima 🙏',
+    '8-15': 'Janmashtami (Krishna Birthday)',
+    '10-17': 'Durga Puja (Maha Saptami)',
+    '10-18': 'Durga Puja (Maha Ashtami)',
+    '10-19': 'Durga Puja (Maha Navami)',
+    '10-20': 'Durga Puja (Vijaya Dashami)',
+    '11-1': 'Kali Puja 🪔',
+    '11-2': 'Diwali (Festival of Lights) 🪔',
+    
+    // Christian Holidays
+    '4-3': 'Good Friday ✝️',
+    '4-5': 'Easter Sunday 🐣',
+    '12-24': 'Christmas Eve 🎄',
+    '12-25': 'Christmas Day 🎄',
+    
+    // International Days
+    '1-1': 'New Year\'s Day 🎉',
+    '1-4': 'World Braille Day',
+    '1-24': 'International Day of Education',
+    '1-26': 'International Customs Day',
+    '2-4': 'World Cancer Day',
+    '2-11': 'International Day of Women and Girls in Science',
+    '2-13': 'World Radio Day',
+    '2-14': 'Valentine\'s Day 💝',
+    '2-20': 'World Day of Social Justice',
+    '3-8': 'International Women\'s Day 👩',
+    '3-15': 'World Consumer Rights Day',
+    '3-20': 'International Day of Happiness',
+    '3-21': 'World Poetry Day',
+    '3-22': 'World Water Day 💧',
+    '3-23': 'World Meteorological Day',
+    '4-2': 'World Autism Awareness Day',
+    '4-7': 'World Health Day 🏥',
+    '4-22': 'Earth Day 🌍',
+    '4-23': 'World Book Day 📚',
+    '5-3': 'World Press Freedom Day',
+    '5-8': 'World Red Cross Day',
+    '5-15': 'International Day of Families',
+    '5-17': 'World Telecommunication Day',
+    '5-31': 'World No Tobacco Day',
+    '6-5': 'World Environment Day 🌱',
+    '6-8': 'World Ocean Day 🌊',
+    '6-14': 'World Blood Donor Day',
+    '6-20': 'World Refugee Day',
+    '6-26': 'International Day Against Drug Abuse',
+    '7-11': 'World Population Day',
+    '8-9': 'International Day of World\'s Indigenous Peoples',
+    '8-12': 'International Youth Day',
+    '8-19': 'World Humanitarian Day',
+    '9-8': 'International Literacy Day 📖',
+    '9-15': 'International Day of Democracy',
+    '9-16': 'International Day for Preservation of Ozone Layer',
+    '9-21': 'International Day of Peace ☮️',
+    '9-27': 'World Tourism Day',
+    '10-1': 'International Day of Older Persons',
+    '10-2': 'International Day of Non-Violence',
+    '10-5': 'World Teachers\' Day 👨‍🏫',
+    '10-10': 'World Mental Health Day',
+    '10-16': 'World Food Day 🍚',
+    '10-24': 'United Nations Day 🇺🇳',
+    '11-14': 'World Diabetes Day',
+    '11-16': 'International Day for Tolerance',
+    '11-19': 'World Toilet Day',
+    '11-20': 'Universal Children\'s Day 👶',
+    '11-25': 'International Day for Elimination of Violence Against Women',
+    '12-1': 'World AIDS Day',
+    '12-2': 'International Day for Abolition of Slavery',
+    '12-3': 'International Day of Persons with Disabilities',
+    '12-5': 'International Volunteer Day',
+    '12-10': 'Human Rights Day',
+    '12-31': 'New Year\'s Eve 🎆'
+  };
+  
+  // Update today's date display
+  function updateTodayDate() {
+    const today = new Date();
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+    const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+    
+    // English date
+    const day = today.getDate();
+    const month = months[today.getMonth()];
+    const year = today.getFullYear();
+    const dayName = days[today.getDay()];
+    
+    document.getElementById('englishDate').textContent = `${day} ${month} ${year}`;
+    document.getElementById('dayName').textContent = dayName;
+    
+    // Bengali date
+    const bengaliDate = toBengaliDate(today);
+    document.getElementById('bengaliDate').textContent = bengaliDate;
+    
+    // Special event
+    const monthDay = `${today.getMonth() + 1}-${day}`;
+    const event = specialEvents[monthDay];
+    if (event) {
+      document.getElementById('specialEvent').textContent = `(${event})`;
+    } else {
+      document.getElementById('specialEvent').textContent = '';
+    }
+  }
+  
+  // Initialize
+  updateTodayDate();
+  
+  // Auto-update at midnight
+  function scheduleNextMidnightUpdate() {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const timeUntilMidnight = tomorrow - now;
+    
+    setTimeout(() => {
+      updateTodayDate();
+      // Schedule next update
+      scheduleNextMidnightUpdate();
+      
+      // Also reload the routine to highlight today's row correctly
+      if (typeof window.loadRoutine === 'function') {
+        window.loadRoutine();
+      }
+    }, timeUntilMidnight);
+  }
+  
+  scheduleNextMidnightUpdate();
+</script>
+
+<script type="module">
+  /* =========================
+     CLASS DURATION TIMER
+     Shows live progress of current class
+  ========================= */
+  
+  import { getDoc, doc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  
+  let currentClassData = null;
+  let timerInterval = null;
+  
+  async function updateClassTimer() {
+    const now = new Date();
+    const currentDay = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][now.getDay()];
+    const currentTime = now.getHours() * 60 + now.getMinutes(); // minutes since midnight
+    
+    try {
+      // Load time slots
+      const slotsSnap = await getDoc(doc(window.db, "settings", "timeSlots"));
+      const timeSlots = slotsSnap.exists() ? slotsSnap.data().slots : [];
+      
+      // Load today's routine
+      const routineSnap = await getDoc(doc(window.db, "routine", currentDay));
+      if (!routineSnap.exists()) {
+        hideTimer();
+        return;
+      }
+      
+      const classes = routineSnap.data().classes || [];
+      
+      // Find current class
+      let foundClass = null;
+      let classSlot = null;
+      
+      for (const cls of classes) {
+        const slot = timeSlots.find(s => s.time === cls.time);
+        if (!slot) continue;
+        
+        const [startHour, startMin] = slot.start.split(':').map(Number);
+        const [endHour, endMin] = slot.end.split(':').map(Number);
+        
+        const startTime = startHour * 60 + startMin;
+        const endTime = endHour * 60 + endMin;
+        
+        if (currentTime >= startTime && currentTime < endTime) {
+          foundClass = cls;
+          classSlot = slot;
+          break;
+        }
+      }
+      
+      if (foundClass && classSlot) {
+        showTimer(foundClass, classSlot, currentTime);
+      } else {
+        hideTimer();
+      }
+      
+    } catch (error) {
+      console.error("Error updating class timer:", error);
+      hideTimer();
+    }
+  }
+  
+  function showTimer(classData, slot, currentTime) {
+    const timer = document.getElementById('classDurationTimer');
+    timer.classList.remove('hidden');
+    
+    // Parse times
+    const [startHour, startMin] = slot.start.split(':').map(Number);
+    const [endHour, endMin] = slot.end.split(':').map(Number);
+    
+    const startTime = startHour * 60 + startMin;
+    const endTime = endHour * 60 + endMin;
+    
+    const totalDuration = endTime - startTime;
+    const elapsed = currentTime - startTime;
+    const remaining = endTime - currentTime;
+    
+    // Update UI
+    document.getElementById('timerClassName').textContent = classData.subject;
+    document.getElementById('timerRoom').textContent = `Room ${classData.room} • ${classData.code}`;
+    
+    // Format times for display
+    const formatTime = (hour, min) => {
+      const period = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+      return `${displayHour}:${min.toString().padStart(2, '0')} ${period}`;
+    };
+    
+    document.getElementById('timerStartTime').textContent = `Started: ${formatTime(startHour, startMin)}`;
+    document.getElementById('timerEndTime').textContent = `Ends: ${formatTime(endHour, endMin)}`;
+    
+    // Update countdown
+    if (remaining <= 5) {
+      document.getElementById('timerStatus').textContent = '⚠️ Class ending in';
+      document.getElementById('timerMinutes').textContent = `${remaining} ${remaining === 1 ? 'minute' : 'minutes'}!`;
+      timer.classList.add('ending-soon');
+      
+      // Show browser notification for last minute
+      if (remaining === 1 && Notification.permission === 'granted') {
+        new Notification('Class Ending Soon!', {
+          body: `${classData.subject} ends in 1 minute`,
+          icon: '/y.png'
+        });
+      }
+    } else {
+      document.getElementById('timerStatus').textContent = 'Class ends in';
+      document.getElementById('timerMinutes').textContent = `${remaining} minutes`;
+      timer.classList.remove('ending-soon');
+    }
+    
+    // Update progress bar
+    const progress = (elapsed / totalDuration) * 100;
+    document.getElementById('timerProgressBar').style.width = `${Math.min(progress, 100)}%`;
+  }
+  
+  function hideTimer() {
+    document.getElementById('classDurationTimer').classList.add('hidden');
+  }
+  
+  // Request notification permission
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+  
+  // Update timer every minute
+  updateClassTimer();
+  timerInterval = setInterval(updateClassTimer, 60000); // Update every 60 seconds
+  
+  // Also update every 10 seconds for more accurate progress bar
+  setInterval(() => {
+    const timer = document.getElementById('classDurationTimer');
+    if (!timer.classList.contains('hidden')) {
+      updateClassTimer();
+    }
+  }, 10000);
+</script>
 
 <script>
   if ("serviceWorker" in navigator) {
@@ -339,20 +1247,68 @@ darkToggle.addEventListener('click', () => {
 <script>
   let deferredPrompt;
   const installBtn = document.getElementById("installBtn");
+  const installBanner = document.getElementById("installBanner");
+  const bannerInstallBtn = document.getElementById("bannerInstallBtn");
+  const bannerDismissBtn = document.getElementById("bannerDismissBtn");
+
+  // Check if banner was already dismissed
+  const bannerDismissed = localStorage.getItem('installBannerDismissed');
+  
+  // Show banner after 3 seconds if not dismissed before
+  if (!bannerDismissed) {
+    setTimeout(() => {
+      installBanner.classList.remove('hidden');
+    }, 3000);
+  }
 
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
     installBtn.hidden = false;
+    
+    // Show banner if not dismissed
+    if (!bannerDismissed) {
+      installBanner.classList.remove('hidden');
+    }
   });
 
+  // Install from bottom button
   installBtn.addEventListener("click", async () => {
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    installBtn.hidden = true;
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        installBanner.classList.add('hidden');
+        localStorage.setItem('installBannerDismissed', 'true');
+      }
+      installBtn.hidden = true;
+      deferredPrompt = null;
+    }
+  });
+
+  // Install from banner button
+  bannerInstallBtn.addEventListener("click", async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        installBanner.classList.add('hidden');
+        localStorage.setItem('installBannerDismissed', 'true');
+      }
+      deferredPrompt = null;
+    } else {
+      // If browser prompt not available, just hide banner
+      installBanner.classList.add('hidden');
+      localStorage.setItem('installBannerDismissed', 'true');
+    }
+  });
+
+  // Dismiss banner
+  bannerDismissBtn.addEventListener("click", () => {
+    installBanner.classList.add('hidden');
+    localStorage.setItem('installBannerDismissed', 'true');
   });
 </script>
 
 </body>
 </html>
-
