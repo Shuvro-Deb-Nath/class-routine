@@ -47,6 +47,344 @@
 <button id="darkModeToggle" class="dark-toggle-btn">🌙</button>
 
 <style>
+/* ==========================================
+   SPLASH SCREEN
+========================================== */
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0d47a1 0%, #1976d2 50%, #2196f3 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  animation: fadeOut 0.5s ease 2s forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.splash-content {
+  text-align: center;
+  animation: splashSlideUp 0.8s ease;
+}
+
+@keyframes splashSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.splash-logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 20px;
+  animation: splashBounce 1s ease infinite;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes splashBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.splash-title {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0 0 30px 0;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.splash-loader {
+  margin: 20px 0;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.splash-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  margin: 20px 0 0 0;
+  animation: splashPulse 1.5s ease infinite;
+}
+
+@keyframes splashPulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ==========================================
+   TOAST NOTIFICATIONS
+========================================== */
+.toast-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  background: white;
+  color: #1976d2;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(33, 150, 243, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 280px;
+  max-width: 400px;
+  pointer-events: auto;
+  animation: toastSlideIn 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(400px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.toast.hiding {
+  animation: toastSlideOut 0.4s ease forwards;
+}
+
+@keyframes toastSlideOut {
+  to {
+    opacity: 0;
+    transform: translateX(400px);
+  }
+}
+
+.toast-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.toast-content {
+  flex: 1;
+}
+
+.toast-title {
+  font-weight: bold;
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+
+.toast-message {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.5;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.toast-close:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.toast.success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.toast.error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.toast.warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.toast.info {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+}
+
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.4);
+  animation: toastProgress 3s linear forwards;
+}
+
+@keyframes toastProgress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@media (max-width: 768px) {
+  .toast-container {
+    top: 60px;
+    right: 10px;
+    left: 10px;
+  }
+  
+  .toast {
+    min-width: auto;
+    max-width: 100%;
+  }
+  
+  .splash-logo {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .splash-title {
+    font-size: 2rem;
+  }
+}
+
+body.manual-dark .toast:not(.success):not(.error):not(.warning):not(.info) {
+  background: rgba(30, 30, 50, 0.95);
+  color: #e3f2fd;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(100, 181, 246, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  .toast:not(.success):not(.error):not(.warning):not(.info) {
+    background: rgba(30, 30, 50, 0.95);
+    color: #e3f2fd;
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(100, 181, 246, 0.3);
+  }
+}
+
+/* ==========================================
+   SKELETON LOADERS
+========================================== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeletonLoading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-date {
+  height: 80px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
+
+.skeleton-countdown {
+  height: 100px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+}
+
+.skeleton-table {
+  height: 400px;
+  border-radius: 12px;
+}
+
+body.manual-dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(100, 181, 246, 0.05) 0%,
+    rgba(100, 181, 246, 0.1) 50%,
+    rgba(100, 181, 246, 0.05) 100%
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(100, 181, 246, 0.05) 0%,
+      rgba(100, 181, 246, 0.1) 50%,
+      rgba(100, 181, 246, 0.05) 100%
+    );
+  }
+}
+
 /* Install Banner */
 .install-banner {
   position: fixed;
@@ -693,6 +1031,21 @@ darkToggle.addEventListener('click', () => {
 </script>
 <body>
 
+<!-- Splash Screen -->
+<div id="splashScreen" class="splash-screen">
+  <div class="splash-content">
+    <img src="y.png" alt="Logo" class="splash-logo">
+    <h1 class="splash-title">Class Routine</h1>
+    <div class="splash-loader">
+      <div class="spinner"></div>
+    </div>
+    <p class="splash-text">Loading your schedule...</p>
+  </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toastContainer" class="toast-container"></div>
+
 <!-- Install App Banner -->
 <div id="installBanner" class="install-banner hidden">
   <div class="install-banner-content">
@@ -1307,6 +1660,120 @@ darkToggle.addEventListener('click', () => {
   bannerDismissBtn.addEventListener("click", () => {
     installBanner.classList.add('hidden');
     localStorage.setItem('installBannerDismissed', 'true');
+  });
+</script>
+
+<script>
+  /* ==========================================
+     PREMIUM FEATURES: SPLASH, TOAST, SKELETON
+  ========================================== */
+  
+  // 1. SPLASH SCREEN - Auto hide after 2 seconds
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const splash = document.getElementById('splashScreen');
+      if (splash) {
+        splash.style.display = 'none';
+      }
+    }, 2500); // 2.5 seconds total (includes fade out)
+  });
+  
+  // 2. TOAST NOTIFICATION SYSTEM
+  window.showToast = function(options) {
+    const {
+      title = 'Notification',
+      message = '',
+      type = 'info', // success, error, warning, info
+      duration = 3000,
+      icon = null
+    } = options;
+    
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    // Default icons based on type
+    const icons = {
+      success: '✓',
+      error: '✕',
+      warning: '⚠',
+      info: 'ℹ'
+    };
+    
+    const toastIcon = icon || icons[type] || 'ℹ';
+    
+    toast.innerHTML = `
+      <div class="toast-icon">${toastIcon}</div>
+      <div class="toast-content">
+        <div class="toast-title">${title}</div>
+        ${message ? `<p class="toast-message">${message}</p>` : ''}
+      </div>
+      <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+      <div class="toast-progress"></div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto remove after duration
+    setTimeout(() => {
+      toast.classList.add('hiding');
+      setTimeout(() => toast.remove(), 400);
+    }, duration);
+  };
+  
+  // 3. SKELETON LOADERS - Show while content loads
+  function showSkeletonLoaders() {
+    const tableContainer = document.querySelector('.table-container');
+    if (!tableContainer) return;
+    
+    // Create skeleton HTML
+    const skeletonHTML = `
+      <div class="skeleton skeleton-date"></div>
+      <div class="skeleton skeleton-countdown"></div>
+      <div class="skeleton skeleton-table"></div>
+    `;
+    
+    // Show skeletons temporarily
+    const skeletonWrapper = document.createElement('div');
+    skeletonWrapper.id = 'skeletonLoader';
+    skeletonWrapper.innerHTML = skeletonHTML;
+    tableContainer.insertBefore(skeletonWrapper, tableContainer.firstChild);
+  }
+  
+  function hideSkeletonLoaders() {
+    const skeletonLoader = document.getElementById('skeletonLoader');
+    if (skeletonLoader) {
+      skeletonLoader.remove();
+    }
+  }
+  
+  // Show skeletons on page load
+  showSkeletonLoaders();
+  
+  // Hide skeletons when content is loaded (after script.js loads the routine)
+  window.addEventListener('load', () => {
+    // Wait for Firebase data to load
+    setTimeout(() => {
+      hideSkeletonLoaders();
+      
+      // Show welcome toast
+      showToast({
+        title: 'Welcome! 👋',
+        message: 'Your class routine is ready',
+        type: 'success',
+        duration: 3000
+      });
+    }, 1500);
+  });
+  
+  // Make toast function globally available for other scripts
+  window.addEventListener('message', (event) => {
+    if (event.data.type === 'showToast') {
+      showToast(event.data.options);
+    }
   });
 </script>
 
