@@ -6,8 +6,154 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="admin.css" />
     <link rel="icon" href="y.png" type="image/png" sizes="32x32"/> 
+    
+    <style>
+      /* Toast Notifications for Admin Panel */
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 100000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+      }
+
+      .toast {
+        background: white;
+        color: #1976d2;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 320px;
+        max-width: 450px;
+        pointer-events: auto;
+        animation: toastSlideIn 0.4s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      @keyframes toastSlideIn {
+        from {
+          opacity: 0;
+          transform: translateX(400px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .toast.hiding {
+        animation: toastSlideOut 0.4s ease forwards;
+      }
+
+      @keyframes toastSlideOut {
+        to {
+          opacity: 0;
+          transform: translateX(400px);
+        }
+      }
+
+      .toast-icon {
+        font-size: 28px;
+        flex-shrink: 0;
+      }
+
+      .toast-content {
+        flex: 1;
+      }
+
+      .toast-title {
+        font-weight: bold;
+        margin: 0 0 4px 0;
+        font-size: 15px;
+      }
+
+      .toast-message {
+        margin: 0;
+        font-size: 13px;
+        opacity: 0.85;
+      }
+
+      .toast-close {
+        background: none;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+        color: inherit;
+        opacity: 0.6;
+        padding: 0;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+      }
+
+      .toast-close:hover {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .toast.success {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+      }
+
+      .toast.error {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+      }
+
+      .toast.warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+      }
+
+      .toast.info {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+      }
+
+      .toast-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.5);
+        animation: toastProgress 3s linear forwards;
+      }
+
+      @keyframes toastProgress {
+        from { width: 100%; }
+        to { width: 0%; }
+      }
+
+      @media (max-width: 768px) {
+        .toast-container {
+          top: 10px;
+          right: 10px;
+          left: 10px;
+        }
+        
+        .toast {
+          min-width: auto;
+          max-width: 100%;
+        }
+      }
+    </style>
   </head>
   <body>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+    
     <div class="admin-wrapper">
       <h1 class="admin-title">⚙ Dev Control Dashboard</h1>
       
@@ -166,6 +312,54 @@
 
     <!-- ================= FIREBASE SCRIPT ================= -->
     <script type="module">
+      /* ==========================================
+         TOAST NOTIFICATION SYSTEM
+      ========================================== */
+      window.showToast = function(options) {
+        const {
+          title = 'Notification',
+          message = '',
+          type = 'info',
+          duration = 3000,
+          icon = null
+        } = options;
+        
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        
+        const icons = {
+          success: '✓',
+          error: '✕',
+          warning: '⚠',
+          info: 'ℹ'
+        };
+        
+        const toastIcon = icon || icons[type] || 'ℹ';
+        
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        toast.innerHTML = `
+          <div class="toast-icon">${toastIcon}</div>
+          <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            ${message ? `<p class="toast-message">${message}</p>` : ''}
+          </div>
+          <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+          <div class="toast-progress"></div>
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.classList.add('hiding');
+          setTimeout(() => toast.remove(), 400);
+        }, duration);
+      };
+      
+      /* ==========================================
+         FIREBASE SETUP
+      ========================================== */
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
       import {
         getFirestore,
@@ -258,7 +452,11 @@
           // Save back
           await setDoc(doc(db, "settings", "timeSlots"), { slots });
 
-          alert(`✅ Time Slot ${position + 1} updated to: ${formatted}`);
+          showToast({
+            title: 'Time Slot Updated! ⏰',
+            message: `Slot ${position + 1}: ${formatted}`,
+            type: 'success'
+          });
           loadCurrentTimeSlots();
           loadEditTimeDropdown();
           loadCancelSlots();
@@ -285,7 +483,12 @@
 
         try {
           await setDoc(doc(db, "settings", "timeSlots"), { slots });
-          alert('✅ Normal schedule loaded!');
+          showToast({
+            title: 'Schedule Updated! 📅',
+            message: 'Normal schedule has been loaded',
+            type: 'success',
+            icon: '✓'
+          });
           loadCurrentTimeSlots();
           loadEditTimeDropdown();
           loadCancelSlots();
@@ -312,7 +515,12 @@
 
         try {
           await setDoc(doc(db, "settings", "timeSlots"), { slots });
-          alert('✅ Ramadan schedule loaded!');
+          showToast({
+            title: 'Schedule Updated! 🌙',
+            message: 'Ramadan schedule has been loaded',
+            type: 'success',
+            icon: '✓'
+          });
           loadCurrentTimeSlots();
           loadEditTimeDropdown();
           loadCancelSlots();
@@ -364,7 +572,11 @@
           created: Date.now(),
         });
 
-        alert("✅ Notice saved");
+        showToast({
+          title: 'Notice Published! 📢',
+          message: 'All students will see this notice',
+          type: 'success'
+        });
         title.value = "";
         msg.value = "";
         loadNoticesList();
@@ -417,7 +629,11 @@
           time: etime.value,
         });
 
-        alert("✅ Event added");
+        showToast({
+          title: 'Event Added! 📘',
+          message: `${etype.value} - ${course.value}`,
+          type: 'success'
+        });
         etype.value = "";
         course.value = "";
         etitle.value = "";
@@ -621,7 +837,11 @@
           classes: classes,
         });
 
-        alert("✅ Slot updated");
+        showToast({
+          title: 'Routine Updated! 🛠',
+          message: 'Class slot has been updated',
+          type: 'success'
+        });
       };
 
       window.addSlot = async function () {
@@ -652,7 +872,11 @@
           classes: classes,
         });
 
-        alert("✅ Slot added");
+        showToast({
+          title: 'Slot Added! ➕',
+          message: 'New class has been added to routine',
+          type: 'success'
+        });
       };
 
       window.deleteSlot = async function () {
@@ -767,7 +991,12 @@
             timestamp: new Date().toISOString()
           });
           
-          alert(`✅ Effective date updated to: ${formattedDate}`);
+          showToast({
+            title: 'Effective Date Updated! 📅',
+            message: formattedDate,
+            type: 'success',
+            icon: '✓'
+          });
           loadCurrentEffectiveDate();
           
         } catch (error) {
