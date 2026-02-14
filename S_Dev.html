@@ -57,6 +57,26 @@
         </div>
       </div>
 
+      <!-- ================= EFFECTIVE DATE MANAGER ================= -->
+      <div class="card" style="border: 3px solid #10b981;">
+        <h3>📅 Routine Effective Date</h3>
+        <p style="color: white; margin-bottom: 15px;">
+          Set the "Effective from" date that appears in the routine header.
+        </p>
+
+        <div style="background: rgba(16, 185, 129, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+          <h4 style="color: #10b981; margin-top: 0;">Current Effective Date:</h4>
+          <div id="currentEffectiveDate" style="color: white; font-size: 18px; font-weight: bold;">
+            Loading...
+          </div>
+        </div>
+
+        <label style="color: white; display: block; margin-bottom: 10px;">New Effective Date:</label>
+        <input id="effectiveDate" type="date" style="margin-bottom: 15px;" />
+
+        <button class="btn-green" onclick="updateEffectiveDate()">💾 Update Effective Date</button>
+      </div>
+
       <!-- ================= NOTICE ================= -->
       <div class="card">
         <h3>📢 Add Notice</h3>
@@ -696,6 +716,66 @@
         }
       }
 
+      /* ================= EFFECTIVE DATE MANAGER ================= */
+      
+      // Load current effective date
+      async function loadCurrentEffectiveDate() {
+        try {
+          const snap = await getDoc(doc(db, "settings", "effectiveDate"));
+          
+          if (snap.exists()) {
+            const dateStr = snap.data().date;
+            document.getElementById("currentEffectiveDate").textContent = dateStr;
+            
+            // Pre-fill the input with current date
+            const date = new Date(dateStr);
+            const formattedDate = date.toISOString().split('T')[0];
+            document.getElementById("effectiveDate").value = formattedDate;
+          } else {
+            document.getElementById("currentEffectiveDate").textContent = "7 FEBRUARY 2026 (Default)";
+          }
+        } catch (error) {
+          console.error("Error loading effective date:", error);
+          document.getElementById("currentEffectiveDate").textContent = "Error loading date";
+        }
+      }
+      
+      // Update effective date
+      window.updateEffectiveDate = async function() {
+        const dateInput = document.getElementById("effectiveDate").value;
+        
+        if (!dateInput) {
+          alert("❌ Please select a date");
+          return;
+        }
+        
+        try {
+          // Convert to readable format: "7 FEBRUARY 2026"
+          const date = new Date(dateInput);
+          const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
+                         'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+          
+          const day = date.getDate();
+          const month = months[date.getMonth()];
+          const year = date.getFullYear();
+          
+          const formattedDate = `${day} ${month} ${year}`;
+          
+          // Save to Firebase
+          await setDoc(doc(db, "settings", "effectiveDate"), {
+            date: formattedDate,
+            timestamp: new Date().toISOString()
+          });
+          
+          alert(`✅ Effective date updated to: ${formattedDate}`);
+          loadCurrentEffectiveDate();
+          
+        } catch (error) {
+          console.error("Error updating effective date:", error);
+          alert("❌ Error updating date: " + error.message);
+        }
+      };
+
       // Load on page start
       loadCurrentTimeSlots();
       loadNoticesList();
@@ -703,6 +783,7 @@
       loadCancelledList();
       loadCancelSlots();
       loadEditTimeDropdown();
+      loadCurrentEffectiveDate();
     </script>
   </body>
 </html>
