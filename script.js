@@ -238,18 +238,170 @@ let lastMinute = -1;
 function runAllTimers() {
   const now = new Date();
   const currentMinute = now.getMinutes();
-  
-  // Only update class highlights when minute changes
+
+  // 🔥 Run once per minute
   if (currentMinute !== lastMinute) {
     checkCurrentClass();
+    updateWeekProgress(); // FIXED
     lastMinute = currentMinute;
   }
-  
-  // Update countdowns every second (they need precision)
+
+  // 🔥 Run every second
   updateClassCountdown();
   updateAssignmentCountdown();
   updateExamCountdown();
+  updateDayProgress();
 }
+
+
+function updateWeekProgress() {
+  const box = document.getElementById("weekProgressBox");
+  const fill = document.getElementById("weekProgressFill");
+  const text = document.getElementById("weekProgressText");
+
+  if (!box || !fill || !text) return;
+
+  const now = new Date();
+
+  // Monday = 0, Sunday = 6
+  const dayIndex = (now.getDay() + 6) % 7;
+
+  // total minutes in a week (Mon–Sun)
+  const totalMinutes = 7 * 24 * 60;
+
+  // minutes passed this week
+  const passedMinutes =
+    dayIndex * 24 * 60 +
+    now.getHours() * 60 +
+    now.getMinutes();
+
+  let percent = (passedMinutes / totalMinutes) * 100;
+  percent = Math.max(0, Math.min(percent, 100));
+
+  fill.style.width = percent.toFixed(2) + "%";
+  box.classList.remove("hidden");
+
+  // text
+  text.textContent = Math.floor(percent) + "%";
+
+  // 🎉 End of week
+  if (percent > 99) {
+    text.textContent = "Week Completed 🎉";
+  }
+
+  // 🎨 color states
+  if (percent > 80) {
+    fill.style.background = "linear-gradient(90deg, #f44336, #ef5350)";
+  } else if (percent > 50) {
+    fill.style.background = "linear-gradient(90deg, #ff9800, #ffb74d)";
+  } else {
+    fill.style.background = "linear-gradient(90deg, #4caf50, #81c784)";
+  }
+}
+
+function updateDayProgress() {
+  const box = document.getElementById("dayProgressBox");
+  const fill = document.getElementById("dayProgressFill");
+  const text = document.getElementById("dayProgressText");
+
+  if (!box || !fill || !text) return;
+
+  const now = new Date();
+  const today = now.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
+
+  let earliest = null;
+  let latest = null;
+  let inBreak = false;
+
+  document.querySelectorAll("td[data-time]").forEach((cell, index) => {
+    const row = cell.closest("tr");
+    const day = row.querySelector(".day-name")?.textContent.trim();
+
+    if (day !== today) return;
+
+    const [start, end] = cell.dataset.time.split("–");
+    const s = parse12hTime(start);
+    const e = parse12hTime(end);
+
+    const startMin = s.h * 60 + s.m;
+    const endMin = e.h * 60 + e.m;
+     const startTime = new Date();
+startTime.setHours(s.h, s.m, 0, 0);
+
+const endTime = new Date();
+endTime.setHours(e.h, e.m, 0, 0);
+
+const durationMs = endTime - startTime;
+const passedMs = now - startTime;
+
+const percent = Math.max(
+  0,
+  Math.min(((now - startTime) / (endTime - startTime)) * 100, 100)
+);
+
+    if (earliest === null || startMin < earliest) earliest = startMin;
+    if (latest === null || endMin > latest) latest = endMin;
+
+    // ☕ Detect break (empty cell = no class)
+    if (!cell.textContent.trim()) {
+      const currentMin = now.getHours() * 60 + now.getMinutes();
+      if (currentMin >= startMin && currentMin < endMin) {
+        inBreak = true;
+      }
+    }
+  });
+
+  if (earliest === null || latest === null) {
+    box.classList.add("hidden");
+    return;
+  }
+
+  const currentMin = now.getHours() * 60 + now.getMinutes();
+
+  // 🎉 AFTER LAST CLASS
+  if (currentMin > latest) {
+    fill.style.width = "100%";
+    text.textContent = "Day Completed 🎉";
+    fill.style.background = "linear-gradient(90deg, #10b981, #34d399)";
+    box.classList.remove("hidden");
+    return;
+  }
+
+  // 🌙 BEFORE FIRST CLASS
+  if (currentMin < earliest) {
+    fill.style.width = "0%";
+    text.textContent = "Day not started";
+    box.classList.remove("hidden");
+    return;
+  }
+
+  // 📊 NORMAL PROGRESS
+  let percent = ((currentMin - earliest) / (latest - earliest)) * 100;
+  percent = Math.max(0, Math.min(percent, 100));
+
+  fill.style.width = percent + "%";
+  box.classList.remove("hidden");
+
+  // ☕ BREAK TIME
+  if (inBreak) {
+    text.textContent = "Break Time ☕";
+    fill.style.background = "linear-gradient(90deg, #9e9e9e, #bdbdbd)";
+    return;
+  }
+
+  // 📊 NORMAL TEXT
+  text.textContent = Math.floor(percent) + "%";
+
+  // 🎨 COLOR STATES
+  if (percent > 80) {
+    fill.style.background = "linear-gradient(90deg, #f44336, #ef5350)";
+  } else if (percent > 50) {
+    fill.style.background = "linear-gradient(90deg, #ff9800, #ffb74d)";
+  } else {
+    fill.style.background = "linear-gradient(90deg, #4caf50, #81c784)";
+  }
+}
+
 
 /* =========================
    RENDER ROUTINE TABLE
@@ -360,15 +512,15 @@ function parse12hTime(str) {
 function getDateForDay(dayCode) {
   const map = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
   const now = new Date();
+
   let diff = map[dayCode] - now.getDay();
 
-  // If day already passed this week, move to next week
-  if (diff < 0) diff += 7;
-
+  // DO NOT push to next week
   const d = new Date(now);
   d.setDate(now.getDate() + diff);
   return d;
 }
+
 
 function formatRemainingTime(mins) {
   const s = Math.floor(mins * 60);
@@ -402,8 +554,9 @@ function checkCurrentClass() {
 
   document.querySelectorAll("td[data-time]").forEach(cell => {
     cell.classList.remove("active-class", "upcoming-class", "done-class");
-    cell.querySelectorAll(".live-badge,.live-countdown,.upcoming-countdown,.done-label")
-      .forEach(e => e.remove());
+    cell.querySelectorAll(".live-badge,.live-countdown")
+  .forEach(e => e.remove());
+
 
     if (cell.classList.contains("cancelled-class")) return;
 
@@ -416,23 +569,72 @@ function checkCurrentClass() {
 
     const startMin = s.h * 60 + s.m;
     const endMin = e.h * 60 + e.m;
+const startTime = new Date();
+startTime.setHours(s.h, s.m, 0, 0);
+
+const endTime = new Date();
+endTime.setHours(e.h, e.m, 0, 0);
+
+const durationMs = endTime - startTime;
+const passedMs = now - startTime;
+
+const percent = Math.max(0, Math.min((passedMs / durationMs) * 100, 100));
 
     /* 🔴 LIVE CLASS */
     if (cellDay === today && currentMinutes >= startMin && currentMinutes < endMin) {
-      cell.classList.add("active-class");
-      row.classList.add("current-row");
+  cell.classList.add("active-class");
+  row.classList.add("current-row");
 
-      const badge = document.createElement("div");
-      badge.className = "live-badge";
-      badge.textContent = "🔴 LIVE";
-      cell.appendChild(badge);
+  
+ 
 
-      const cd = document.createElement("div");
-      cd.className = "live-countdown";
-      cd.textContent = `LIVE • ${formatRemainingTime(endMin - currentMinutes)} left`;
-      cell.appendChild(cd);
-      return;
-    }
+
+  // LIVE badge
+  const badge = document.createElement("div");
+  badge.className = "live-badge";
+  badge.textContent = "🔴 LIVE";
+  cell.appendChild(badge);
+
+  // Countdown
+  const cd = document.createElement("div");
+  cd.className = "live-countdown";
+  cd.textContent = `LIVE • ${formatRemainingTime(endMin - currentMinutes)} left`;
+  cell.appendChild(cd);
+
+  // Progress bar
+let bar = cell.querySelector(".class-progress-bar");
+
+if (!bar) {
+  const progress = document.createElement("div");
+  progress.className = "class-progress";
+
+  bar = document.createElement("div");
+  bar.className = "class-progress-bar";
+  
+
+
+
+  progress.appendChild(bar);
+  cell.appendChild(progress);
+}
+
+
+// update width smoothly
+bar.style.width = percent.toFixed(2) + "%";
+
+// color states
+if (percent > 80) {
+  bar.style.background = "linear-gradient(90deg, #f44336, #ef5350)";
+} else if (percent > 50) {
+  bar.style.background = "linear-gradient(90deg, #ff9800, #ffb74d)";
+} else {
+  bar.style.background = "linear-gradient(90deg, #4caf50, #81c784)";
+}
+
+
+  return;
+}
+
 
     /* ✅ DONE CLASS */
     const classDate = getDateForDay(cellDay);
