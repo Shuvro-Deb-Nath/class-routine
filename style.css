@@ -1896,3 +1896,51 @@ tr.today-row {
     background: linear-gradient(135deg, #1976d2, #2196f3);
   }
 }
+.class-progress {
+  width: 100%;
+  height: 6px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.class-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #4caf50, #81c784);
+    transition: width 0.5s linear;
+  border-radius: 6px;
+}
+.day-progress {
+  background: linear-gradient(135deg, #1565c0, #2196f3);
+  color: white;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+}
+
+.day-progress-header {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.day-progress-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.day-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #4caf50, #81c784);
+  transition: width 1s linear;
+}
+.class-progress-bar {
+  transition: width 0.5s linear;
+}
