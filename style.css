@@ -716,7 +716,7 @@ body::after {
 }
 
 .day::after {
-  content: '📅';
+  content: '';
   position: absolute;
   right: 10px;
   top: 50%;
@@ -1944,4 +1944,12 @@ tr.today-row {
 .class-progress-bar {
   transition: width 0.5s linear;
 }
+.break-header {
+  background: #333;
+  color: #fff;
+}
 
+.break-cell {
+  background: #eee;
+  font-style: italic;
+}
