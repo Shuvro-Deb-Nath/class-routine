@@ -24,6 +24,8 @@ let routineDays = [];
 let academicEvents = [];
 let cancelledClasses = [];
 let notices = [];
+let breakIndex = 3; // default fallback
+
 
 /* =========================
    ENABLE OFFLINE PERSISTENCE
@@ -75,6 +77,23 @@ async function loadTimeSlots() {
         "02:35 PM –03:55 PM"
       ];
     }
+  }
+}
+async function loadBreakSlot() {
+  try {
+    const snap = await getDoc(doc(window.db, "settings", "break"));
+
+    if (snap.exists()) {
+      breakIndex = snap.data().index ?? 3;
+    } else {
+      breakIndex = 3;
+    }
+
+    console.log("Break index:", breakIndex);
+
+  } catch (e) {
+    console.log("⚠️ Using default break slot");
+    breakIndex = 3;
   }
 }
 
@@ -195,7 +214,7 @@ async function init() {
   try {
     // MUST load time slots first!
     await loadTimeSlots();
-    
+    await loadBreakSlot();
     // Then load everything else
     await Promise.all([
       loadRoutine(),
@@ -436,7 +455,7 @@ function renderRoutine(days) {
     
     timeSlots.forEach((slot, index) => {
       // Skip break slot (usually 4th slot)
-      if (index === 3) {
+      if (index === (breakIndex ?? 3)) {
         headerRow.innerHTML += '<th class="break-header" rowspan="3">BREAK<br>' + slot + '</th>';
       } else {
         headerRow.innerHTML += '<th>' + slot + '</th>';
@@ -554,8 +573,10 @@ function checkCurrentClass() {
 
   document.querySelectorAll("td[data-time]").forEach(cell => {
     cell.classList.remove("active-class", "upcoming-class", "done-class");
-    cell.querySelectorAll(".live-badge,.live-countdown")
-  .forEach(e => e.remove());
+    cell.querySelectorAll(
+  ".live-badge,.live-countdown,.done-label,.upcoming-countdown"
+).forEach(e => e.remove());
+
 
 
     if (cell.classList.contains("cancelled-class")) return;
@@ -652,10 +673,13 @@ if (percent > 80) {
     ) {
       cell.classList.add("done-class");
 
-      const done = document.createElement("div");
-      done.className = "done-label";
-      done.textContent = "✓ Class Taken";
-      cell.appendChild(done);
+      if (!cell.querySelector(".done-label")) {
+  const done = document.createElement("div");
+  done.className = "done-label";
+  done.textContent = "✓ Class Taken";
+  cell.appendChild(done);
+}
+
       return;
     }
 
@@ -672,12 +696,17 @@ if (percent > 80) {
   });
 
   if (nextCell && nextStart) {
-    nextCell.classList.add("upcoming-class");
-    const cd = document.createElement("div");
-    cd.className = "upcoming-countdown";
-    cd.textContent = `Starts in ${formatRemainingTime((nextStart - now) / 60000)}`;
-    nextCell.appendChild(cd);
-  }
+  nextCell.classList.add("upcoming-class");
+
+  // 🔥 REMOVE OLD FIRST
+  nextCell.querySelectorAll(".upcoming-countdown").forEach(e => e.remove());
+
+  const cd = document.createElement("div");
+  cd.className = "upcoming-countdown";
+  cd.textContent = `Starts in ${formatRemainingTime((nextStart - now) / 60000)}`;
+  nextCell.appendChild(cd);
+}
+
 }
 
 /* =========================
