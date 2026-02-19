@@ -430,8 +430,8 @@ function getFormattedDateForDay(dayCode) {
   const now = new Date();
   let diff = map[dayCode] - now.getDay();
 
-  // If already passed, show next week's date
-  if (diff < 0) diff += 7;
+  // Show the date within the CURRENT week (past days stay in this week)
+  // Do NOT push past days to next week
 
   const d = new Date();
   d.setDate(now.getDate() + diff);
