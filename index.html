@@ -1094,7 +1094,16 @@ darkToggle.addEventListener('click', () => {
     </div>
   </div>
   <div id="noticeBoard"></div>
-<!-- Weekly Progress -->
+  <!-- Day Progress -->
+<div id="dayProgressBox" class="day-progress hidden">
+  <div class="day-progress-header">
+    📊 Day Progress: <span id="dayProgressText">0%</span>
+  </div>
+
+  <div class="day-progress-bar">
+    <div id="dayProgressFill" class="day-progress-fill"></div>
+  </div>
+</div>
 
 
   <!-- Class Duration Timer -->
@@ -1155,16 +1164,7 @@ darkToggle.addEventListener('click', () => {
   </div>
 </div>
 
-  <!-- Day Progress -->
-<div id="dayProgressBox" class="day-progress hidden">
-  <div class="day-progress-header">
-    📊 Day Progress: <span id="dayProgressText">0%</span>
-  </div>
 
-  <div class="day-progress-bar">
-    <div id="dayProgressFill" class="day-progress-fill"></div>
-  </div>
-</div>
 <section class="features-info">
   <h2>📅 How This Routine Works</h2>
 
@@ -1801,3 +1801,4 @@ darkToggle.addEventListener('click', () => {
 
 </body>
 </html>
+
