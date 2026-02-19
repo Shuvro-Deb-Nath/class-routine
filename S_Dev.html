@@ -187,7 +187,19 @@
         <input id="slotEndTime" type="time" value="10:05" />
 
         <button class="btn-orange" onclick="updateTimeSlot()">💾 Update Time Slot</button>
-        
+         <label style="color: white; display:block; margin-top:10px;">
+  Select Break Slot:
+</label>
+
+<select id="breakSlot">
+  
+  <option value="3">Slot 4</option>
+  <option value="4">Slot 5</option>
+</select>
+
+<button class="btn-green" onclick="saveBreakSlot()">
+  💾 Save Break Slot
+</button>
         <hr />
         
         <h4 style="color: white;">Quick Presets:</h4>
@@ -1004,6 +1016,26 @@
           alert("❌ Error updating date: " + error.message);
         }
       };
+       
+      window.saveBreakSlot = async function () {
+  const breakIndex = parseInt(document.getElementById("breakSlot").value);
+
+  try {
+    await setDoc(doc(db, "settings", "break"), {
+      index: breakIndex
+    });
+
+    showToast({
+      title: 'Break Updated ☕',
+      message: `Break is now Slot ${breakIndex + 1}`,
+      type: 'success'
+    });
+
+  } catch (e) {
+    alert("❌ Error saving break slot");
+    console.error(e);
+  }
+};
 
       // Load on page start
       loadCurrentTimeSlots();
