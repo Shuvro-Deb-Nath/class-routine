@@ -1953,3 +1953,75 @@ tr.today-row {
   background: #eee;
   font-style: italic;
 }
+
+/* =============================
+   📝 EXAM MODE - SKY BLUE THEME
+============================= */
+
+body.exam-mode {
+  --main: #2196f3;
+  --dark: #0d47a1;
+  --light: #64b5f6;
+}
+
+/* Background */
+body.exam-mode {
+  background: linear-gradient(135deg, #0d47a1, #1976d2, #2196f3, #64b5f6) !important;
+}
+
+/* HERO HEADER */
+body.exam-mode .hero {
+  background: linear-gradient(135deg, #0d47a1, #1976d2, #2196f3) !important;
+  box-shadow: 0 0 40px rgba(33, 150, 243, 0.5);
+}
+
+/* TODAY DATE BOX */
+body.exam-mode .today-date-section {
+  background: linear-gradient(135deg, #1565c0, #1976d2, #42a5f5) !important;
+}
+
+/* ROUTINE TABLE HEADER */
+body.exam-mode .routine-table th {
+  background: linear-gradient(135deg, #1565c0, #2196f3) !important;
+}
+
+/* TABLE CELLS */
+body.exam-mode .routine-table td {
+  border-color: rgba(33, 150, 243, 0.3) !important;
+}
+
+/* CURRENT CLASS */
+body.exam-mode .current-class {
+  background: linear-gradient(135deg, #2196f3, #64b5f6) !important;
+  color: white;
+}
+
+/* TIMER */
+body.exam-mode .class-duration-timer {
+  background: linear-gradient(135deg, #1976d2, #64b5f6) !important;
+}
+
+/* NEXT CLASS BOX */
+body.exam-mode .next-class {
+  background: linear-gradient(135deg, #2196f3, #42a5f5) !important;
+}
+
+/* PROGRESS BAR */
+body.exam-mode #dayProgressFill {
+  background: linear-gradient(90deg, #64b5f6, #bbdefb) !important;
+}
+
+/* WEEK PROGRESS */
+body.exam-mode #weekProgressFill {
+  background: linear-gradient(90deg, #2196f3, #90caf9) !important;
+}
+
+/* NOTICE */
+body.exam-mode .notice {
+  border-left: 5px solid #64b5f6 !important;
+}
+
+/* DARK MODE BUTTON */
+body.exam-mode .dark-toggle-btn {
+  background: linear-gradient(135deg, #0d47a1, #2196f3) !important;
+}
