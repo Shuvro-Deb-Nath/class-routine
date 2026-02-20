@@ -1,1804 +1,2166 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <meta name="theme-color" content="#2196f3">
-  <title>Class Routine</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="theme-color" content="#2196f3" />
+    <title>Class Routine</title>
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="y.png" type="image/png" sizes="32x32" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="y.png" type="image/png" sizes="32x32" />
 
-  <!-- Performance hints -->
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-<link rel="dns-prefetch" href="https://www.gstatic.com">
-<link rel="preload" href="style.css" as="style">
-  <!-- Preload critical images -->
-  <link rel="preload" as="image" href="UULogo.webp">
-  <link rel="preload" as="image" href="y.png">
-  <link rel="manifest" href="/manifest.json">
+    <!-- Performance hints -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.gstatic.com" />
+    <link rel="preload" href="style.css" as="style" />
+    <!-- Preload critical images -->
+    <link rel="preload" as="image" href="UULogo.webp" />
+    <link rel="preload" as="image" href="y.png" />
+    <link rel="manifest" href="/manifest.json" />
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        getDocs,
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDoJVuE1cZTSRCMKen3DqlInJyZjQFs4UI",
-      authDomain: "class-routine-8b46c.firebaseapp.com",
-      projectId: "class-routine-8b46c",
-      storageBucket: "class-routine-8b46c.firebasestorage.app",
-      messagingSenderId: "666402119675",
-      appId: "1:666402119675:web:8fdc82c87af8303ed1355e"
-    };
+      const firebaseConfig = {
+        apiKey: "AIzaSyDoJVuE1cZTSRCMKen3DqlInJyZjQFs4UI",
+        authDomain: "class-routine-8b46c.firebaseapp.com",
+        projectId: "class-routine-8b46c",
+        storageBucket: "class-routine-8b46c.firebasestorage.app",
+        messagingSenderId: "666402119675",
+        appId: "1:666402119675:web:8fdc82c87af8303ed1355e",
+      };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.app = app;
-    window.db = db; // allow other scripts to use it
-  </script>
-</head>
-<!-- Dark Mode Toggle Button -->
-<button id="darkModeToggle" class="dark-toggle-btn">🌙</button>
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      window.app = app;
+      window.db = db; // allow other scripts to use it
+      window._fbDoc = doc;
+      window._fbGetDoc = getDoc;
+      window._fbGetDocs = getDocs;
+      window._fbCollection = collection;
+    </script>
+  </head>
+  <!-- Dark Mode Toggle Button -->
+  <button id="darkModeToggle" class="dark-toggle-btn">🌙</button>
 
-<style>
-/* ==========================================
+  <style>
+    /* ==========================================
    SPLASH SCREEN
 ========================================== */
-.splash-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #0d47a1 0%, #1976d2 50%, #2196f3 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999999;
-  animation: fadeOut 0.5s ease 2s forwards;
-}
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        135deg,
+        #0d47a1 0%,
+        #1976d2 50%,
+        #2196f3 100%
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      animation: fadeOut 0.5s ease 2s forwards;
+    }
 
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
 
-.splash-content {
-  text-align: center;
-  animation: splashSlideUp 0.8s ease;
-}
+    .splash-content {
+      text-align: center;
+      animation: splashSlideUp 0.8s ease;
+    }
 
-@keyframes splashSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+    @keyframes splashSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-.splash-logo {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 20px;
-  animation: splashBounce 1s ease infinite;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
-}
+    .splash-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 20px;
+      animation: splashBounce 1s ease infinite;
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+    }
 
-@keyframes splashBounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
+    @keyframes splashBounce {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
 
-.splash-title {
-  color: white;
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin: 0 0 30px 0;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
+    .splash-title {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 0 0 30px 0;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
 
-.splash-loader {
-  margin: 20px 0;
-}
+    .splash-loader {
+      margin: 20px 0;
+    }
 
-.spinner {
-  width: 50px;
-  height: 50px;
-  margin: 0 auto;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
+    .spinner {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
-.splash-text {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
-  margin: 20px 0 0 0;
-  animation: splashPulse 1.5s ease infinite;
-}
+    .splash-text {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      margin: 20px 0 0 0;
+      animation: splashPulse 1.5s ease infinite;
+    }
 
-@keyframes splashPulse {
-  0%, 100% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 1;
-  }
-}
+    @keyframes splashPulse {
+      0%,
+      100% {
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
 
-/* ==========================================
+    /* ==========================================
    TOAST NOTIFICATIONS
 ========================================== */
-.toast-container {
-  position: fixed;
-  top: 80px;
-  right: 20px;
-  z-index: 100000;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  pointer-events: none;
-}
+    .toast-container {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
 
-.toast {
-  background: white;
-  color: #1976d2;
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(33, 150, 243, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 280px;
-  max-width: 400px;
-  pointer-events: auto;
-  animation: toastSlideIn 0.4s ease;
-  position: relative;
-  overflow: hidden;
-}
+    .toast {
+      background: white;
+      color: #1976d2;
+      padding: 16px 20px;
+      border-radius: 12px;
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(33, 150, 243, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 280px;
+      max-width: 400px;
+      pointer-events: auto;
+      animation: toastSlideIn 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
 
-@keyframes toastSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(400px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
+    @keyframes toastSlideIn {
+      from {
+        opacity: 0;
+        transform: translateX(400px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
 
-.toast.hiding {
-  animation: toastSlideOut 0.4s ease forwards;
-}
+    .toast.hiding {
+      animation: toastSlideOut 0.4s ease forwards;
+    }
 
-@keyframes toastSlideOut {
-  to {
-    opacity: 0;
-    transform: translateX(400px);
-  }
-}
+    @keyframes toastSlideOut {
+      to {
+        opacity: 0;
+        transform: translateX(400px);
+      }
+    }
 
-.toast-icon {
-  font-size: 24px;
-  flex-shrink: 0;
-}
+    .toast-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
 
-.toast-content {
-  flex: 1;
-}
+    .toast-content {
+      flex: 1;
+    }
 
-.toast-title {
-  font-weight: bold;
-  margin: 0 0 4px 0;
-  font-size: 14px;
-}
+    .toast-title {
+      font-weight: bold;
+      margin: 0 0 4px 0;
+      font-size: 14px;
+    }
 
-.toast-message {
-  margin: 0;
-  font-size: 13px;
-  opacity: 0.8;
-}
+    .toast-message {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.8;
+    }
 
-.toast-close {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: inherit;
-  opacity: 0.5;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-}
+    .toast-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: inherit;
+      opacity: 0.5;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
 
-.toast-close:hover {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.1);
-}
+    .toast-close:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.1);
+    }
 
-.toast.success {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
-}
+    .toast.success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
 
-.toast.error {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
-}
+    .toast.error {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
 
-.toast.warning {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: white;
-}
+    .toast.warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
 
-.toast.info {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
-}
+    .toast.info {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+    }
 
-.toast-progress {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.4);
-  animation: toastProgress 3s linear forwards;
-}
+    .toast-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.4);
+      animation: toastProgress 3s linear forwards;
+    }
 
-@keyframes toastProgress {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0%;
-  }
-}
+    @keyframes toastProgress {
+      from {
+        width: 100%;
+      }
+      to {
+        width: 0%;
+      }
+    }
 
-@media (max-width: 768px) {
-  .toast-container {
-    top: 60px;
-    right: 10px;
-    left: 10px;
-  }
-  
-  .toast {
-    min-width: auto;
-    max-width: 100%;
-  }
-  
-  .splash-logo {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .splash-title {
-    font-size: 2rem;
-  }
-}
+    @media (max-width: 768px) {
+      .toast-container {
+        top: 60px;
+        right: 10px;
+        left: 10px;
+      }
 
-body.manual-dark .toast:not(.success):not(.error):not(.warning):not(.info) {
-  background: rgba(30, 30, 50, 0.95);
-  color: #e3f2fd;
-  box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(100, 181, 246, 0.3);
-}
+      .toast {
+        min-width: auto;
+        max-width: 100%;
+      }
 
-@media (prefers-color-scheme: dark) {
-  .toast:not(.success):not(.error):not(.warning):not(.info) {
-    background: rgba(30, 30, 50, 0.95);
-    color: #e3f2fd;
-    box-shadow: 
-      0 10px 30px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(100, 181, 246, 0.3);
-  }
-}
+      .splash-logo {
+        width: 100px;
+        height: 100px;
+      }
 
-/* ==========================================
+      .splash-title {
+        font-size: 2rem;
+      }
+    }
+
+    body.manual-dark .toast:not(.success):not(.error):not(.warning):not(.info) {
+      background: rgba(30, 30, 50, 0.95);
+      color: #e3f2fd;
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(100, 181, 246, 0.3);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .toast:not(.success):not(.error):not(.warning):not(.info) {
+        background: rgba(30, 30, 50, 0.95);
+        color: #e3f2fd;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(100, 181, 246, 0.3);
+      }
+    }
+
+    /* ==========================================
    SKELETON LOADERS
 ========================================== */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  background-size: 200% 100%;
-  animation: skeletonLoading 1.5s ease-in-out infinite;
-  border-radius: 8px;
-}
-
-@keyframes skeletonLoading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-.skeleton-date {
-  height: 80px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-}
-
-.skeleton-countdown {
-  height: 100px;
-  margin-bottom: 20px;
-  border-radius: 16px;
-}
-
-.skeleton-table {
-  height: 400px;
-  border-radius: 12px;
-}
-
-body.manual-dark .skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(100, 181, 246, 0.05) 0%,
-    rgba(100, 181, 246, 0.1) 50%,
-    rgba(100, 181, 246, 0.05) 100%
-  );
-}
-
-@media (prefers-color-scheme: dark) {
-  .skeleton {
-    background: linear-gradient(
-      90deg,
-      rgba(100, 181, 246, 0.05) 0%,
-      rgba(100, 181, 246, 0.1) 50%,
-      rgba(100, 181, 246, 0.05) 100%
-    );
-  }
-}
-
-/* Install Banner */
-.install-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, #1565c0, #1976d2);
-  color: white;
-  padding: 12px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 100000;
-  transform: translateY(-100%);
-  transition: transform 0.4s ease-in-out;
-}
-
-.install-banner:not(.hidden) {
-  transform: translateY(0);
-}
-
-.install-banner.hidden {
-  display: block;
-  transform: translateY(-100%);
-}
-
-.install-banner-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 1200px;
-  margin: 0 auto;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.install-banner-icon {
-  font-size: 32px;
-  flex-shrink: 0;
-}
-
-.install-banner-text {
-  flex: 1;
-  min-width: 200px;
-}
-
-.install-banner-text strong {
-  display: block;
-  font-size: 16px;
-  margin-bottom: 3px;
-}
-
-.install-banner-text p {
-  margin: 0;
-  font-size: 13px;
-  opacity: 0.9;
-}
-
-.install-banner-actions {
-  display: flex;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.banner-install-btn,
-.banner-dismiss-btn {
-  padding: 8px 20px;
-  border: none;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.banner-install-btn {
-  background: white;
-  color: #1565c0;
-}
-
-.banner-install-btn:hover {
-  background: #f5f5f5;
-  transform: scale(1.05);
-}
-
-.banner-dismiss-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-.banner-dismiss-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Mobile responsive */
-@media (max-width: 600px) {
-  .install-banner-content {
-    flex-direction: column;
-    text-align: center;
-    gap: 10px;
-  }
-  
-  .install-banner-text strong {
-    font-size: 15px;
-  }
-  
-  .install-banner-text p {
-    font-size: 12px;
-  }
-  
-  .install-banner-actions {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .banner-install-btn,
-  .banner-dismiss-btn {
-    flex: 1;
-    max-width: 150px;
-  }
-}
-
-/* Today's Date Section */
-.today-date-section {
-  background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #2196f3 100%);
-  color: white;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 
-    0 8px 24px rgba(21, 101, 192, 0.3),
-    0 0 40px rgba(33, 150, 243, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.today-date-section::before {
-  content: '📅';
-  position: absolute;
-  font-size: 120px;
-  opacity: 0.1;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.date-content {
-  position: relative;
-  z-index: 1;
-}
-
-.date-main {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-
-.date-separator {
-  opacity: 0.6;
-  font-weight: normal;
-}
-
-.date-secondary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 16px;
-  opacity: 0.95;
-  flex-wrap: wrap;
-}
-
-#bengaliDate {
-  font-weight: 600;
-}
-
-.special-event {
-  background: rgba(255, 255, 255, 0.25);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  display: none;
-}
-
-.special-event:not(:empty) {
-  display: inline-block;
-}
-
-/* Mobile responsive for date section */
-@media (max-width: 768px) {
-  .today-date-section {
-    padding: 15px;
-    margin-bottom: 15px;
-  }
-  
-  .date-main {
-    font-size: 18px;
-    gap: 10px;
-  }
-  
-  .date-secondary {
-    font-size: 14px;
-    gap: 8px;
-  }
-  
-  .special-event {
-    font-size: 12px;
-    padding: 3px 10px;
-  }
-  
-  .today-date-section::before {
-    font-size: 80px;
-  }
-}
-
-/* Dark mode for date section */
-body.manual-dark .today-date-section {
-  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #1565c0 100%);
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(33, 150, 243, 0.3);
-}
-
-@media (prefers-color-scheme: dark) {
-  .today-date-section {
-    background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #1565c0 100%);
-    box-shadow: 
-      0 8px 24px rgba(0, 0, 0, 0.5),
-      0 0 40px rgba(33, 150, 243, 0.3);
-  }
-}
-
-/* Class Duration Timer */
-.class-duration-timer {
-  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
-  color: white;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 16px;
-  box-shadow: 
-    0 10px 30px rgba(22, 163, 74, 0.4),
-    0 0 50px rgba(34, 197, 94, 0.2);
-  position: relative;
-  overflow: hidden;
-  animation: timerPulse 2s ease-in-out infinite;
-}
-
-@keyframes timerPulse {
-  0%, 100% {
-    box-shadow: 
-      0 10px 30px rgba(22, 163, 74, 0.4),
-      0 0 50px rgba(34, 197, 94, 0.2);
-  }
-  50% {
-    box-shadow: 
-      0 12px 35px rgba(22, 163, 74, 0.5),
-      0 0 60px rgba(34, 197, 94, 0.3);
-  }
-}
-
-.class-duration-timer.ending-soon {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-  animation: urgentPulse 1s ease-in-out infinite;
-}
-
-@keyframes urgentPulse {
-  0%, 100% {
-    box-shadow: 
-      0 10px 30px rgba(220, 38, 38, 0.5),
-      0 0 50px rgba(239, 68, 68, 0.3);
-  }
-  50% {
-    box-shadow: 
-      0 15px 40px rgba(220, 38, 38, 0.7),
-      0 0 70px rgba(239, 68, 68, 0.5);
-  }
-}
-
-.timer-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 15px;
-}
-
-.timer-icon {
-  font-size: 40px;
-  animation: iconBounce 2s ease-in-out infinite;
-}
-
-@keyframes iconBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-.timer-info h3 {
-  margin: 0;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.timer-info p {
-  margin: 3px 0 0 0;
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-.timer-body {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 15px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-}
-
-.timer-countdown {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-#timerStatus {
-  font-size: 14px;
-  opacity: 0.9;
-  margin-bottom: 5px;
-}
-
-#timerMinutes {
-  font-size: 32px;
-  font-weight: bold;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.progress-bar-container {
-  width: 100%;
-  height: 12px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 15px;
-  position: relative;
-}
-
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #fff 0%, #dcfce7 100%);
-  border-radius: 10px;
-  transition: width 1s linear;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  position: relative;
-}
-
-.progress-bar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.timer-details {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  opacity: 0.9;
-}
-
-/* Mobile responsive for timer */
-@media (max-width: 768px) {
-  .class-duration-timer {
-    padding: 15px;
-  }
-  
-  .timer-icon {
-    font-size: 32px;
-  }
-  
-  .timer-info h3 {
-    font-size: 18px;
-  }
-  
-  #timerMinutes {
-    font-size: 24px;
-  }
-  
-  .timer-details {
-    font-size: 11px;
-  }
-}
-
-/* Dark mode for timer */
-body.manual-dark .class-duration-timer {
-  background: linear-gradient(135deg, #065f46 0%, #059669 100%);
-}
-
-body.manual-dark .class-duration-timer.ending-soon {
-  background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
-}
-
-@media (prefers-color-scheme: dark) {
-  .class-duration-timer {
-    background: linear-gradient(135deg, #065f46 0%, #059669 100%);
-  }
-  
-  .class-duration-timer.ending-soon {
-    background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
-  }
-}
-
-/* Mobile responsive */
-@media (max-width: 600px) {
-  .install-banner-content {
-    flex-direction: column;
-    text-align: center;
-    gap: 10px;
-  }
-  
-  .install-banner-text strong {
-    font-size: 15px;
-  }
-  
-  .install-banner-text p {
-    font-size: 12px;
-  }
-  
-  .install-banner-actions {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .banner-install-btn,
-  .banner-dismiss-btn {
-    flex: 1;
-    max-width: 150px;
-  }
-}
-
-.dark-toggle-btn {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: linear-gradient(135deg, #1565c0, #1976d2);
-  color: white;
-  border: none;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  font-size: 16px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,.3);
-  z-index: 99999;
-  transition: all 0.3s ease;
-}
-
-.dark-toggle-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0,0,0,.4);
-}
-
-/* Force dark mode when active */
-body.manual-dark {
-  background: linear-gradient(135deg, #0a0e27 0%, #16213e 25%, #1a1a2e 50%, #0f3460 75%, #0a0e27 100%) !important;
-}
-
-body.manual-dark::before {
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(79, 172, 254, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(52, 152, 219, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(41, 128, 185, 0.2) 0%, transparent 50%) !important;
-}
-
-body.manual-dark .hero {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a237e 75%, #0d47a1 100%) !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 60px rgba(33, 150, 243, 0.2), inset 0 -5px 20px rgba(255, 255, 255, 0.05) !important;
-}
-
-body.manual-dark .title {
-  color: #e3f2fd !important;
-}
-
-body.manual-dark .effective {
-  background: rgba(13, 71, 161, 0.4) !important;
-  color: #bbdefb !important;
-  border: 1px solid rgba(100, 181, 246, 0.3) !important;
-}
-
-body.manual-dark .routine-table {
-  background: rgba(26, 26, 46, 0.95) !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
-  border: 1px solid rgba(100, 181, 246, 0.2) !important;
-}
-
-body.manual-dark .routine-table th {
-  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%) !important;
-  color: #e3f2fd !important;
-  border-bottom: 2px solid rgba(33, 150, 243, 0.3) !important;
-}
-
-body.manual-dark .routine-table td {
-  background: rgba(30, 30, 50, 0.8) !important;
-  color: #e3f2fd !important;
-  border: 1px solid rgba(100, 181, 246, 0.1) !important;
-}
-
-body.manual-dark .routine-table td strong {
-  color: #90caf9 !important;
-}
-
-body.manual-dark .routine-table td small {
-  color: #bbdefb !important;
-}
-
-body.manual-dark tr.today-row {
-  background: rgba(33, 150, 243, 0.25) !important;
-}
-
-body.manual-dark tr.today-row td {
-  background: rgba(30, 30, 50, 0.9) !important;
-  border-color: rgba(33, 150, 243, 0.3) !important;
-}
-
-body.manual-dark .day-date {
-  color: #90caf9 !important;
-}
-
-body.manual-dark .active-class {
-  background: linear-gradient(135deg, rgba(27, 94, 32, 0.4), rgba(46, 125, 50, 0.4)) !important;
-  border: 2px solid #66bb6a !important;
-}
-
-body.manual-dark .live-badge {
-  background: linear-gradient(135deg, #2e7d32, #43a047) !important;
-}
-
-body.manual-dark .live-countdown {
-  background: rgba(46, 125, 50, 0.3) !important;
-  color: #a5d6a7 !important;
-}
-
-body.manual-dark .upcoming-class {
-  background: linear-gradient(135deg, rgba(230, 81, 0, 0.3), rgba(245, 124, 0, 0.3)) !important;
-  border: 2px solid #ff9800 !important;
-}
-
-body.manual-dark .upcoming-countdown {
-  background: rgba(245, 124, 0, 0.3) !important;
-  color: #ffcc80 !important;
-}
-
-body.manual-dark .done-class {
-  background: rgba(30, 30, 50, 0.5) !important;
-  opacity: 0.6 !important;
-}
-
-body.manual-dark .done-label {
-  background: rgba(66, 66, 66, 0.5) !important;
-  color: #90a4ae !important;
-}
-
-body.manual-dark .cancelled-class {
-  background: linear-gradient(135deg, rgba(183, 28, 28, 0.3), rgba(211, 47, 47, 0.3)) !important;
-  border: 2px solid #e53935 !important;
-}
-
-body.manual-dark .notice {
-  background: rgba(26, 26, 46, 0.9) !important;
-  border-left: 4px solid #42a5f5 !important;
-  color: #e3f2fd !important;
-}
-
-body.manual-dark .notice h4 {
-  color: #90caf9 !important;
-}
-
-body.manual-dark .notice p {
-  color: #bbdefb !important;
-}
-
-body.manual-dark .next-class {
-  background: linear-gradient(135deg, #1a237e, #0d47a1) !important;
-  color: #e3f2fd !important;
-}
-
-body.manual-dark .features-info {
-  background: rgba(26, 26, 46, 0.95) !important;
-  border: 1px solid rgba(100, 181, 246, 0.2) !important;
-}
-
-body.manual-dark .features-info h2 {
-  color: #90caf9 !important;
-}
-
-body.manual-dark .feature-item {
-  background: rgba(30, 30, 50, 0.8) !important;
-  border: 1px solid rgba(100, 181, 246, 0.2) !important;
-}
-
-body.manual-dark .feature-item p {
-  color: #bbdefb !important;
-}
-
-body.manual-dark footer {
-  background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%) !important;
-  color: #90caf9 !important;
-  border-top: 1px solid rgba(100, 181, 246, 0.2) !important;
-}
-</style>
-
-<script>
-const darkToggle = document.getElementById('darkModeToggle');
-
-// Check saved preference
-if (localStorage.getItem('darkMode') === 'enabled') {
-  document.body.classList.add('manual-dark');
-  darkToggle.textContent = '☀️';
-}
-
-// Toggle on click
-darkToggle.addEventListener('click', () => {
-  document.body.classList.toggle('manual-dark');
-  
-  if (document.body.classList.contains('manual-dark')) {
-    darkToggle.textContent = '☀️';
-    localStorage.setItem('darkMode', 'enabled');
-  } else {
-    darkToggle.textContent = '🌙';
-    localStorage.setItem('darkMode', 'disabled');
-  }
-});
-</script>
-<body>
-
-<!-- Splash Screen -->
-<div id="splashScreen" class="splash-screen">
-  <div class="splash-content">
-    <img src="y.png" alt="Logo" class="splash-logo">
-    <h1 class="splash-title">Class Routine</h1>
-    <div class="splash-loader">
-      <div class="spinner"></div>
-    </div>
-    <p class="splash-text">Loading your schedule...</p>
-  </div>
-</div>
-
-<!-- Toast Notification Container -->
-<div id="toastContainer" class="toast-container"></div>
-
-<!-- Install App Banner -->
-<div id="installBanner" class="install-banner hidden">
-  <div class="install-banner-content">
-    <div class="install-banner-icon">📲</div>
-    <div class="install-banner-text">
-      <strong>Install Class Routine App</strong>
-      <p>Quick access to your schedule - works offline!</p>
-    </div>
-    <div class="install-banner-actions">
-      <button id="bannerInstallBtn" class="banner-install-btn">Install Now</button>
-      <button id="bannerDismissBtn" class="banner-dismiss-btn">Maybe Later</button>
-    </div>
-  </div>
-</div>
-
-<div class="hero">
-  <div class="hero-top">
-    <img src="UULogo.webp" class="logo" alt="Logo" loading="eager" decoding="async">
-
-    <h1 class="title">
-      <span class="line1">CSE 60 A</span>
-      <span class="line2">Class Routine & Updates (Spring 2026)</span>
-    </h1>
-
-    <img src="y.png" class="banner" alt="Banner" loading="eager" decoding="async">
-  </div>
-
-  <p class="effective"><b>Effective from <span id="effectiveFromDate">7 FEBRUARY 2026</span></b></p>
-</div>
-
-
-
-<div class="table-container">
-  <!-- Today's Date Section -->
-  <div id="todayDate" class="today-date-section">
-    <div class="date-content">
-      <div class="date-main">
-        <span id="englishDate">14 February 2026</span>
-        <span class="date-separator">|</span>
-        <span id="dayName">SATURDAY</span>
-      </div>
-      <div class="date-secondary">
-        <span id="bengaliDate">১লা ফাল্গুন ১৪৩২</span>
-        <span id="specialEvent" class="special-event"></span>
-      </div>
-    </div>
-  </div>
-  <div id="noticeBoard"></div>
-  <!-- Day Progress -->
-<div id="dayProgressBox" class="day-progress hidden">
-  <div class="day-progress-header">
-    📊 Day Progress: <span id="dayProgressText">0%</span>
-  </div>
-
-  <div class="day-progress-bar">
-    <div id="dayProgressFill" class="day-progress-fill"></div>
-  </div>
-</div>
-
-
-  <!-- Class Duration Timer -->
-  <div id="classDurationTimer" class="class-duration-timer hidden">
-    <div class="timer-header">
-      <span class="timer-icon">⏱️</span>
-      <div class="timer-info">
-        <h3 id="timerClassName">Current Class</h3>
-        <p id="timerRoom">Room 301</p>
+    .skeleton {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.1) 100%
+      );
+      background-size: 200% 100%;
+      animation: skeletonLoading 1.5s ease-in-out infinite;
+      border-radius: 8px;
+    }
+
+    @keyframes skeletonLoading {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    .skeleton-date {
+      height: 80px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+    }
+
+    .skeleton-countdown {
+      height: 100px;
+      margin-bottom: 20px;
+      border-radius: 16px;
+    }
+
+    .skeleton-table {
+      height: 400px;
+      border-radius: 12px;
+    }
+
+    body.manual-dark .skeleton {
+      background: linear-gradient(
+        90deg,
+        rgba(100, 181, 246, 0.05) 0%,
+        rgba(100, 181, 246, 0.1) 50%,
+        rgba(100, 181, 246, 0.05) 100%
+      );
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          rgba(100, 181, 246, 0.05) 0%,
+          rgba(100, 181, 246, 0.1) 50%,
+          rgba(100, 181, 246, 0.05) 100%
+        );
+      }
+    }
+
+    /* Install Banner */
+    .install-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #1565c0, #1976d2);
+      color: white;
+      padding: 12px 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 100000;
+      transform: translateY(-100%);
+      transition: transform 0.4s ease-in-out;
+    }
+
+    .install-banner:not(.hidden) {
+      transform: translateY(0);
+    }
+
+    .install-banner.hidden {
+      display: block;
+      transform: translateY(-100%);
+    }
+
+    .install-banner-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .install-banner-icon {
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+
+    .install-banner-text {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .install-banner-text strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 3px;
+    }
+
+    .install-banner-text p {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .install-banner-actions {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .banner-install-btn,
+    .banner-dismiss-btn {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .banner-install-btn {
+      background: white;
+      color: #1565c0;
+    }
+
+    .banner-install-btn:hover {
+      background: #f5f5f5;
+      transform: scale(1.05);
+    }
+
+    .banner-dismiss-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .banner-dismiss-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 600px) {
+      .install-banner-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+
+      .install-banner-text strong {
+        font-size: 15px;
+      }
+
+      .install-banner-text p {
+        font-size: 12px;
+      }
+
+      .install-banner-actions {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .banner-install-btn,
+      .banner-dismiss-btn {
+        flex: 1;
+        max-width: 150px;
+      }
+    }
+
+    /* Today's Date Section */
+    .today-date-section {
+      background: linear-gradient(
+        135deg,
+        #1565c0 0%,
+        #1976d2 50%,
+        #2196f3 100%
+      );
+      color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow:
+        0 8px 24px rgba(21, 101, 192, 0.3),
+        0 0 40px rgba(33, 150, 243, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .today-date-section::before {
+      content: "📅";
+      position: absolute;
+      font-size: 120px;
+      opacity: 0.1;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .date-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .date-main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .date-separator {
+      opacity: 0.6;
+      font-weight: normal;
+    }
+
+    .date-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 16px;
+      opacity: 0.95;
+      flex-wrap: wrap;
+    }
+
+    #bengaliDate {
+      font-weight: 600;
+    }
+
+    .special-event {
+      background: rgba(255, 255, 255, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      display: none;
+    }
+
+    .special-event:not(:empty) {
+      display: inline-block;
+    }
+
+    /* Mobile responsive for date section */
+    @media (max-width: 768px) {
+      .today-date-section {
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+
+      .date-main {
+        font-size: 18px;
+        gap: 10px;
+      }
+
+      .date-secondary {
+        font-size: 14px;
+        gap: 8px;
+      }
+
+      .special-event {
+        font-size: 12px;
+        padding: 3px 10px;
+      }
+
+      .today-date-section::before {
+        font-size: 80px;
+      }
+    }
+
+    /* Dark mode for date section */
+    body.manual-dark .today-date-section {
+      background: linear-gradient(
+        135deg,
+        #1a237e 0%,
+        #0d47a1 50%,
+        #1565c0 100%
+      );
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(33, 150, 243, 0.3);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .today-date-section {
+        background: linear-gradient(
+          135deg,
+          #1a237e 0%,
+          #0d47a1 50%,
+          #1565c0 100%
+        );
+        box-shadow:
+          0 8px 24px rgba(0, 0, 0, 0.5),
+          0 0 40px rgba(33, 150, 243, 0.3);
+      }
+    }
+
+    /* Class Duration Timer */
+    .class-duration-timer {
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+      color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 16px;
+      box-shadow:
+        0 10px 30px rgba(22, 163, 74, 0.4),
+        0 0 50px rgba(34, 197, 94, 0.2);
+      position: relative;
+      overflow: hidden;
+      animation: timerPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes timerPulse {
+      0%,
+      100% {
+        box-shadow:
+          0 10px 30px rgba(22, 163, 74, 0.4),
+          0 0 50px rgba(34, 197, 94, 0.2);
+      }
+      50% {
+        box-shadow:
+          0 12px 35px rgba(22, 163, 74, 0.5),
+          0 0 60px rgba(34, 197, 94, 0.3);
+      }
+    }
+
+    .class-duration-timer.ending-soon {
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+      animation: urgentPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes urgentPulse {
+      0%,
+      100% {
+        box-shadow:
+          0 10px 30px rgba(220, 38, 38, 0.5),
+          0 0 50px rgba(239, 68, 68, 0.3);
+      }
+      50% {
+        box-shadow:
+          0 15px 40px rgba(220, 38, 38, 0.7),
+          0 0 70px rgba(239, 68, 68, 0.5);
+      }
+    }
+
+    .timer-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .timer-icon {
+      font-size: 40px;
+      animation: iconBounce 2s ease-in-out infinite;
+    }
+
+    @keyframes iconBounce {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .timer-info h3 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .timer-info p {
+      margin: 3px 0 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .timer-body {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 15px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .timer-countdown {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    #timerStatus {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+
+    #timerMinutes {
+      font-size: 32px;
+      font-weight: bold;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #fff 0%, #dcfce7 100%);
+      border-radius: 10px;
+      transition: width 1s linear;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      position: relative;
+    }
+
+    .progress-bar::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+      );
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .timer-details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    /* Mobile responsive for timer */
+    @media (max-width: 768px) {
+      .class-duration-timer {
+        padding: 15px;
+      }
+
+      .timer-icon {
+        font-size: 32px;
+      }
+
+      .timer-info h3 {
+        font-size: 18px;
+      }
+
+      #timerMinutes {
+        font-size: 24px;
+      }
+
+      .timer-details {
+        font-size: 11px;
+      }
+    }
+
+    /* Dark mode for timer */
+    body.manual-dark .class-duration-timer {
+      background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+    }
+
+    body.manual-dark .class-duration-timer.ending-soon {
+      background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .class-duration-timer {
+        background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+      }
+
+      .class-duration-timer.ending-soon {
+        background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+      }
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 600px) {
+      .install-banner-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+
+      .install-banner-text strong {
+        font-size: 15px;
+      }
+
+      .install-banner-text p {
+        font-size: 12px;
+      }
+
+      .install-banner-actions {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .banner-install-btn,
+      .banner-dismiss-btn {
+        flex: 1;
+        max-width: 150px;
+      }
+    }
+
+    .dark-toggle-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: linear-gradient(135deg, #1565c0, #1976d2);
+      color: white;
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 99999;
+      transition: all 0.3s ease;
+    }
+
+    .dark-toggle-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Force dark mode when active */
+    body.manual-dark {
+      background: linear-gradient(
+        135deg,
+        #0a0e27 0%,
+        #16213e 25%,
+        #1a1a2e 50%,
+        #0f3460 75%,
+        #0a0e27 100%
+      ) !important;
+    }
+
+    body.manual-dark::before {
+      background:
+        radial-gradient(
+          circle at 20% 50%,
+          rgba(79, 172, 254, 0.15) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          circle at 80% 80%,
+          rgba(52, 152, 219, 0.15) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          circle at 40% 20%,
+          rgba(41, 128, 185, 0.2) 0%,
+          transparent 50%
+        ) !important;
+    }
+
+    body.manual-dark .hero {
+      background: linear-gradient(
+        135deg,
+        #1a1a2e 0%,
+        #16213e 25%,
+        #0f3460 50%,
+        #1a237e 75%,
+        #0d47a1 100%
+      ) !important;
+      box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.6),
+        0 0 60px rgba(33, 150, 243, 0.2),
+        inset 0 -5px 20px rgba(255, 255, 255, 0.05) !important;
+    }
+
+    body.manual-dark .title {
+      color: #e3f2fd !important;
+    }
+
+    body.manual-dark .effective {
+      background: rgba(13, 71, 161, 0.4) !important;
+      color: #bbdefb !important;
+      border: 1px solid rgba(100, 181, 246, 0.3) !important;
+    }
+
+    body.manual-dark .routine-table {
+      background: rgba(26, 26, 46, 0.95) !important;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+      border: 1px solid rgba(100, 181, 246, 0.2) !important;
+    }
+
+    body.manual-dark .routine-table th {
+      background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%) !important;
+      color: #e3f2fd !important;
+      border-bottom: 2px solid rgba(33, 150, 243, 0.3) !important;
+    }
+
+    body.manual-dark .routine-table td {
+      background: rgba(30, 30, 50, 0.8) !important;
+      color: #e3f2fd !important;
+      border: 1px solid rgba(100, 181, 246, 0.1) !important;
+    }
+
+    body.manual-dark .routine-table td strong {
+      color: #90caf9 !important;
+    }
+
+    body.manual-dark .routine-table td small {
+      color: #bbdefb !important;
+    }
+
+    body.manual-dark tr.today-row {
+      background: rgba(33, 150, 243, 0.25) !important;
+    }
+
+    body.manual-dark tr.today-row td {
+      background: rgba(30, 30, 50, 0.9) !important;
+      border-color: rgba(33, 150, 243, 0.3) !important;
+    }
+
+    body.manual-dark .day-date {
+      color: #90caf9 !important;
+    }
+
+    body.manual-dark .active-class {
+      background: linear-gradient(
+        135deg,
+        rgba(27, 94, 32, 0.4),
+        rgba(46, 125, 50, 0.4)
+      ) !important;
+      border: 2px solid #66bb6a !important;
+    }
+
+    body.manual-dark .live-badge {
+      background: linear-gradient(135deg, #2e7d32, #43a047) !important;
+    }
+
+    body.manual-dark .live-countdown {
+      background: rgba(46, 125, 50, 0.3) !important;
+      color: #a5d6a7 !important;
+    }
+
+    body.manual-dark .upcoming-class {
+      background: linear-gradient(
+        135deg,
+        rgba(230, 81, 0, 0.3),
+        rgba(245, 124, 0, 0.3)
+      ) !important;
+      border: 2px solid #ff9800 !important;
+    }
+
+    body.manual-dark .upcoming-countdown {
+      background: rgba(245, 124, 0, 0.3) !important;
+      color: #ffcc80 !important;
+    }
+
+    body.manual-dark .done-class {
+      background: rgba(30, 30, 50, 0.5) !important;
+      opacity: 0.6 !important;
+    }
+
+    body.manual-dark .done-label {
+      background: rgba(66, 66, 66, 0.5) !important;
+      color: #90a4ae !important;
+    }
+
+    body.manual-dark .cancelled-class {
+      background: linear-gradient(
+        135deg,
+        rgba(183, 28, 28, 0.3),
+        rgba(211, 47, 47, 0.3)
+      ) !important;
+      border: 2px solid #e53935 !important;
+    }
+
+    body.manual-dark .notice {
+      background: rgba(26, 26, 46, 0.9) !important;
+      border-left: 4px solid #42a5f5 !important;
+      color: #e3f2fd !important;
+    }
+
+    body.manual-dark .notice h4 {
+      color: #90caf9 !important;
+    }
+
+    body.manual-dark .notice p {
+      color: #bbdefb !important;
+    }
+
+    body.manual-dark .next-class {
+      background: linear-gradient(135deg, #1a237e, #0d47a1) !important;
+      color: #e3f2fd !important;
+    }
+
+    body.manual-dark .features-info {
+      background: rgba(26, 26, 46, 0.95) !important;
+      border: 1px solid rgba(100, 181, 246, 0.2) !important;
+    }
+
+    body.manual-dark .features-info h2 {
+      color: #90caf9 !important;
+    }
+
+    body.manual-dark .feature-item {
+      background: rgba(30, 30, 50, 0.8) !important;
+      border: 1px solid rgba(100, 181, 246, 0.2) !important;
+    }
+
+    body.manual-dark .feature-item p {
+      color: #bbdefb !important;
+    }
+
+    body.manual-dark footer {
+      background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%) !important;
+      color: #90caf9 !important;
+      border-top: 1px solid rgba(100, 181, 246, 0.2) !important;
+    }
+  </style>
+
+  <script>
+    const darkToggle = document.getElementById("darkModeToggle");
+
+    // Check saved preference
+    if (localStorage.getItem("darkMode") === "enabled") {
+      document.body.classList.add("manual-dark");
+      darkToggle.textContent = "☀️";
+    }
+
+    // Toggle on click
+    darkToggle.addEventListener("click", () => {
+      document.body.classList.toggle("manual-dark");
+
+      if (document.body.classList.contains("manual-dark")) {
+        darkToggle.textContent = "☀️";
+        localStorage.setItem("darkMode", "enabled");
+      } else {
+        darkToggle.textContent = "🌙";
+        localStorage.setItem("darkMode", "disabled");
+      }
+    });
+  </script>
+  <body>
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-screen">
+      <div class="splash-content">
+        <img src="y.png" alt="Logo" class="splash-logo" />
+        <h1 class="splash-title">Class Routine</h1>
+        <div class="splash-loader">
+          <div class="spinner"></div>
+        </div>
+        <p class="splash-text">Loading your schedule...</p>
       </div>
     </div>
-    
-    <div class="timer-body">
-      <div class="timer-countdown">
-        <span id="timerStatus">Class ends in</span>
-        <span id="timerMinutes">35 minutes</span>
-      </div>
-      
-      <div class="progress-bar-container">
-        <div id="timerProgressBar" class="progress-bar"></div>
-      </div>
-      
-      <div class="timer-details">
-        <span id="timerStartTime">Started: 10:05 AM</span>
-        <span id="timerEndTime">Ends: 11:25 AM</span>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Install App Banner -->
+    <div id="installBanner" class="install-banner hidden">
+      <div class="install-banner-content">
+        <div class="install-banner-icon">📲</div>
+        <div class="install-banner-text">
+          <strong>Install Class Routine App</strong>
+          <p>Quick access to your schedule - works offline!</p>
+        </div>
+        <div class="install-banner-actions">
+          <button id="bannerInstallBtn" class="banner-install-btn">
+            Install Now
+          </button>
+          <button id="bannerDismissBtn" class="banner-dismiss-btn">
+            Maybe Later
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-  
-  <div id="countdownStack">
-    <div id="classCountdown" class="next-class hidden"></div>
-    <div id="assignmentCountdown" class="next-class hidden"></div>
-    <div id="examCountdown" class="next-class hidden"></div>
-  </div>
-  
-  <table class="routine-table">
-    <thead>
-      <tr>
-        <th>Day</th>
-        <th>08:45 AM –10:05 AM</th>
-        <th>10:05 AM –11:25 AM</th>
-        <th>11:25 AM –12:45 PM</th>
-        <th class="break-header" rowspan="3">BREAK<br>12:45 PM –01:15 PM</th>
-        <th>01:15 PM –02:35 PM</th>
-        <th>02:35 PM –03:55 PM</th>
-      </tr>
-    </thead>
-    <tbody id="routineBody"></tbody>
-  </table>
-</div>
-<div id="weekProgressBox" class="day-progress hidden">
-  <div class="day-progress-header">
-    📅 Weekly Progress: <span id="weekProgressText">0%</span>
-  </div>
 
-  <div class="day-progress-bar">
-    <div id="weekProgressFill" class="day-progress-fill"></div>
-  </div>
-</div>
+    <div class="hero">
+      <div class="hero-top">
+        <img
+          src="UULogo.webp"
+          class="logo"
+          alt="Logo"
+          loading="eager"
+          decoding="async"
+        />
 
+        <h1 class="title">
+          <span class="line1">CSE 60 A</span>
+          <span class="line2">Class Routine & Updates (Spring 2026)</span>
+        </h1>
 
-<section class="features-info">
-  <h2>📅 How This Routine Works</h2>
+        <img
+          src="y.png"
+          class="banner"
+          alt="Banner"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
 
-  <div class="feature-list">
-    <div class="feature-item today-demo">
-      <span class="feature-badge">📅 TODAY</span>
-      <p>
-        The <b>entire row</b> for <b>today's date</b> is automatically highlighted,
-        so you instantly know which day's classes are relevant.
+      <p class="effective">
+        <b
+          >Effective from <span id="effectiveFromDate">7 FEBRUARY 2026</span></b
+        >
       </p>
     </div>
 
-    <div class="feature-item current-demo">
-      <span class="feature-badge">🔴 LIVE</span>
-      <p>
-        The <b>currently running class</b> is highlighted in green with a
-        <b>LIVE indicator</b>. This updates automatically based on the current time.
-      </p>
+    <div class="table-container">
+      <!-- Today's Date Section -->
+      <div id="todayDate" class="today-date-section">
+        <div class="date-content">
+          <div class="date-main">
+            <span id="englishDate">14 February 2026</span>
+            <span class="date-separator">|</span>
+            <span id="dayName">SATURDAY</span>
+          </div>
+          <div class="date-secondary">
+            <span id="bengaliDate">১লা ফাল্গুন ১৪৩২</span>
+            <span id="specialEvent" class="special-event"></span>
+          </div>
+        </div>
+      </div>
+      <div id="noticeBoard"></div>
+      <!-- Weekly Progress -->
+
+      <!-- Class Duration Timer -->
+      <div id="classDurationTimer" class="class-duration-timer hidden">
+        <div class="timer-header">
+          <span class="timer-icon">⏱️</span>
+          <div class="timer-info">
+            <h3 id="timerClassName">Current Class</h3>
+            <p id="timerRoom">Room 301</p>
+          </div>
+        </div>
+
+        <div class="timer-body">
+          <div class="timer-countdown">
+            <span id="timerStatus">Class ends in</span>
+            <span id="timerMinutes">35 minutes</span>
+          </div>
+
+          <div class="progress-bar-container">
+            <div id="timerProgressBar" class="progress-bar"></div>
+          </div>
+
+          <div class="timer-details">
+            <span id="timerStartTime">Started: 10:05 AM</span>
+            <span id="timerEndTime">Ends: 11:25 AM</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="countdownStack">
+        <div id="classCountdown" class="next-class hidden"></div>
+        <div id="assignmentCountdown" class="next-class hidden"></div>
+        <div id="examCountdown" class="next-class hidden"></div>
+      </div>
+
+      <table class="routine-table">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>08:45 AM –10:05 AM</th>
+            <th>10:05 AM –11:25 AM</th>
+            <th>11:25 AM –12:45 PM</th>
+            <th class="break-header" rowspan="3">
+              BREAK<br />12:45 PM –01:15 PM
+            </th>
+            <th>01:15 PM –02:35 PM</th>
+            <th>02:35 PM –03:55 PM</th>
+          </tr>
+        </thead>
+        <tbody id="routineBody"></tbody>
+      </table>
+    </div>
+    <div class="table-container" id="examRoutineSection" style="display:none;">
+      <div id="examRoutineHeader" style="
+        background: linear-gradient(135deg, #6d28d9, #7c3aed, #8b5cf6);
+        color: white;
+        padding: 20px 24px;
+        border-radius: 16px 16px 0 0;
+        margin-bottom: 0;
+        text-align: center;
+      ">
+        <div style="font-size: 28px; margin-bottom: 6px;">📝</div>
+        <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 1px;">EXAM ROUTINE</h2>
+        <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">CSE 60 A — Spring 2026</p>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="routine-table" id="examRoutineTable" style="border-radius: 0 0 16px 16px;">
+          <thead>
+            <tr style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
+              <th style="color:white; text-align:center; width:50px;">#</th>
+              <th style="color:white; text-align:center;">Date</th>
+              <th style="color:white; text-align:center;">Course Name</th>
+              <th style="color:white; text-align:center;">Course Code</th>
+              <th style="color:white; text-align:center;">Time</th>
+              <th style="color:white; text-align:center;">Room No</th>
+            </tr>
+          </thead>
+          <tbody id="examRoutineBody">
+            <tr><td colspan="6" style="text-align:center; padding:30px; color:#7c3aed;">Loading exam schedule...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="feature-item upcoming-demo">
-      <span class="feature-badge">⏰ NEXT</span>
-      <p>
-        The <b>next upcoming class</b> after the current one is highlighted in orange,
-        helping you prepare in advance.
-      </p>
+    <style>
+      /* Exam Routine Table Styles */
+      #examRoutineSection .routine-table th {
+        background: linear-gradient(135deg, #4c1d95, #6d28d9) !important;
+        color: white !important;
+      }
+      #examRoutineSection .routine-table td {
+        text-align: center;
+        padding: 14px 12px;
+        vertical-align: middle;
+      }
+      .exam-today-row td {
+        background: linear-gradient(135deg, rgba(109,40,217,0.15), rgba(139,92,246,0.15)) !important;
+        border-left: 4px solid #7c3aed !important;
+        font-weight: bold;
+      }
+      .exam-serial {
+        font-weight: bold;
+        color: #7c3aed;
+        font-size: 16px;
+      }
+      .exam-date-cell .exam-date-val {
+        font-weight: bold;
+        font-size: 14px;
+        display: block;
+      }
+      .exam-date-cell .exam-day-val {
+        font-size: 12px;
+        color: #7c3aed;
+        display: block;
+        margin-top: 3px;
+      }
+      .exam-course-name {
+        font-weight: bold;
+        font-size: 14px;
+      }
+      .exam-code {
+        background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+      }
+      .exam-time {
+        font-size: 13px;
+        color: #555;
+        white-space: nowrap;
+      }
+      .exam-room {
+        font-weight: bold;
+        color: #1976d2;
+      }
+      /* Dark mode for exam */
+      body.manual-dark #examRoutineSection .routine-table td {
+        background: rgba(26, 26, 46, 0.95) !important;
+        color: #e3f2fd !important;
+      }
+      body.manual-dark .exam-date-cell .exam-day-val { color: #c4b5fd !important; }
+      body.manual-dark .exam-time { color: #c4b5fd !important; }
+      body.manual-dark .exam-room { color: #90caf9 !important; }
+      body.manual-dark .exam-today-row td {
+        background: rgba(109,40,217,0.25) !important;
+      }
+      @media (prefers-color-scheme: dark) {
+        #examRoutineSection .routine-table td { background: rgba(26,26,46,0.95) !important; color: #e3f2fd !important; }
+        .exam-date-cell .exam-day-val { color: #c4b5fd !important; }
+        .exam-time { color: #c4b5fd !important; }
+        .exam-room { color: #90caf9 !important; }
+      }
+    </style>
+      <div class="day-progress-header">
+        📅 Weekly Progress: <span id="weekProgressText">0%</span>
+      </div>
+
+      <div class="day-progress-bar">
+        <div id="weekProgressFill" class="day-progress-fill"></div>
+      </div>
     </div>
 
-    <div class="feature-item auto-demo">
-      <span class="feature-badge">⚙️ AUTO</span>
-      <p>
-        All highlights update <b>automatically</b> based on your device's
-        <b>date and time</b>. No manual refresh is needed.
-      </p>
+    <!-- Day Progress -->
+    <div id="dayProgressBox" class="day-progress hidden">
+      <div class="day-progress-header">
+        📊 Day Progress: <span id="dayProgressText">0%</span>
+      </div>
+
+      <div class="day-progress-bar">
+        <div id="dayProgressFill" class="day-progress-fill"></div>
+      </div>
     </div>
-  </div>
-</section>
+    <section class="features-info">
+      <h2>📅 How This Routine Works</h2>
 
-<footer>
-  © 2026 | Class Routine | Powered by SHUVRO DEB NATH
-</footer>
+      <div class="feature-list">
+        <div class="feature-item today-demo">
+          <span class="feature-badge">📅 TODAY</span>
+          <p>
+            The <b>entire row</b> for <b>today's date</b> is automatically
+            highlighted, so you instantly know which day's classes are relevant.
+          </p>
+        </div>
 
-<button id="installBtn" hidden class="install-btn">
-  📲 Install App
-</button>
+        <div class="feature-item current-demo">
+          <span class="feature-badge">🔴 LIVE</span>
+          <p>
+            The <b>currently running class</b> is highlighted in green with a
+            <b>LIVE indicator</b>. This updates automatically based on the
+            current time.
+          </p>
+        </div>
 
-<script type="module" src="script.js"></script>
+        <div class="feature-item upcoming-demo">
+          <span class="feature-badge">⏰ NEXT</span>
+          <p>
+            The <b>next upcoming class</b> after the current one is highlighted
+            in orange, helping you prepare in advance.
+          </p>
+        </div>
 
-<script type="module">
-  // Load effective date from Firebase
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-  
-  async function loadEffectiveDate() {
-    try {
-      const db = window.db; // Use the db initialized in head
-      const snap = await getDoc(doc(db, "settings", "effectiveDate"));
-      
-      if (snap.exists()) {
-        document.getElementById("effectiveFromDate").textContent = snap.data().date;
+        <div class="feature-item auto-demo">
+          <span class="feature-badge">⚙️ AUTO</span>
+          <p>
+            All highlights update <b>automatically</b> based on your device's
+            <b>date and time</b>. No manual refresh is needed.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer>© 2026 | Class Routine | Powered by SHUVRO DEB NATH</footer>
+
+    <button id="installBtn" hidden class="install-btn">📲 Install App</button>
+
+    <script type="module" src="script.js"></script>
+
+    <script type="module">
+      // Load effective date from Firebase
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+      async function loadEffectiveDate() {
+        try {
+          const db = window.db; // Use the db initialized in head
+          const snap = await getDoc(doc(db, "settings", "effectiveDate"));
+
+          if (snap.exists()) {
+            document.getElementById("effectiveFromDate").textContent =
+              snap.data().date;
+          }
+          // If doesn't exist, keep default "7 FEBRUARY 2026"
+        } catch (error) {
+          console.error("Error loading effective date:", error);
+          // Keep default on error
+        }
       }
-      // If doesn't exist, keep default "7 FEBRUARY 2026"
-    } catch (error) {
-      console.error("Error loading effective date:", error);
-      // Keep default on error
-    }
-  }
-  
-  loadEffectiveDate();
-</script>
 
-<script>
-  // Bengali number conversion
-  const bengaliNumbers = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-  const toBengaliNumber = (num) => String(num).split('').map(d => bengaliNumbers[d]).join('');
-  
-  // Bengali months
-  const bengaliMonths = [
-    'বৈশাখ', 'জ্যৈষ্ঠ', 'আষাঢ়', 'শ্রাবণ', 'ভাদ্র', 'আশ্বিন',
-    'কার্তিক', 'অগ্রহায়ণ', 'পৌষ', 'মাঘ', 'ফাল্গুন', 'চৈত্র'
-  ];
-  
-  // Bengali date suffixes
-  const getBengaliDateSuffix = (day) => {
-    if (day === 1) return 'লা';
-    if (day === 2 || day === 3) return 'রা';
-    if (day === 4) return 'ঠা';
-    if (day === 5 || day === 6) return 'ই';
-    return 'ই';
-  };
-  
-  // Convert Gregorian to Bengali calendar (approximation)
-  function toBengaliDate(date) {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDate();
-    
-    // Bengali year is roughly Gregorian year - 593/594
-    // Bengali new year starts around April 14-15
-    let bengaliYear = year - 593;
-    
-    // Month mapping (approximate)
-    const monthStart = [
-      { g: 3, d: 14 }, // Baishakh starts ~April 14
-      { g: 4, d: 15 }, // Jyoishtho starts ~May 15
-      { g: 5, d: 15 }, // Asharh starts ~June 15
-      { g: 6, d: 16 }, // Shravan starts ~July 16
-      { g: 7, d: 16 }, // Bhadro starts ~Aug 16
-      { g: 8, d: 16 }, // Ashwin starts ~Sep 16
-      { g: 9, d: 16 }, // Kartik starts ~Oct 16
-      { g: 10, d: 15 }, // Ogrohayon starts ~Nov 15
-      { g: 11, d: 15 }, // Poush starts ~Dec 15
-      { g: 0, d: 14 }, // Magh starts ~Jan 14
-      { g: 1, d: 14 }, // Falgun starts ~Feb 14
-      { g: 2, d: 14 }  // Choitro starts ~Mar 14
-    ];
-    
-    let bengaliMonth = 0;
-    let bengaliDay = 0;
-    
-    for (let i = 0; i < monthStart.length; i++) {
-      const nextMonth = (i + 1) % 12;
-      const currentStart = monthStart[i];
-      const nextStart = monthStart[nextMonth];
-      
-      let currentDate = new Date(year, currentStart.g, currentStart.d);
-      let nextDate = new Date(year, nextStart.g, nextStart.d);
-      
-      // Adjust year for months that wrap around
-      if (nextStart.g < currentStart.g) {
-        nextDate = new Date(year + 1, nextStart.g, nextStart.d);
+      loadEffectiveDate();
+    </script>
+
+    <script>
+      // Bengali number conversion
+      const bengaliNumbers = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+      const toBengaliNumber = (num) =>
+        String(num)
+          .split("")
+          .map((d) => bengaliNumbers[d])
+          .join("");
+
+      // Bengali months
+      const bengaliMonths = [
+        "বৈশাখ",
+        "জ্যৈষ্ঠ",
+        "আষাঢ়",
+        "শ্রাবণ",
+        "ভাদ্র",
+        "আশ্বিন",
+        "কার্তিক",
+        "অগ্রহায়ণ",
+        "পৌষ",
+        "মাঘ",
+        "ফাল্গুন",
+        "চৈত্র",
+      ];
+
+      // Bengali date suffixes
+      const getBengaliDateSuffix = (day) => {
+        if (day === 1) return "লা";
+        if (day === 2 || day === 3) return "রা";
+        if (day === 4) return "ঠা";
+        if (day === 5 || day === 6) return "ই";
+        return "ই";
+      };
+
+      // Convert Gregorian to Bengali calendar (approximation)
+      function toBengaliDate(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const day = date.getDate();
+
+        // Bengali year is roughly Gregorian year - 593/594
+        // Bengali new year starts around April 14-15
+        let bengaliYear = year - 593;
+
+        // Month mapping (approximate)
+        const monthStart = [
+          { g: 3, d: 14 }, // Baishakh starts ~April 14
+          { g: 4, d: 15 }, // Jyoishtho starts ~May 15
+          { g: 5, d: 15 }, // Asharh starts ~June 15
+          { g: 6, d: 16 }, // Shravan starts ~July 16
+          { g: 7, d: 16 }, // Bhadro starts ~Aug 16
+          { g: 8, d: 16 }, // Ashwin starts ~Sep 16
+          { g: 9, d: 16 }, // Kartik starts ~Oct 16
+          { g: 10, d: 15 }, // Ogrohayon starts ~Nov 15
+          { g: 11, d: 15 }, // Poush starts ~Dec 15
+          { g: 0, d: 14 }, // Magh starts ~Jan 14
+          { g: 1, d: 14 }, // Falgun starts ~Feb 14
+          { g: 2, d: 14 }, // Choitro starts ~Mar 14
+        ];
+
+        let bengaliMonth = 0;
+        let bengaliDay = 0;
+
+        for (let i = 0; i < monthStart.length; i++) {
+          const nextMonth = (i + 1) % 12;
+          const currentStart = monthStart[i];
+          const nextStart = monthStart[nextMonth];
+
+          let currentDate = new Date(year, currentStart.g, currentStart.d);
+          let nextDate = new Date(year, nextStart.g, nextStart.d);
+
+          // Adjust year for months that wrap around
+          if (nextStart.g < currentStart.g) {
+            nextDate = new Date(year + 1, nextStart.g, nextStart.d);
+          }
+          if (currentStart.g === 0 && month > 6) {
+            currentDate = new Date(year + 1, currentStart.g, currentStart.d);
+            nextDate = new Date(year + 1, nextStart.g, nextStart.d);
+          }
+
+          if (date >= currentDate && date < nextDate) {
+            bengaliMonth = i;
+            const diffTime = date - currentDate;
+            bengaliDay = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            break;
+          }
+        }
+
+        // Adjust year if we're in months before Baishakh
+        if (bengaliMonth >= 9) {
+          bengaliYear = year - 594;
+        }
+
+        const suffix = getBengaliDateSuffix(bengaliDay);
+        return `${toBengaliNumber(bengaliDay)}${suffix} ${bengaliMonths[bengaliMonth]} ${toBengaliNumber(bengaliYear)}`;
       }
-      if (currentStart.g === 0 && month > 6) {
-        currentDate = new Date(year + 1, currentStart.g, currentStart.d);
-        nextDate = new Date(year + 1, nextStart.g, nextStart.d);
+
+      // Special events calendar
+      const specialEvents = {
+        // Bangladesh National Days
+        "2-21": "International Mother Language Day 🇧🇩",
+        "3-17": "Sheikh Mujibur Rahman's Birthday 🇧🇩",
+        "3-26": "Independence Day 🇧🇩",
+        "4-14": "Pohela Boishakh (Bengali New Year) 🎊",
+        "5-1": "May Day",
+        "8-15": "National Mourning Day 🇧🇩",
+        "11-7": "National Revolution & Solidarity Day 🇧🇩",
+        "12-16": "Victory Day 🇧🇩",
+
+        // Religious Holidays 2026 (Islamic Calendar - approximate)
+        "2-28": "Shab-e-Barat 🌙",
+        "3-1": "Eid-ul-Fitr 🌙 (Day 1)",
+        "3-2": "Eid-ul-Fitr 🌙 (Day 2)",
+        "3-3": "Eid-ul-Fitr 🌙 (Day 3)",
+        "5-7": "Eid-ul-Adha 🐑 (Day 1)",
+        "5-8": "Eid-ul-Adha 🐑 (Day 2)",
+        "5-9": "Eid-ul-Adha 🐑 (Day 3)",
+        "5-28": "Muharram (Ashura) 🌙",
+        "7-6": "Milad-un-Nabi 🌙",
+
+        // Hindu Festivals 2026
+        "2-3": "Saraswati Puja 📚",
+        "3-14": "Holi (Festival of Colors) 🎨",
+        "4-6": "Ram Navami",
+        "5-5": "Buddha Purnima 🙏",
+        "8-15": "Janmashtami (Krishna Birthday)",
+        "10-17": "Durga Puja (Maha Saptami)",
+        "10-18": "Durga Puja (Maha Ashtami)",
+        "10-19": "Durga Puja (Maha Navami)",
+        "10-20": "Durga Puja (Vijaya Dashami)",
+        "11-1": "Kali Puja 🪔",
+        "11-2": "Diwali (Festival of Lights) 🪔",
+
+        // Christian Holidays
+        "4-3": "Good Friday ✝️",
+        "4-5": "Easter Sunday 🐣",
+        "12-24": "Christmas Eve 🎄",
+        "12-25": "Christmas Day 🎄",
+
+        // International Days
+        "1-1": "New Year's Day 🎉",
+        "1-4": "World Braille Day",
+        "1-24": "International Day of Education",
+        "1-26": "International Customs Day",
+        "2-4": "World Cancer Day",
+        "2-11": "International Day of Women and Girls in Science",
+        "2-13": "World Radio Day",
+        "2-14": "Valentine's Day 💝",
+        "2-20": "World Day of Social Justice",
+        "3-8": "International Women's Day 👩",
+        "3-15": "World Consumer Rights Day",
+        "3-20": "International Day of Happiness",
+        "3-21": "World Poetry Day",
+        "3-22": "World Water Day 💧",
+        "3-23": "World Meteorological Day",
+        "4-2": "World Autism Awareness Day",
+        "4-7": "World Health Day 🏥",
+        "4-22": "Earth Day 🌍",
+        "4-23": "World Book Day 📚",
+        "5-3": "World Press Freedom Day",
+        "5-8": "World Red Cross Day",
+        "5-15": "International Day of Families",
+        "5-17": "World Telecommunication Day",
+        "5-31": "World No Tobacco Day",
+        "6-5": "World Environment Day 🌱",
+        "6-8": "World Ocean Day 🌊",
+        "6-14": "World Blood Donor Day",
+        "6-20": "World Refugee Day",
+        "6-26": "International Day Against Drug Abuse",
+        "7-11": "World Population Day",
+        "8-9": "International Day of World's Indigenous Peoples",
+        "8-12": "International Youth Day",
+        "8-19": "World Humanitarian Day",
+        "9-8": "International Literacy Day 📖",
+        "9-15": "International Day of Democracy",
+        "9-16": "International Day for Preservation of Ozone Layer",
+        "9-21": "International Day of Peace ☮️",
+        "9-27": "World Tourism Day",
+        "10-1": "International Day of Older Persons",
+        "10-2": "International Day of Non-Violence",
+        "10-5": "World Teachers' Day 👨‍🏫",
+        "10-10": "World Mental Health Day",
+        "10-16": "World Food Day 🍚",
+        "10-24": "United Nations Day 🇺🇳",
+        "11-14": "World Diabetes Day",
+        "11-16": "International Day for Tolerance",
+        "11-19": "World Toilet Day",
+        "11-20": "Universal Children's Day 👶",
+        "11-25": "International Day for Elimination of Violence Against Women",
+        "12-1": "World AIDS Day",
+        "12-2": "International Day for Abolition of Slavery",
+        "12-3": "International Day of Persons with Disabilities",
+        "12-5": "International Volunteer Day",
+        "12-10": "Human Rights Day",
+        "12-31": "New Year's Eve 🎆",
+      };
+
+      // Update today's date display
+      function updateTodayDate() {
+        const today = new Date();
+        const months = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+        const days = [
+          "SUNDAY",
+          "MONDAY",
+          "TUESDAY",
+          "WEDNESDAY",
+          "THURSDAY",
+          "FRIDAY",
+          "SATURDAY",
+        ];
+
+        // English date
+        const day = today.getDate();
+        const month = months[today.getMonth()];
+        const year = today.getFullYear();
+        const dayName = days[today.getDay()];
+
+        document.getElementById("englishDate").textContent =
+          `${day} ${month} ${year}`;
+        document.getElementById("dayName").textContent = dayName;
+
+        // Bengali date
+        const bengaliDate = toBengaliDate(today);
+        document.getElementById("bengaliDate").textContent = bengaliDate;
+
+        // Special event
+        const monthDay = `${today.getMonth() + 1}-${day}`;
+        const event = specialEvents[monthDay];
+        if (event) {
+          document.getElementById("specialEvent").textContent = `(${event})`;
+        } else {
+          document.getElementById("specialEvent").textContent = "";
+        }
       }
-      
-      if (date >= currentDate && date < nextDate) {
-        bengaliMonth = i;
-        const diffTime = date - currentDate;
-        bengaliDay = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-        break;
-      }
-    }
-    
-    // Adjust year if we're in months before Baishakh
-    if (bengaliMonth >= 9) {
-      bengaliYear = year - 594;
-    }
-    
-    const suffix = getBengaliDateSuffix(bengaliDay);
-    return `${toBengaliNumber(bengaliDay)}${suffix} ${bengaliMonths[bengaliMonth]} ${toBengaliNumber(bengaliYear)}`;
-  }
-  
-  // Special events calendar
-  const specialEvents = {
-    // Bangladesh National Days
-    '2-21': 'International Mother Language Day 🇧🇩',
-    '3-17': 'Sheikh Mujibur Rahman\'s Birthday 🇧🇩',
-    '3-26': 'Independence Day 🇧🇩',
-    '4-14': 'Pohela Boishakh (Bengali New Year) 🎊',
-    '5-1': 'May Day',
-    '8-15': 'National Mourning Day 🇧🇩',
-    '11-7': 'National Revolution & Solidarity Day 🇧🇩',
-    '12-16': 'Victory Day 🇧🇩',
-    
-    // Religious Holidays 2026 (Islamic Calendar - approximate)
-    '2-28': 'Shab-e-Barat 🌙',
-    '3-1': 'Eid-ul-Fitr 🌙 (Day 1)',
-    '3-2': 'Eid-ul-Fitr 🌙 (Day 2)',
-    '3-3': 'Eid-ul-Fitr 🌙 (Day 3)',
-    '5-7': 'Eid-ul-Adha 🐑 (Day 1)',
-    '5-8': 'Eid-ul-Adha 🐑 (Day 2)',
-    '5-9': 'Eid-ul-Adha 🐑 (Day 3)',
-    '5-28': 'Muharram (Ashura) 🌙',
-    '7-6': 'Milad-un-Nabi 🌙',
-    
-    // Hindu Festivals 2026
-    '2-3': 'Saraswati Puja 📚',
-    '3-14': 'Holi (Festival of Colors) 🎨',
-    '4-6': 'Ram Navami',
-    '5-5': 'Buddha Purnima 🙏',
-    '8-15': 'Janmashtami (Krishna Birthday)',
-    '10-17': 'Durga Puja (Maha Saptami)',
-    '10-18': 'Durga Puja (Maha Ashtami)',
-    '10-19': 'Durga Puja (Maha Navami)',
-    '10-20': 'Durga Puja (Vijaya Dashami)',
-    '11-1': 'Kali Puja 🪔',
-    '11-2': 'Diwali (Festival of Lights) 🪔',
-    
-    // Christian Holidays
-    '4-3': 'Good Friday ✝️',
-    '4-5': 'Easter Sunday 🐣',
-    '12-24': 'Christmas Eve 🎄',
-    '12-25': 'Christmas Day 🎄',
-    
-    // International Days
-    '1-1': 'New Year\'s Day 🎉',
-    '1-4': 'World Braille Day',
-    '1-24': 'International Day of Education',
-    '1-26': 'International Customs Day',
-    '2-4': 'World Cancer Day',
-    '2-11': 'International Day of Women and Girls in Science',
-    '2-13': 'World Radio Day',
-    '2-14': 'Valentine\'s Day 💝',
-    '2-20': 'World Day of Social Justice',
-    '3-8': 'International Women\'s Day 👩',
-    '3-15': 'World Consumer Rights Day',
-    '3-20': 'International Day of Happiness',
-    '3-21': 'World Poetry Day',
-    '3-22': 'World Water Day 💧',
-    '3-23': 'World Meteorological Day',
-    '4-2': 'World Autism Awareness Day',
-    '4-7': 'World Health Day 🏥',
-    '4-22': 'Earth Day 🌍',
-    '4-23': 'World Book Day 📚',
-    '5-3': 'World Press Freedom Day',
-    '5-8': 'World Red Cross Day',
-    '5-15': 'International Day of Families',
-    '5-17': 'World Telecommunication Day',
-    '5-31': 'World No Tobacco Day',
-    '6-5': 'World Environment Day 🌱',
-    '6-8': 'World Ocean Day 🌊',
-    '6-14': 'World Blood Donor Day',
-    '6-20': 'World Refugee Day',
-    '6-26': 'International Day Against Drug Abuse',
-    '7-11': 'World Population Day',
-    '8-9': 'International Day of World\'s Indigenous Peoples',
-    '8-12': 'International Youth Day',
-    '8-19': 'World Humanitarian Day',
-    '9-8': 'International Literacy Day 📖',
-    '9-15': 'International Day of Democracy',
-    '9-16': 'International Day for Preservation of Ozone Layer',
-    '9-21': 'International Day of Peace ☮️',
-    '9-27': 'World Tourism Day',
-    '10-1': 'International Day of Older Persons',
-    '10-2': 'International Day of Non-Violence',
-    '10-5': 'World Teachers\' Day 👨‍🏫',
-    '10-10': 'World Mental Health Day',
-    '10-16': 'World Food Day 🍚',
-    '10-24': 'United Nations Day 🇺🇳',
-    '11-14': 'World Diabetes Day',
-    '11-16': 'International Day for Tolerance',
-    '11-19': 'World Toilet Day',
-    '11-20': 'Universal Children\'s Day 👶',
-    '11-25': 'International Day for Elimination of Violence Against Women',
-    '12-1': 'World AIDS Day',
-    '12-2': 'International Day for Abolition of Slavery',
-    '12-3': 'International Day of Persons with Disabilities',
-    '12-5': 'International Volunteer Day',
-    '12-10': 'Human Rights Day',
-    '12-31': 'New Year\'s Eve 🎆'
-  };
-  
-  // Update today's date display
-  function updateTodayDate() {
-    const today = new Date();
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                    'July', 'August', 'September', 'October', 'November', 'December'];
-    const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-    
-    // English date
-    const day = today.getDate();
-    const month = months[today.getMonth()];
-    const year = today.getFullYear();
-    const dayName = days[today.getDay()];
-    
-    document.getElementById('englishDate').textContent = `${day} ${month} ${year}`;
-    document.getElementById('dayName').textContent = dayName;
-    
-    // Bengali date
-    const bengaliDate = toBengaliDate(today);
-    document.getElementById('bengaliDate').textContent = bengaliDate;
-    
-    // Special event
-    const monthDay = `${today.getMonth() + 1}-${day}`;
-    const event = specialEvents[monthDay];
-    if (event) {
-      document.getElementById('specialEvent').textContent = `(${event})`;
-    } else {
-      document.getElementById('specialEvent').textContent = '';
-    }
-  }
-  
-  // Initialize
-  updateTodayDate();
-  
-  // Auto-update at midnight
-  function scheduleNextMidnightUpdate() {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    
-    const timeUntilMidnight = tomorrow - now;
-    
-    setTimeout(() => {
+
+      // Initialize
       updateTodayDate();
-      // Schedule next update
-      scheduleNextMidnightUpdate();
-      
-      // Also reload the routine to highlight today's row correctly
-      if (typeof window.loadRoutine === 'function') {
-        window.loadRoutine();
-      }
-    }, timeUntilMidnight);
-  }
-  
-  scheduleNextMidnightUpdate();
-</script>
 
-<script type="module">
-  /* =========================
+      // Auto-update at midnight
+      function scheduleNextMidnightUpdate() {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+
+        const timeUntilMidnight = tomorrow - now;
+
+        setTimeout(() => {
+          updateTodayDate();
+          // Schedule next update
+          scheduleNextMidnightUpdate();
+
+          // Also reload the routine to highlight today's row correctly
+          if (typeof window.loadRoutine === "function") {
+            window.loadRoutine();
+          }
+        }, timeUntilMidnight);
+      }
+
+      scheduleNextMidnightUpdate();
+    </script>
+
+    <script type="module">
+      /* =========================
      CLASS DURATION TIMER
      Shows live progress of current class
   ========================= */
-  
-  import { getDoc, doc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-  
-  let currentClassData = null;
-  let timerInterval = null;
-  
-  async function updateClassTimer() {
-    const now = new Date();
-    const currentDay = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][now.getDay()];
-    const currentTime = now.getHours() * 60 + now.getMinutes(); // minutes since midnight
-    
-    try {
-      // Load time slots
-      const slotsSnap = await getDoc(doc(window.db, "settings", "timeSlots"));
-      const timeSlots = slotsSnap.exists() ? slotsSnap.data().slots : [];
-      
-      // Load today's routine
-      const routineSnap = await getDoc(doc(window.db, "routine", currentDay));
-      if (!routineSnap.exists()) {
-        hideTimer();
-        return;
-      }
-      
-      const classes = routineSnap.data().classes || [];
-      
-      // Find current class
-      let foundClass = null;
-      let classSlot = null;
-      
-      for (const cls of classes) {
-        const slot = timeSlots.find(s => s.time === cls.time);
-        if (!slot) continue;
-        
-        const [startHour, startMin] = slot.start.split(':').map(Number);
-        const [endHour, endMin] = slot.end.split(':').map(Number);
-        
-        const startTime = startHour * 60 + startMin;
-        const endTime = endHour * 60 + endMin;
-        
-        if (currentTime >= startTime && currentTime < endTime) {
-          foundClass = cls;
-          classSlot = slot;
-          break;
+
+      import {
+        getDoc,
+        doc,
+      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+      let currentClassData = null;
+      let timerInterval = null;
+
+      async function updateClassTimer() {
+        const now = new Date();
+        const currentDay = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][
+          now.getDay()
+        ];
+        const currentTime = now.getHours() * 60 + now.getMinutes(); // minutes since midnight
+
+        try {
+          // Load time slots
+          const slotsSnap = await getDoc(
+            doc(window.db, "settings", "timeSlots"),
+          );
+          const timeSlots = slotsSnap.exists() ? slotsSnap.data().slots : [];
+
+          // Load today's routine
+          const routineSnap = await getDoc(
+            doc(window.db, "routine", currentDay),
+          );
+          if (!routineSnap.exists()) {
+            hideTimer();
+            return;
+          }
+
+          const classes = routineSnap.data().classes || [];
+
+          // Find current class
+          let foundClass = null;
+          let classSlot = null;
+
+          for (const cls of classes) {
+            const slot = timeSlots.find((s) => s.time === cls.time);
+            if (!slot) continue;
+
+            const [startHour, startMin] = slot.start.split(":").map(Number);
+            const [endHour, endMin] = slot.end.split(":").map(Number);
+
+            const startTime = startHour * 60 + startMin;
+            const endTime = endHour * 60 + endMin;
+
+            if (currentTime >= startTime && currentTime < endTime) {
+              foundClass = cls;
+              classSlot = slot;
+              break;
+            }
+          }
+
+          if (foundClass && classSlot) {
+            showTimer(foundClass, classSlot, currentTime);
+          } else {
+            hideTimer();
+          }
+        } catch (error) {
+          console.error("Error updating class timer:", error);
+          hideTimer();
         }
       }
-      
-      if (foundClass && classSlot) {
-        showTimer(foundClass, classSlot, currentTime);
-      } else {
-        hideTimer();
+
+      function showTimer(classData, slot, currentTime) {
+        const timer = document.getElementById("classDurationTimer");
+        timer.classList.remove("hidden");
+
+        // Parse times
+        const [startHour, startMin] = slot.start.split(":").map(Number);
+        const [endHour, endMin] = slot.end.split(":").map(Number);
+
+        const startTime = startHour * 60 + startMin;
+        const endTime = endHour * 60 + endMin;
+
+        const totalDuration = endTime - startTime;
+        const elapsed = currentTime - startTime;
+        const remaining = endTime - currentTime;
+
+        // Update UI
+        document.getElementById("timerClassName").textContent =
+          classData.subject;
+        document.getElementById("timerRoom").textContent =
+          `Room ${classData.room} • ${classData.code}`;
+
+        // Format times for display
+        const formatTime = (hour, min) => {
+          const period = hour >= 12 ? "PM" : "AM";
+          const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+          return `${displayHour}:${min.toString().padStart(2, "0")} ${period}`;
+        };
+
+        document.getElementById("timerStartTime").textContent =
+          `Started: ${formatTime(startHour, startMin)}`;
+        document.getElementById("timerEndTime").textContent =
+          `Ends: ${formatTime(endHour, endMin)}`;
+
+        // Update countdown
+        if (remaining <= 5) {
+          document.getElementById("timerStatus").textContent =
+            "⚠️ Class ending in";
+          document.getElementById("timerMinutes").textContent =
+            `${remaining} ${remaining === 1 ? "minute" : "minutes"}!`;
+          timer.classList.add("ending-soon");
+
+          // Show browser notification for last minute
+          if (remaining === 1 && Notification.permission === "granted") {
+            new Notification("Class Ending Soon!", {
+              body: `${classData.subject} ends in 1 minute`,
+              icon: "/y.png",
+            });
+          }
+        } else {
+          document.getElementById("timerStatus").textContent = "Class ends in";
+          document.getElementById("timerMinutes").textContent =
+            `${remaining} minutes`;
+          timer.classList.remove("ending-soon");
+        }
+
+        // Update progress bar
+        const progress = (elapsed / totalDuration) * 100;
+        document.getElementById("timerProgressBar").style.width =
+          `${Math.min(progress, 100)}%`;
       }
-      
-    } catch (error) {
-      console.error("Error updating class timer:", error);
-      hideTimer();
-    }
-  }
-  
-  function showTimer(classData, slot, currentTime) {
-    const timer = document.getElementById('classDurationTimer');
-    timer.classList.remove('hidden');
-    
-    // Parse times
-    const [startHour, startMin] = slot.start.split(':').map(Number);
-    const [endHour, endMin] = slot.end.split(':').map(Number);
-    
-    const startTime = startHour * 60 + startMin;
-    const endTime = endHour * 60 + endMin;
-    
-    const totalDuration = endTime - startTime;
-    const elapsed = currentTime - startTime;
-    const remaining = endTime - currentTime;
-    
-    // Update UI
-    document.getElementById('timerClassName').textContent = classData.subject;
-    document.getElementById('timerRoom').textContent = `Room ${classData.room} • ${classData.code}`;
-    
-    // Format times for display
-    const formatTime = (hour, min) => {
-      const period = hour >= 12 ? 'PM' : 'AM';
-      const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-      return `${displayHour}:${min.toString().padStart(2, '0')} ${period}`;
-    };
-    
-    document.getElementById('timerStartTime').textContent = `Started: ${formatTime(startHour, startMin)}`;
-    document.getElementById('timerEndTime').textContent = `Ends: ${formatTime(endHour, endMin)}`;
-    
-    // Update countdown
-    if (remaining <= 5) {
-      document.getElementById('timerStatus').textContent = '⚠️ Class ending in';
-      document.getElementById('timerMinutes').textContent = `${remaining} ${remaining === 1 ? 'minute' : 'minutes'}!`;
-      timer.classList.add('ending-soon');
-      
-      // Show browser notification for last minute
-      if (remaining === 1 && Notification.permission === 'granted') {
-        new Notification('Class Ending Soon!', {
-          body: `${classData.subject} ends in 1 minute`,
-          icon: '/y.png'
-        });
+
+      function hideTimer() {
+        document.getElementById("classDurationTimer").classList.add("hidden");
       }
-    } else {
-      document.getElementById('timerStatus').textContent = 'Class ends in';
-      document.getElementById('timerMinutes').textContent = `${remaining} minutes`;
-      timer.classList.remove('ending-soon');
-    }
-    
-    // Update progress bar
-    const progress = (elapsed / totalDuration) * 100;
-    document.getElementById('timerProgressBar').style.width = `${Math.min(progress, 100)}%`;
-  }
-  
-  function hideTimer() {
-    document.getElementById('classDurationTimer').classList.add('hidden');
-  }
-  
-  // Request notification permission
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission();
-  }
-  
-  // Update timer every minute
-  updateClassTimer();
-  timerInterval = setInterval(updateClassTimer, 60000); // Update every 60 seconds
-  
-  // Also update every 10 seconds for more accurate progress bar
-  setInterval(() => {
-    const timer = document.getElementById('classDurationTimer');
-    if (!timer.classList.contains('hidden')) {
+
+      // Request notification permission
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+
+      // Update timer every minute
       updateClassTimer();
-    }
-  }, 10000);
-</script>
+      timerInterval = setInterval(updateClassTimer, 60000); // Update every 60 seconds
 
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/service-worker.js");
-  }
-</script>
+      // Also update every 10 seconds for more accurate progress bar
+      setInterval(() => {
+        const timer = document.getElementById("classDurationTimer");
+        if (!timer.classList.contains("hidden")) {
+          updateClassTimer();
+        }
+      }, 10000);
+    </script>
 
-<script>
-  let deferredPrompt;
-  const installBtn = document.getElementById("installBtn");
-  const installBanner = document.getElementById("installBanner");
-  const bannerInstallBtn = document.getElementById("bannerInstallBtn");
-  const bannerDismissBtn = document.getElementById("bannerDismissBtn");
-
-  // Check if banner was already dismissed
-  const bannerDismissed = localStorage.getItem('installBannerDismissed');
-  
-  // Show banner after 3 seconds if not dismissed before
-  if (!bannerDismissed) {
-    setTimeout(() => {
-      installBanner.classList.remove('hidden');
-    }, 3000);
-  }
-
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.hidden = false;
-    
-    // Show banner if not dismissed
-    if (!bannerDismissed) {
-      installBanner.classList.remove('hidden');
-    }
-  });
-
-  // Install from bottom button
-  installBtn.addEventListener("click", async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        installBanner.classList.add('hidden');
-        localStorage.setItem('installBannerDismissed', 'true');
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service-worker.js");
       }
-      installBtn.hidden = true;
-      deferredPrompt = null;
-    }
-  });
+    </script>
 
-  // Install from banner button
-  bannerInstallBtn.addEventListener("click", async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        installBanner.classList.add('hidden');
-        localStorage.setItem('installBannerDismissed', 'true');
+    <script>
+      let deferredPrompt;
+      const installBtn = document.getElementById("installBtn");
+      const installBanner = document.getElementById("installBanner");
+      const bannerInstallBtn = document.getElementById("bannerInstallBtn");
+      const bannerDismissBtn = document.getElementById("bannerDismissBtn");
+
+      // Check if banner was already dismissed
+      const bannerDismissed = localStorage.getItem("installBannerDismissed");
+
+      // Show banner after 3 seconds if not dismissed before
+      if (!bannerDismissed) {
+        setTimeout(() => {
+          installBanner.classList.remove("hidden");
+        }, 3000);
       }
-      deferredPrompt = null;
-    } else {
-      // If browser prompt not available, just hide banner
-      installBanner.classList.add('hidden');
-      localStorage.setItem('installBannerDismissed', 'true');
-    }
-  });
 
-  // Dismiss banner
-  bannerDismissBtn.addEventListener("click", () => {
-    installBanner.classList.add('hidden');
-    localStorage.setItem('installBannerDismissed', 'true');
-  });
-</script>
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.hidden = false;
 
-<script>
-  /* ==========================================
+        // Show banner if not dismissed
+        if (!bannerDismissed) {
+          installBanner.classList.remove("hidden");
+        }
+      });
+
+      // Install from bottom button
+      installBtn.addEventListener("click", async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === "accepted") {
+            installBanner.classList.add("hidden");
+            localStorage.setItem("installBannerDismissed", "true");
+          }
+          installBtn.hidden = true;
+          deferredPrompt = null;
+        }
+      });
+
+      // Install from banner button
+      bannerInstallBtn.addEventListener("click", async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === "accepted") {
+            installBanner.classList.add("hidden");
+            localStorage.setItem("installBannerDismissed", "true");
+          }
+          deferredPrompt = null;
+        } else {
+          // If browser prompt not available, just hide banner
+          installBanner.classList.add("hidden");
+          localStorage.setItem("installBannerDismissed", "true");
+        }
+      });
+
+      // Dismiss banner
+      bannerDismissBtn.addEventListener("click", () => {
+        installBanner.classList.add("hidden");
+        localStorage.setItem("installBannerDismissed", "true");
+      });
+    </script>
+
+    <script>
+      /* ==========================================
      PREMIUM FEATURES: SPLASH, TOAST, SKELETON
   ========================================== */
-  
-  // 1. SPLASH SCREEN - Auto hide after 2 seconds
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      const splash = document.getElementById('splashScreen');
-      if (splash) {
-        splash.style.display = 'none';
-      }
-    }, 2500); // 2.5 seconds total (includes fade out)
-  });
-  
-  // 2. TOAST NOTIFICATION SYSTEM
-  window.showToast = function(options) {
-    const {
-      title = 'Notification',
-      message = '',
-      type = 'info', // success, error, warning, info
-      duration = 3000,
-      icon = null
-    } = options;
-    
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
-    
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    
-    // Default icons based on type
-    const icons = {
-      success: '✓',
-      error: '✕',
-      warning: '⚠',
-      info: 'ℹ'
-    };
-    
-    const toastIcon = icon || icons[type] || 'ℹ';
-    
-    toast.innerHTML = `
+
+      // 1. SPLASH SCREEN - Auto hide after 2 seconds
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          const splash = document.getElementById("splashScreen");
+          if (splash) {
+            splash.style.display = "none";
+          }
+        }, 2500); // 2.5 seconds total (includes fade out)
+      });
+
+      // 2. TOAST NOTIFICATION SYSTEM
+      window.showToast = function (options) {
+        const {
+          title = "Notification",
+          message = "",
+          type = "info", // success, error, warning, info
+          duration = 3000,
+          icon = null,
+        } = options;
+
+        const container = document.getElementById("toastContainer");
+        if (!container) return;
+
+        // Create toast element
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+
+        // Default icons based on type
+        const icons = {
+          success: "✓",
+          error: "✕",
+          warning: "⚠",
+          info: "ℹ",
+        };
+
+        const toastIcon = icon || icons[type] || "ℹ";
+
+        toast.innerHTML = `
       <div class="toast-icon">${toastIcon}</div>
       <div class="toast-content">
         <div class="toast-title">${title}</div>
-        ${message ? `<p class="toast-message">${message}</p>` : ''}
+        ${message ? `<p class="toast-message">${message}</p>` : ""}
       </div>
       <button class="toast-close" onclick="this.parentElement.remove()">×</button>
       <div class="toast-progress"></div>
     `;
-    
-    container.appendChild(toast);
-    
-    // Auto remove after duration
-    setTimeout(() => {
-      toast.classList.add('hiding');
-      setTimeout(() => toast.remove(), 400);
-    }, duration);
-  };
-  
-  // 3. SKELETON LOADERS - Show while content loads
-  function showSkeletonLoaders() {
-    const tableContainer = document.querySelector('.table-container');
-    if (!tableContainer) return;
-    
-    // Create skeleton HTML
-    const skeletonHTML = `
+
+        container.appendChild(toast);
+
+        // Auto remove after duration
+        setTimeout(() => {
+          toast.classList.add("hiding");
+          setTimeout(() => toast.remove(), 400);
+        }, duration);
+      };
+
+      // 3. SKELETON LOADERS - Show while content loads
+      function showSkeletonLoaders() {
+        const tableContainer = document.querySelector(".table-container");
+        if (!tableContainer) return;
+
+        // Create skeleton HTML
+        const skeletonHTML = `
       <div class="skeleton skeleton-date"></div>
       <div class="skeleton skeleton-countdown"></div>
       <div class="skeleton skeleton-table"></div>
     `;
-    
-    // Show skeletons temporarily
-    const skeletonWrapper = document.createElement('div');
-    skeletonWrapper.id = 'skeletonLoader';
-    skeletonWrapper.innerHTML = skeletonHTML;
-    tableContainer.insertBefore(skeletonWrapper, tableContainer.firstChild);
-  }
-  
-  function hideSkeletonLoaders() {
-    const skeletonLoader = document.getElementById('skeletonLoader');
-    if (skeletonLoader) {
-      skeletonLoader.remove();
-    }
-  }
-  
-  // Show skeletons on page load
-  showSkeletonLoaders();
-  
-  // Hide skeletons when content is loaded (after script.js loads the routine)
-  window.addEventListener('load', () => {
-    // Wait for Firebase data to load
-    setTimeout(() => {
-      hideSkeletonLoaders();
-      
-      // Show welcome toast
-      showToast({
-        title: 'Welcome! 👋',
-        message: 'Your class routine is ready',
-        type: 'success',
-        duration: 3000
+
+        // Show skeletons temporarily
+        const skeletonWrapper = document.createElement("div");
+        skeletonWrapper.id = "skeletonLoader";
+        skeletonWrapper.innerHTML = skeletonHTML;
+        tableContainer.insertBefore(skeletonWrapper, tableContainer.firstChild);
+      }
+
+      function hideSkeletonLoaders() {
+        const skeletonLoader = document.getElementById("skeletonLoader");
+        if (skeletonLoader) {
+          skeletonLoader.remove();
+        }
+      }
+
+      // Show skeletons on page load
+      showSkeletonLoaders();
+
+      // Hide skeletons when content is loaded (after script.js loads the routine)
+      window.addEventListener("load", () => {
+        // Wait for Firebase data to load
+        setTimeout(() => {
+          hideSkeletonLoaders();
+
+          // Show welcome toast
+          showToast({
+            title: "Welcome! 👋",
+            message: "Your class routine is ready",
+            type: "success",
+            duration: 3000,
+          });
+        }, 1500);
       });
-    }, 1500);
-  });
-  
-  // Make toast function globally available for other scripts
-  window.addEventListener('message', (event) => {
-    if (event.data.type === 'showToast') {
-      showToast(event.data.options);
-    }
-  });
-</script>
 
-</body>
+      // Make toast function globally available for other scripts
+      window.addEventListener("message", (event) => {
+        if (event.data.type === "showToast") {
+          showToast(event.data.options);
+        }
+      });
+    </script>
+    <script type="module">
+      /* ==========================================
+         EXAM ROUTINE MODE DETECTION
+      ========================================== */
+      async function checkExamMode() {
+        const db = window.db;
+        if (!db) { setTimeout(checkExamMode, 500); return; }
+
+        try {
+          const docFn = window._fbDoc;
+          const getDocFn = window._fbGetDoc;
+          const getDocsFn = window._fbGetDocs;
+          const collectionFn = window._fbCollection;
+
+          const modeSnap = await getDocFn(docFn(db, "settings", "examMode"));
+          const isExamMode = modeSnap.exists() && modeSnap.data().active === true;
+
+          const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
+          const examSection = document.getElementById("examRoutineSection");
+
+          if (isExamMode) {
+            // Hide routine table parts but keep date/notice/Bengali date visible
+            if (mainTable) {
+              const toHide = mainTable.querySelectorAll(
+                ".routine-table, #classDurationTimer, #countdownStack"
+              );
+              toHide.forEach(el => el.style.display = "none");
+            }
+            examSection.style.display = "block";
+
+            // Load exam entries
+            const snap = await getDocsFn(collectionFn(db, "examRoutine"));
+            const entries = [];
+            snap.forEach(d => entries.push({ id: d.id, ...d.data() }));
+            entries.sort((a, b) => a.date.localeCompare(b.date));
+
+            const tbody = document.getElementById("examRoutineBody");
+            tbody.innerHTML = "";
+
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+
+            if (entries.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#7c3aed;">No exam entries found.</td></tr>';
+              return;
+            }
+
+            entries.forEach((e, i) => {
+              const tr = document.createElement("tr");
+              if (e.date === todayStr) {
+                tr.className = "exam-today-row";
+              }
+              tr.innerHTML = `
+                <td><span class="exam-serial">${i + 1}</span></td>
+                <td class="exam-date-cell">
+                  <span class="exam-date-val">${e.displayDate}</span>
+                  <span class="exam-day-val">(${e.day})</span>
+                </td>
+                <td><span class="exam-course-name">${e.courseName}</span></td>
+                <td><span class="exam-code">${e.courseCode}</span></td>
+                <td><span class="exam-time">${e.time}</span></td>
+                <td><span class="exam-room">${e.room}</span></td>
+              `;
+              tbody.appendChild(tr);
+            });
+
+            // Also update the welcome toast message
+            // (overrides script.js toast if it fires after)
+            setTimeout(() => {
+              if (window.showToast) {
+                showToast({
+                  title: "📝 Exam Routine Active",
+                  message: "Showing exam schedule — good luck!",
+                  type: "info",
+                  duration: 4000
+                });
+              }
+            }, 2000);
+
+          } else {
+            // Normal mode: restore hidden elements, hide exam
+            if (mainTable) {
+              const toShow = mainTable.querySelectorAll(
+                ".routine-table, #classDurationTimer, #countdownStack"
+              );
+              toShow.forEach(el => el.style.display = "");
+            }
+            examSection.style.display = "none";
+          }
+        } catch(err) {
+          console.error("Exam mode check failed:", err);
+        }
+      }
+
+      // Wait for Firebase to be ready
+      if (window.db) {
+        checkExamMode();
+      } else {
+        window.addEventListener("load", () => setTimeout(checkExamMode, 800));
+      }
+    </script>
+  </body>
 </html>
-
