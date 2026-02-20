@@ -317,6 +317,60 @@
         <button class="btn-red" onclick="deleteSlot()">Delete Slot</button>
       </div>
       
+      <!-- ================= EXAM ROUTINE MANAGER ================= -->
+      <div class="card" style="border: 3px solid #a855f7;">
+        <h3>📝 Exam Routine Manager</h3>
+        <p style="color: white; margin-bottom: 15px;">
+          <b>📌 Note:</b> Launching the exam routine will <b>replace</b> the main class routine on the main page until you restore it.
+        </p>
+
+        <!-- Mode control -->
+        <div style="background: rgba(168,85,247,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+          <h4 style="color: #d8b4fe; margin-top: 0;">Current Mode:</h4>
+          <div id="currentExamMode" style="color: white; font-size: 18px; font-weight: bold;">Loading...</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+          <button style="background: linear-gradient(135deg,#7c3aed,#a855f7); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;" onclick="launchExamRoutine()">🚀 Launch Exam Routine</button>
+          <button style="background: linear-gradient(135deg,#059669,#10b981); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;" onclick="restoreMainRoutine()">↩️ Restore Main Routine</button>
+        </div>
+
+        <hr style="border-color: rgba(168,85,247,0.3);" />
+
+        <h4 style="color: #d8b4fe;">➕ Add Exam Entry</h4>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div>
+            <label style="color: white; display:block; margin-bottom:5px; font-size:13px;">Exam Date</label>
+            <input id="examDate" type="date" style="width:100%; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="color: white; display:block; margin-bottom:5px; font-size:13px;">Start Time</label>
+            <input id="examStartTime" type="time" style="width:100%; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="color: white; display:block; margin-bottom:5px; font-size:13px;">End Time</label>
+            <input id="examEndTime" type="time" style="width:100%; box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="color: white; display:block; margin-bottom:5px; font-size:13px;">Room No</label>
+            <input id="examRoom" placeholder="e.g. Room 301" style="width:100%; box-sizing:border-box;" />
+          </div>
+        </div>
+
+        <label style="color: white; display:block; margin-top:10px; margin-bottom:5px; font-size:13px;">Course Name</label>
+        <input id="examCourseName" placeholder="e.g. Data Structures" style="width:100%; box-sizing:border-box;" />
+
+        <label style="color: white; display:block; margin-top:10px; margin-bottom:5px; font-size:13px;">Course Code</label>
+        <input id="examCourseCode" placeholder="e.g. CSE 2105" style="width:100%; box-sizing:border-box;" />
+
+        <button style="background: linear-gradient(135deg,#a855f7,#7c3aed); color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; font-weight:bold; margin-top:15px; width:100%;" onclick="addExamEntry()">➕ Add Exam Entry</button>
+
+        <hr style="border-color: rgba(168,85,247,0.3); margin-top:20px;" />
+        <h4 style="color: #d8b4fe;">📋 Current Exam Entries</h4>
+        <div id="examEntryList"></div>
+      </div>
+
       <hr />
       <h3>📋 Cancelled Classes List</h3>
       <div id="cancelList"></div>
@@ -1036,6 +1090,141 @@
     console.error(e);
   }
 };
+
+      /* ================= EXAM ROUTINE MANAGER ================= */
+
+      function formatTime12hFromInput(t) {
+        const [h, m] = t.split(':').map(Number);
+        const p = h >= 12 ? 'PM' : 'AM';
+        const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+        return `${String(h12).padStart(2,'0')}:${String(m).padStart(2,'0')} ${p}`;
+      }
+
+      function getDayName(dateStr) {
+        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const d = new Date(dateStr + 'T00:00:00');
+        return days[d.getDay()];
+      }
+
+      function formatDisplayDate(dateStr) {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const d = new Date(dateStr + 'T00:00:00');
+        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+      }
+
+      async function loadExamMode() {
+        try {
+          const snap = await getDoc(doc(db, "settings", "examMode"));
+          const active = snap.exists() && snap.data().active === true;
+          document.getElementById("currentExamMode").innerHTML = active
+            ? '<span style="color:#d8b4fe;">📝 EXAM ROUTINE is ACTIVE</span>'
+            : '<span style="color:#86efac;">📅 MAIN ROUTINE is ACTIVE</span>';
+        } catch(e) {
+          document.getElementById("currentExamMode").textContent = "Error loading";
+        }
+      }
+
+      window.launchExamRoutine = async function() {
+        const snap = await getDocs(collection(db, "examRoutine"));
+        if (snap.empty) {
+          alert("⚠️ No exam entries found! Please add exam entries first.");
+          return;
+        }
+        if (!confirm("🚀 Launch Exam Routine? The main class routine will be replaced on the main page.")) return;
+        await setDoc(doc(db, "settings", "examMode"), { active: true, updatedAt: Date.now() });
+        showToast({ title: 'Exam Routine Launched! 📝', message: 'Students will now see the exam schedule', type: 'success' });
+        loadExamMode();
+      };
+
+      window.restoreMainRoutine = async function() {
+        if (!confirm("↩️ Restore Main Class Routine? Exam routine will be hidden.")) return;
+        await setDoc(doc(db, "settings", "examMode"), { active: false, updatedAt: Date.now() });
+        showToast({ title: 'Main Routine Restored! 📅', message: 'Students will now see the class schedule', type: 'success' });
+        loadExamMode();
+      };
+
+      window.addExamEntry = async function() {
+        const date = document.getElementById("examDate").value;
+        const startTime = document.getElementById("examStartTime").value;
+        const endTime = document.getElementById("examEndTime").value;
+        const room = document.getElementById("examRoom").value.trim();
+        const courseName = document.getElementById("examCourseName").value.trim();
+        const courseCode = document.getElementById("examCourseCode").value.trim();
+
+        if (!date || !startTime || !endTime || !room || !courseName || !courseCode) {
+          alert("⚠️ Please fill in all fields");
+          return;
+        }
+
+        const timeStr = `${formatTime12hFromInput(startTime)} - ${formatTime12hFromInput(endTime)}`;
+
+        await addDoc(collection(db, "examRoutine"), {
+          date,
+          displayDate: formatDisplayDate(date),
+          day: getDayName(date),
+          time: timeStr,
+          room,
+          courseName,
+          courseCode,
+          createdAt: Date.now()
+        });
+
+        showToast({ title: 'Exam Entry Added! ✅', message: `${courseName} - ${formatDisplayDate(date)}`, type: 'success' });
+
+        document.getElementById("examDate").value = "";
+        document.getElementById("examStartTime").value = "";
+        document.getElementById("examEndTime").value = "";
+        document.getElementById("examRoom").value = "";
+        document.getElementById("examCourseName").value = "";
+        document.getElementById("examCourseCode").value = "";
+
+        loadExamEntryList();
+      };
+
+      async function loadExamEntryList() {
+        const list = document.getElementById("examEntryList");
+        list.innerHTML = "<p style='color:white;'>Loading...</p>";
+
+        const snap = await getDocs(collection(db, "examRoutine"));
+
+        if (snap.empty) {
+          list.innerHTML = "<p style='color:#d8b4fe;'>No exam entries yet.</p>";
+          return;
+        }
+
+        // Sort by date
+        const docs = [];
+        snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
+        docs.sort((a, b) => a.date.localeCompare(b.date));
+
+        list.innerHTML = "";
+        docs.forEach((e, i) => {
+          const div = document.createElement("div");
+          div.style = "background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.4); padding:12px; margin:8px 0; border-radius:10px;";
+          div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+              <div>
+                <b style="color:#d8b4fe;">#${i+1} — ${e.displayDate}</b>
+                <span style="color:#a78bfa; font-size:12px; margin-left:8px;">(${e.day})</span><br>
+                <span style="color:white; font-size:14px;">📚 ${e.courseName}</span><br>
+                <span style="color:#c4b5fd; font-size:13px;">🔢 ${e.courseCode} &nbsp;|&nbsp; ⏰ ${e.time} &nbsp;|&nbsp; 🏫 ${e.room}</span>
+              </div>
+              <button onclick="deleteExamEntry('${e.id}')" style="background:#dc2626;color:white;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;flex-shrink:0;">❌</button>
+            </div>
+          `;
+          list.appendChild(div);
+        });
+      }
+
+      window.deleteExamEntry = async function(id) {
+        if (!confirm("Delete this exam entry?")) return;
+        await deleteDoc(doc(db, "examRoutine", id));
+        showToast({ title: 'Entry Deleted', message: 'Exam entry removed', type: 'warning' });
+        loadExamEntryList();
+      };
+
+      loadExamMode();
+      loadExamEntryList();
 
       // Load on page start
       loadCurrentTimeSlots();
