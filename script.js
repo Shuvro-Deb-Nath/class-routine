@@ -140,6 +140,7 @@ async function loadEvents() {
   try {
     const snap = await getDocs(collection(window.db, "events"));
     academicEvents = snap.docs.map(d => d.data());
+    highlightExamDays();
     localStorage.setItem("events", JSON.stringify(academicEvents));
   } catch (e) {
     const cached = localStorage.getItem("events");
@@ -847,29 +848,122 @@ function updateAssignmentCountdown() {
    EXAM COUNTDOWN
 ========================= */
 function updateExamCountdown() {
-  const container = document.getElementById("examCountdown");
-  if (!container) return;
+  const box = document.getElementById("examCountdownBox");
+  const titleEl = document.getElementById("examTitle");
+  const timerEl = document.getElementById("examTimer");
+  const fill = document.getElementById("examProgressFill");
+  const text = document.getElementById("examProgressText");
+
+  if (!box) return;
 
   const now = new Date();
-  container.innerHTML = "";
 
-  const exams = academicEvents
-    .filter(e => e.type === "exam")
-    .map(e => ({ ...e, d: new Date(`${e.date} ${e.time}`) }))
-    .filter(e => e.d > now)
-    .sort((a, b) => a.d - b.d);
+  const exams = academicEvents.filter(e =>
+    e.type?.toLowerCase() === "exam"
+  );
 
-  if (exams.length === 0) {
-    container.classList.add("hidden");
+  if (!exams.length) {
+    box.classList.add("hidden");
     return;
   }
 
-  exams.forEach(e => {
-    const box = document.createElement("div");
-    box.className = "next-class exam-countdown";
-    box.textContent = `📝 ${e.course} (${e.title}) in ${formatCountdown(e.d - now)}`;
-    container.appendChild(box);
-  });
+  const upcoming = exams
+    .map(e => {
+      const dateTime = new Date(`${e.date}T${e.time}`);
+      return { ...e, dateTime };
+    })
+    .sort((a, b) => a.dateTime - b.dateTime);
 
-  container.classList.remove("hidden");
-} 
+  const next = upcoming[0];
+
+  const diff = next.dateTime - now;
+
+  if (diff <= 0) {
+    timerEl.textContent = "🚨 Exam Started!";
+    fill.style.width = "100%";
+    return;
+  }
+
+  box.classList.remove("hidden");
+  titleEl.textContent = `${next.course} - ${next.title}`;
+
+  // TIME
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const mins = Math.floor((diff / (1000 * 60)) % 60);
+  const secs = Math.floor((diff / 1000) % 60);
+
+  timerEl.textContent = `${days}d ${hours}h ${mins}m ${secs}s`;
+
+  // =========================
+  // 📊 PROGRESS CALCULATION
+  // =========================
+
+  // Dynamic window: from 30 days before exam up to exam time
+  const daysUntil = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const windowDays = Math.max(1, Math.min(daysUntil + 1, 30));
+  const totalDuration = windowDays * 24 * 60 * 60 * 1000;
+  const windowStart = next.dateTime - totalDuration;
+  const elapsed = now - windowStart;
+
+  let percent = (elapsed / totalDuration) * 100;
+  percent = Math.max(0, Math.min(percent, 100));
+
+  fill.style.width = percent + "%";
+  text.textContent = daysUntil > 0
+    ? `${daysUntil} day${daysUntil === 1 ? "" : "s"} left`
+    : "Exam is today! 🚨";
+
+  // 🎨 color change
+  if (percent > 80) {
+    fill.style.background = "linear-gradient(90deg,#ef4444,#dc2626)";
+  } else if (percent > 50) {
+    fill.style.background = "linear-gradient(90deg,#f59e0b,#fbbf24)";
+  } else {
+    fill.style.background = "linear-gradient(90deg,#22c55e,#4ade80)";
+  }
+}
+function highlightExamDays() {
+  if (!academicEvents.length) return;
+
+  const dayCodeToIndex = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
+
+  // Get upcoming exam dates only (today or future), as YYYY-MM-DD strings
+  const todayStr = new Date().toISOString().split("T")[0];
+  const examDates = new Set(
+    academicEvents
+      .filter(e => e.type?.toLowerCase() === "exam" && e.date >= todayStr)
+      .map(e => e.date)
+  );
+
+  document.querySelectorAll(".routine-table tbody tr").forEach(row => {
+    // Always remove first so stale highlights are cleared
+    row.classList.remove("exam-day");
+
+    const dayCode = row.dataset.day;
+    if (!dayCode) return;
+
+    const dayIndex = dayCodeToIndex[dayCode];
+    if (dayIndex === undefined) return;
+
+    // Check if any upcoming exam falls on this day-of-week
+    // by comparing day index of each exam date to this row's day
+    for (const dateStr of examDates) {
+      const examDate = new Date(dateStr + "T00:00:00");
+      if (examDate.getDay() === dayIndex) {
+        // Extra check: the exam date must exactly match what the row is showing
+        // Build the row's actual date the same way renderRoutine does
+        const now = new Date();
+        const diff = dayIndex - now.getDay();
+        const rowDate = new Date(now);
+        rowDate.setDate(now.getDate() + diff);
+        const rowDateStr = rowDate.toISOString().split("T")[0];
+
+        if (dateStr === rowDateStr) {
+          row.classList.add("exam-day");
+        }
+        break;
+      }
+    }
+  });
+}
