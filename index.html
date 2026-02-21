@@ -1093,7 +1093,54 @@
       color: #90caf9 !important;
       border-top: 1px solid rgba(100, 181, 246, 0.2) !important;
     }
-  </style>
+  
+    /* ========== ROUTINE SWITCHER ========== */
+    .routine-switcher {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 16px auto 0;
+      max-width: 400px;
+      padding: 6px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+    }
+
+    .routine-switcher.hidden { display: none; }
+
+    .switcher-btn {
+      flex: 1;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: transparent;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.5px;
+    }
+
+    .switcher-btn.active {
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: white;
+      box-shadow: 0 4px 15px rgba(14,165,233,0.45);
+    }
+
+    .switcher-btn:not(.active):hover {
+      color: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.1);
+    }
+
+    body.manual-dark .routine-switcher {
+      background: rgba(0,20,50,0.6);
+      border-color: rgba(0,180,255,0.2);
+    }
+
+</style>
 
   <script>
     const darkToggle = document.getElementById("darkModeToggle");
@@ -1183,6 +1230,16 @@
       </p>
     </div>
 
+    <!-- ========== ROUTINE SWITCHER ========== -->
+    <div id="routineSwitcher" class="routine-switcher hidden">
+      <button id="switchMain" class="switcher-btn active" onclick="switchToMain()">
+        📅 Class Routine
+      </button>
+      <button id="switchExam" class="switcher-btn" onclick="switchToExam()">
+        📝 Exam Routine
+      </button>
+    </div>
+
     <div class="table-container">
       <!-- Today's Date Section -->
       <div id="todayDate" class="today-date-section">
@@ -1251,111 +1308,345 @@
         <tbody id="routineBody"></tbody>
       </table>
     </div>
-    <div class="table-container" id="examRoutineSection" style="display:none;">
-      <div id="examRoutineHeader" style="
-        background: linear-gradient(135deg, #6d28d9, #7c3aed, #8b5cf6);
-        color: white;
-        padding: 20px 24px;
-        border-radius: 16px 16px 0 0;
-        margin-bottom: 0;
+
+
+<div id="examCountdownBox" class="exam-countdown hidden">
+  <h3>📝 Next Exam</h3>
+  <p id="examTitle">Loading...</p>
+
+  <div id="examTimer">--:--:--</div>
+
+  <!-- Progress Bar -->
+  <div class="exam-progress">
+    <div id="examProgressFill"></div>
+  </div>
+
+  <small id="examProgressText"></small>
+</div>
+
+    <!-- ========== CYBERPUNK EXAM ROUTINE ========== -->
+    <style>
+      /* ── Container ── */
+      #examRoutineSection {
+        background: linear-gradient(135deg, #0a0f1e 0%, #0d1b2a 50%, #0a1628 100%);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow:
+          0 0 0 1px rgba(0,255,255,0.15),
+          0 20px 60px rgba(0,0,0,0.6),
+          0 0 80px rgba(0,200,255,0.08);
+        position: relative;
+      }
+
+      /* ── Animated header ── */
+      #examRoutineHeader {
+        position: relative;
+        overflow: hidden;
+        padding: 28px 24px 22px;
         text-align: center;
-      ">
-        <div style="font-size: 28px; margin-bottom: 6px;">📝</div>
-        <h2 style="margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 1px;">EXAM ROUTINE</h2>
-        <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">CSE 60 A — Spring 2026</p>
+        background: linear-gradient(270deg, #0ea5e9, #06b6d4, #3b82f6, #0284c7, #22d3ee);
+        background-size: 400% 400%;
+        animation: headerShift 6s ease infinite;
+      }
+
+      @keyframes headerShift {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      /* scanline overlay on header */
+      #examRoutineHeader::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0,0,0,0.08) 2px,
+          rgba(0,0,0,0.08) 4px
+        );
+        pointer-events: none;
+      }
+
+      /* glowing circuit lines */
+      #examRoutineHeader::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #00ffff, #ffffff, #00ffff, transparent);
+        animation: scanLine 2.5s linear infinite;
+      }
+
+      @keyframes scanLine {
+        0%   { opacity: 0.4; }
+        50%  { opacity: 1; }
+        100% { opacity: 0.4; }
+      }
+
+      .exam-header-icon {
+        font-size: 36px;
+        margin-bottom: 8px;
+        display: block;
+        animation: iconFloat 3s ease-in-out infinite;
+        filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+      }
+
+      @keyframes iconFloat {
+        0%, 100% { transform: translateY(0); }
+        50%       { transform: translateY(-6px); }
+      }
+
+      .exam-header-title {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: white;
+        text-shadow:
+          0 0 10px rgba(0,255,255,0.9),
+          0 0 30px rgba(0,200,255,0.6),
+          0 0 60px rgba(0,150,255,0.3);
+      }
+
+      .exam-header-sub {
+        margin: 8px 0 0;
+        font-size: 13px;
+        color: rgba(255,255,255,0.85);
+        letter-spacing: 2px;
+        font-family: monospace;
+      }
+
+      /* ── Table wrapper ── */
+      #examRoutineSection .exam-table-wrap {
+        overflow-x: auto;
+        padding: 0 16px 16px;
+      }
+
+      /* ── Table ── */
+      #examRoutineTable {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 16px;
+      }
+
+      /* ── TH ── */
+      #examRoutineTable thead tr {
+        background: linear-gradient(90deg, #0c4a6e, #075985, #0369a1, #075985, #0c4a6e) !important;
+        background-size: 200% 100% !important;
+        animation: thShimmer 4s linear infinite !important;
+      }
+
+      @keyframes thShimmer {
+        0%   { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      #examRoutineTable th {
+        color: #7dd3fc !important;
+        text-align: center;
+        padding: 14px 10px;
+        font-size: 12px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-family: monospace;
+        border-bottom: 2px solid rgba(0,255,255,0.2);
+        position: relative;
+      }
+
+      #examRoutineTable th::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 10%; right: 10%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #00ffff, transparent);
+      }
+
+      /* ── TD ── */
+      #examRoutineTable td {
+        text-align: center;
+        padding: 14px 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(0,180,255,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      /* alternating rows */
+      #examRoutineTable tbody tr:nth-child(odd) td {
+        background: rgba(3, 50, 90, 0.5);
+      }
+      #examRoutineTable tbody tr:nth-child(even) td {
+        background: rgba(2, 30, 60, 0.7);
+      }
+
+      /* ── Hover glow ── */
+      #examRoutineTable tbody tr:hover td {
+        background: rgba(0, 180, 255, 0.12) !important;
+        box-shadow: inset 0 0 20px rgba(0,200,255,0.08);
+        transform: scale(1.005);
+      }
+
+      #examRoutineTable tbody tr:hover .exam-course-name {
+        color: #38bdf8;
+        text-shadow: 0 0 8px rgba(56,189,248,0.6);
+      }
+
+      /* ── Serial number ── */
+      .exam-serial {
+        font-weight: bold;
+        font-size: 15px;
+        color: #00ffff;
+        font-family: monospace;
+        text-shadow: 0 0 8px rgba(0,255,255,0.6);
+      }
+
+      /* ── Date cell ── */
+      .exam-date-val {
+        font-weight: bold;
+        font-size: 14px;
+        display: block;
+        color: #e0f2fe;
+      }
+      .exam-day-val {
+        font-size: 11px;
+        color: #38bdf8;
+        display: block;
+        margin-top: 3px;
+        font-family: monospace;
+        letter-spacing: 1px;
+      }
+
+      /* ── Course name ── */
+      .exam-course-name {
+        font-weight: bold;
+        font-size: 14px;
+        color: #f0f9ff;
+        transition: all 0.3s;
+      }
+
+      /* ── Course code badge ── */
+      .exam-code {
+        background: linear-gradient(135deg, #0369a1, #0ea5e9, #22d3ee);
+        background-size: 200% 200%;
+        animation: badgePulse 3s ease infinite;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        font-family: monospace;
+        letter-spacing: 1px;
+        display: inline-block;
+        box-shadow: 0 0 10px rgba(14,165,233,0.5);
+      }
+
+      @keyframes badgePulse {
+        0%   { background-position: 0% 50%; box-shadow: 0 0 8px rgba(14,165,233,0.4); }
+        50%  { background-position: 100% 50%; box-shadow: 0 0 18px rgba(34,211,238,0.8); }
+        100% { background-position: 0% 50%; box-shadow: 0 0 8px rgba(14,165,233,0.4); }
+      }
+
+      /* ── Time ── */
+      .exam-time {
+        font-size: 13px;
+        color: #7dd3fc;
+        white-space: nowrap;
+        font-family: monospace;
+      }
+
+      /* ── Room ── */
+      .exam-room {
+        font-weight: bold;
+        color: #38bdf8;
+        font-family: monospace;
+        font-size: 13px;
+      }
+
+      /* ── TODAY row — neon pulse ── */
+      .exam-today-row td {
+        background: linear-gradient(135deg,
+          rgba(0,200,255,0.18),
+          rgba(0,100,200,0.22)) !important;
+        border-left: 4px solid #00ffff !important;
+        animation: todayNeon 2s ease-in-out infinite !important;
+      }
+
+      @keyframes todayNeon {
+        0%, 100% {
+          box-shadow: inset 0 0 15px rgba(0,255,255,0.1),
+                      inset 4px 0 15px rgba(0,255,255,0.2);
+        }
+        50% {
+          box-shadow: inset 0 0 30px rgba(0,255,255,0.2),
+                      inset 4px 0 25px rgba(0,255,255,0.4);
+        }
+      }
+
+      .exam-today-row .exam-course-name {
+        color: #00ffff;
+        text-shadow: 0 0 10px rgba(0,255,255,0.7);
+      }
+
+      .exam-today-row .exam-serial {
+        color: #ffffff;
+        text-shadow: 0 0 12px #00ffff, 0 0 25px #00ffff;
+      }
+
+      /* ── TODAY badge on serial ── */
+      .exam-today-badge {
+        display: block;
+        font-size: 9px;
+        background: #00ffff;
+        color: #0a0f1e;
+        border-radius: 4px;
+        padding: 1px 4px;
+        margin-top: 3px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        font-family: monospace;
+      }
+
+      /* ── No entries / loading text ── */
+      #examRoutineBody .empty-msg {
+        color: #38bdf8;
+        font-family: monospace;
+        font-size: 15px;
+        padding: 40px;
+        text-align: center;
+      }
+    </style>
+
+    <div class="table-container" id="examRoutineSection" style="display:none;">
+      <div id="examRoutineHeader">
+        <span class="exam-header-icon">💻</span>
+        <h2 class="exam-header-title">Exam Routine</h2>
+        <p class="exam-header-sub">&gt;_ CSE 60 A &nbsp;|&nbsp; Spring 2026 &nbsp;|&nbsp; Good Luck! 🚀</p>
       </div>
 
-      <div style="overflow-x: auto;">
-        <table class="routine-table" id="examRoutineTable" style="border-radius: 0 0 16px 16px;">
+      <div class="exam-table-wrap">
+        <table id="examRoutineTable">
           <thead>
-            <tr style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
-              <th style="color:white; text-align:center; width:50px;">#</th>
-              <th style="color:white; text-align:center;">Date</th>
-              <th style="color:white; text-align:center;">Course Name</th>
-              <th style="color:white; text-align:center;">Course Code</th>
-              <th style="color:white; text-align:center;">Time</th>
-              <th style="color:white; text-align:center;">Room No</th>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Course Name</th>
+              <th>Course Code</th>
+              <th>Time</th>
+              <th>Room No</th>
             </tr>
           </thead>
           <tbody id="examRoutineBody">
-            <tr><td colspan="6" style="text-align:center; padding:30px; color:#7c3aed;">Loading exam schedule...</td></tr>
+            <tr><td colspan="6" class="empty-msg">&gt;_ Loading exam schedule...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-
-    <style>
-      /* Exam Routine Table Styles */
-      #examRoutineSection .routine-table th {
-        background: linear-gradient(135deg, #4c1d95, #6d28d9) !important;
-        color: white !important;
-      }
-      #examRoutineSection .routine-table td {
-        text-align: center;
-        padding: 14px 12px;
-        vertical-align: middle;
-      }
-      .exam-today-row td {
-        background: linear-gradient(135deg, rgba(109,40,217,0.15), rgba(139,92,246,0.15)) !important;
-        border-left: 4px solid #7c3aed !important;
-        font-weight: bold;
-      }
-      .exam-serial {
-        font-weight: bold;
-        color: #7c3aed;
-        font-size: 16px;
-      }
-      .exam-date-cell .exam-date-val {
-        font-weight: bold;
-        font-size: 14px;
-        display: block;
-      }
-      .exam-date-cell .exam-day-val {
-        font-size: 12px;
-        color: #7c3aed;
-        display: block;
-        margin-top: 3px;
-      }
-      .exam-course-name {
-        font-weight: bold;
-        font-size: 14px;
-      }
-      .exam-code {
-        background: linear-gradient(135deg, #6d28d9, #8b5cf6);
-        color: white;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: bold;
-        display: inline-block;
-      }
-      .exam-time {
-        font-size: 13px;
-        color: #555;
-        white-space: nowrap;
-      }
-      .exam-room {
-        font-weight: bold;
-        color: #1976d2;
-      }
-      /* Dark mode for exam */
-      body.manual-dark #examRoutineSection .routine-table td {
-        background: rgba(26, 26, 46, 0.95) !important;
-        color: #e3f2fd !important;
-      }
-      body.manual-dark .exam-date-cell .exam-day-val { color: #c4b5fd !important; }
-      body.manual-dark .exam-time { color: #c4b5fd !important; }
-      body.manual-dark .exam-room { color: #90caf9 !important; }
-      body.manual-dark .exam-today-row td {
-        background: rgba(109,40,217,0.25) !important;
-      }
-      @media (prefers-color-scheme: dark) {
-        #examRoutineSection .routine-table td { background: rgba(26,26,46,0.95) !important; color: #e3f2fd !important; }
-        .exam-date-cell .exam-day-val { color: #c4b5fd !important; }
-        .exam-time { color: #c4b5fd !important; }
-        .exam-room { color: #90caf9 !important; }
-      }
-    </style>
       <div class="day-progress-header">
         📅 Weekly Progress: <span id="weekProgressText">0%</span>
       </div>
@@ -2063,72 +2354,102 @@
     </script>
     <script type="module">
       /* ==========================================
-         EXAM ROUTINE MODE DETECTION
+         EXAM ROUTINE MODE DETECTION + SWITCHER
       ========================================== */
+
+      let examEntriesCache = [];
+
+      function showMainView() {
+        const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
+        const examSection = document.getElementById("examRoutineSection");
+        if (mainTable) {
+          mainTable.querySelectorAll(".routine-table, #classDurationTimer, #countdownStack")
+            .forEach(el => el.style.display = "");
+        }
+        if (examSection) examSection.style.display = "none";
+        document.getElementById("switchMain").classList.add("active");
+        document.getElementById("switchExam").classList.remove("active");
+      }
+
+      function showExamView() {
+        const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
+        const examSection = document.getElementById("examRoutineSection");
+        if (mainTable) {
+          mainTable.querySelectorAll(".routine-table, #classDurationTimer, #countdownStack")
+            .forEach(el => el.style.display = "none");
+        }
+        if (examSection) examSection.style.display = "block";
+        document.getElementById("switchMain").classList.remove("active");
+        document.getElementById("switchExam").classList.add("active");
+      }
+
+      function renderExamEntries() {
+        const tbody = document.getElementById("examRoutineBody");
+        tbody.innerHTML = "";
+        const todayStr = new Date().toISOString().split("T")[0];
+
+        if (examEntriesCache.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">&gt;_ No exam entries found.</td></tr>';
+          return;
+        }
+
+        examEntriesCache.forEach((e, i) => {
+          const isToday = e.date === todayStr;
+          const isPast  = e.date < todayStr;
+          const tr = document.createElement("tr");
+          if (isToday) tr.className = "exam-today-row";
+          if (isPast)  tr.style.opacity = "0.45";
+          tr.innerHTML = `
+            <td>
+              <span class="exam-serial">${i + 1}</span>
+              ${isToday ? '<span class="exam-today-badge">TODAY</span>' : ''}
+            </td>
+            <td class="exam-date-cell">
+              <span class="exam-date-val">${e.displayDate}</span>
+              <span class="exam-day-val">&gt;_ ${e.day.toUpperCase()}</span>
+            </td>
+            <td><span class="exam-course-name">${e.courseName}</span></td>
+            <td><span class="exam-code">${e.courseCode}</span></td>
+            <td><span class="exam-time">⏰ ${e.time}</span></td>
+            <td><span class="exam-room">🏫 ${e.room}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Switcher buttons
+      window.switchToMain = function() { showMainView(); };
+      window.switchToExam = function() { showExamView(); renderExamEntries(); };
+
       async function checkExamMode() {
         const db = window.db;
         if (!db) { setTimeout(checkExamMode, 500); return; }
 
         try {
-          const docFn = window._fbDoc;
-          const getDocFn = window._fbGetDoc;
-          const getDocsFn = window._fbGetDocs;
+          const docFn        = window._fbDoc;
+          const getDocFn     = window._fbGetDoc;
+          const getDocsFn    = window._fbGetDocs;
           const collectionFn = window._fbCollection;
 
-          const modeSnap = await getDocFn(docFn(db, "settings", "examMode"));
+          // 1. Fetch admin's default mode
+          const modeSnap   = await getDocFn(docFn(db, "settings", "examMode"));
           const isExamMode = modeSnap.exists() && modeSnap.data().active === true;
 
-          const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
-          const examSection = document.getElementById("examRoutineSection");
+          // 2. Pre-load exam entries into cache
+          const snap = await getDocsFn(collectionFn(db, "examRoutine"));
+          examEntriesCache = [];
+          snap.forEach(d => examEntriesCache.push({ id: d.id, ...d.data() }));
+          examEntriesCache.sort((a, b) => a.date.localeCompare(b.date));
 
+          // 3. Show switcher only if exam entries exist
+          if (examEntriesCache.length > 0) {
+            document.getElementById("routineSwitcher").classList.remove("hidden");
+          }
+
+          // 4. Apply admin's default view (no sessionStorage — resets on every reload)
           if (isExamMode) {
-            // Hide routine table parts but keep date/notice/Bengali date visible
-            if (mainTable) {
-              const toHide = mainTable.querySelectorAll(
-                ".routine-table, #classDurationTimer, #countdownStack"
-              );
-              toHide.forEach(el => el.style.display = "none");
-            }
-            examSection.style.display = "block";
-
-            // Load exam entries
-            const snap = await getDocsFn(collectionFn(db, "examRoutine"));
-            const entries = [];
-            snap.forEach(d => entries.push({ id: d.id, ...d.data() }));
-            entries.sort((a, b) => a.date.localeCompare(b.date));
-
-            const tbody = document.getElementById("examRoutineBody");
-            tbody.innerHTML = "";
-
-            const today = new Date();
-            const todayStr = today.toISOString().split('T')[0];
-
-            if (entries.length === 0) {
-              tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#7c3aed;">No exam entries found.</td></tr>';
-              return;
-            }
-
-            entries.forEach((e, i) => {
-              const tr = document.createElement("tr");
-              if (e.date === todayStr) {
-                tr.className = "exam-today-row";
-              }
-              tr.innerHTML = `
-                <td><span class="exam-serial">${i + 1}</span></td>
-                <td class="exam-date-cell">
-                  <span class="exam-date-val">${e.displayDate}</span>
-                  <span class="exam-day-val">(${e.day})</span>
-                </td>
-                <td><span class="exam-course-name">${e.courseName}</span></td>
-                <td><span class="exam-code">${e.courseCode}</span></td>
-                <td><span class="exam-time">${e.time}</span></td>
-                <td><span class="exam-room">${e.room}</span></td>
-              `;
-              tbody.appendChild(tr);
-            });
-
-            // Also update the welcome toast message
-            // (overrides script.js toast if it fires after)
+            showExamView();
+            renderExamEntries();
             setTimeout(() => {
               if (window.showToast) {
                 showToast({
@@ -2139,23 +2460,15 @@
                 });
               }
             }, 2000);
-
           } else {
-            // Normal mode: restore hidden elements, hide exam
-            if (mainTable) {
-              const toShow = mainTable.querySelectorAll(
-                ".routine-table, #classDurationTimer, #countdownStack"
-              );
-              toShow.forEach(el => el.style.display = "");
-            }
-            examSection.style.display = "none";
+            showMainView();
           }
+
         } catch(err) {
           console.error("Exam mode check failed:", err);
         }
       }
 
-      // Wait for Firebase to be ready
       if (window.db) {
         checkExamMode();
       } else {
