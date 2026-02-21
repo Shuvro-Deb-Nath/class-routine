@@ -1955,73 +1955,100 @@ tr.today-row {
 }
 
 /* =============================
-   📝 EXAM MODE - SKY BLUE THEME
+   📝 EXAM COUNTDOWN BOX
 ============================= */
 
-body.exam-mode {
-  --main: #2196f3;
-  --dark: #0d47a1;
-  --light: #64b5f6;
-}
-
-/* Background */
-body.exam-mode {
-  background: linear-gradient(135deg, #0d47a1, #1976d2, #2196f3, #64b5f6) !important;
-}
-
-/* HERO HEADER */
-body.exam-mode .hero {
-  background: linear-gradient(135deg, #0d47a1, #1976d2, #2196f3) !important;
-  box-shadow: 0 0 40px rgba(33, 150, 243, 0.5);
-}
-
-/* TODAY DATE BOX */
-body.exam-mode .today-date-section {
-  background: linear-gradient(135deg, #1565c0, #1976d2, #42a5f5) !important;
-}
-
-/* ROUTINE TABLE HEADER */
-body.exam-mode .routine-table th {
-  background: linear-gradient(135deg, #1565c0, #2196f3) !important;
-}
-
-/* TABLE CELLS */
-body.exam-mode .routine-table td {
-  border-color: rgba(33, 150, 243, 0.3) !important;
-}
-
-/* CURRENT CLASS */
-body.exam-mode .current-class {
-  background: linear-gradient(135deg, #2196f3, #64b5f6) !important;
+.exam-countdown {
+  background: linear-gradient(135deg, #1565c0, #2196f3, #64b5f6);
   color: white;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 16px;
+  text-align: center;
+
+  box-shadow:
+    0 10px 30px rgba(33, 150, 243, 0.4),
+    0 0 50px rgba(33, 150, 243, 0.3);
+
+  animation: examPulse 2s infinite;
 }
 
-/* TIMER */
-body.exam-mode .class-duration-timer {
-  background: linear-gradient(135deg, #1976d2, #64b5f6) !important;
+.exam-countdown h3 {
+  margin: 0 0 8px;
 }
 
-/* NEXT CLASS BOX */
-body.exam-mode .next-class {
-  background: linear-gradient(135deg, #2196f3, #42a5f5) !important;
+#examTitle {
+  font-size: 16px;
+  opacity: 0.9;
+  margin-bottom: 10px;
 }
 
-/* PROGRESS BAR */
-body.exam-mode #dayProgressFill {
-  background: linear-gradient(90deg, #64b5f6, #bbdefb) !important;
+#examTimer {
+  font-size: 26px;
+  font-weight: bold;
 }
 
-/* WEEK PROGRESS */
-body.exam-mode #weekProgressFill {
-  background: linear-gradient(90deg, #2196f3, #90caf9) !important;
+/* Glow animation */
+@keyframes examPulse {
+  0%,100% { box-shadow: 0 0 20px rgba(33,150,243,0.4); }
+  50% { box-shadow: 0 0 60px rgba(33,150,243,0.8); }
 }
 
-/* NOTICE */
-body.exam-mode .notice {
-  border-left: 5px solid #64b5f6 !important;
+/* Hidden */
+.hidden {
+  display: none;
 }
 
-/* DARK MODE BUTTON */
-body.exam-mode .dark-toggle-btn {
-  background: linear-gradient(135deg, #0d47a1, #2196f3) !important;
+/* =============================
+   📊 EXAM PROGRESS BAR
+============================= */
+
+.exam-progress {
+  width: 100%;
+  height: 10px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 10px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+#examProgressFill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #64b5f6, #bbdefb);
+  transition: width 1s linear;
+}
+
+#examProgressText {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  opacity: 0.9;
+}
+/* =============================
+   📅 EXAM DAY HIGHLIGHT
+============================= */
+
+/* Row gets a red border — cell backgrounds are NOT touched */
+.exam-day {
+  box-shadow: inset 0 0 0 3px #ef4444;
+}
+
+/* 📝 EXAM badge shown inside the day-name cell only */
+.exam-day td:first-child {
+  position: relative;
+}
+
+.exam-day td:first-child .day-name::after {
+  content: "📝 EXAM";
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-align: center;
+  letter-spacing: 0.5px;
 }
