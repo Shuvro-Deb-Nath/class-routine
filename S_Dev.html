@@ -429,9 +429,10 @@
 
         try {
           await setDoc(doc(db, "settings", "timeSlots"), { slots });
+          await setDoc(doc(db, "settings", "break"), { index: 3 });
           showToast({
             title: 'Schedule Updated! 📅',
-            message: 'Normal schedule has been loaded',
+            message: 'Normal schedule loaded — break at Slot 4',
             type: 'success',
             icon: '✓'
           });
@@ -461,9 +462,10 @@
 
         try {
           await setDoc(doc(db, "settings", "timeSlots"), { slots });
+          await setDoc(doc(db, "settings", "break"), { index: 4 });
           showToast({
             title: 'Schedule Updated! 🌙',
-            message: 'Ramadan schedule has been loaded',
+            message: 'Ramadan schedule loaded — break at Slot 5',
             type: 'success',
             icon: '✓'
           });
@@ -874,59 +876,82 @@
       };
 
       /* ================= SMART CANCEL UI ================= */
+
+      // Same NORMAL_SLOTS used in d.js renderRoutine — must stay in sync
+      const CANCEL_NORMAL_SLOTS = [
+        "08:45 AM –10:05 AM",
+        "10:05 AM –11:25 AM",
+        "11:25 AM –12:45 PM",
+        "12:45 PM –01:15 PM",  // index 3 = BREAK in normal
+        "01:15 PM –02:35 PM",
+        "02:35 PM –03:55 PM"
+      ];
+      const CANCEL_NORMAL_BREAK = 3;
+      // The 5 class-slot strings in order (break removed)
+      const CANCEL_SAVED_SLOTS = CANCEL_NORMAL_SLOTS.filter((_, i) => i !== CANCEL_NORMAL_BREAK);
+
+      // Helper: parse 12h time string to {h, m}
+      function parse12hTimeAdmin(str) {
+        if (!str) return { h: 0, m: 0 };
+        const parts = str.trim().split("–")[0].trim().split(" ");
+        const [time, mer] = [parts[0], parts[1]];
+        let [h, m] = time.split(":").map(Number);
+        if (mer === "PM" && h !== 12) h += 12;
+        if (mer === "AM" && h === 12) h = 0;
+        return { h, m };
+      }
+
       document.getElementById("cday").addEventListener("change", loadCancelSlots);
 
       async function loadCancelSlots() {
         const day = cday.value;
 
-        // Load the routine classes (always from "routine" collection — same subjects)
+        // Load this day's classes from Firebase
         const snap = await getDoc(doc(db, "routine", day));
-        if (!snap.exists()) return;
+        if (!snap.exists()) { ctime.innerHTML = ""; csubject.value = ""; return; }
         const classes = snap.data().classes || [];
 
-        // Load current active time slots (could be normal or Ramadan)
-        let activeSlots = [];
-        if (cancelScheduleMode === "ramadan") {
-          // Load Ramadan slots from Firebase settings
-          const slotsSnap = await getDoc(doc(db, "settings", "timeSlots"));
-          activeSlots = slotsSnap.exists() ? slotsSnap.data().slots || [] : [];
-        } else {
-          // Main routine: use the saved times from Firebase routine directly
-          activeSlots = classes.map(c => c.time);
-        }
-
-        // Remove break slot (empty-ish slot)
-        const breakSnap = await getDoc(doc(db, "settings", "break"));
-        const bkIndex = breakSnap.exists() ? (breakSnap.data().index ?? 3) : 3;
+        // Sort classes by their saved start time (same order as renderRoutine)
+        const sortedClasses = [...classes].sort((a, b) => {
+          const pa = parse12hTimeAdmin(a.time);
+          const pb = parse12hTimeAdmin(b.time);
+          return (pa.h * 60 + pa.m) - (pb.h * 60 + pb.m);
+        });
 
         ctime.innerHTML = "";
 
-        if (cancelScheduleMode === "ramadan") {
-          // Map each Ramadan slot by position to the class at that position
-          // Classes in Firebase are sorted by their original time
-          const sortedClasses = [...classes].sort((a, b) => {
-            const pa = parse12hTimeAdmin(a.time);
-            const pb = parse12hTimeAdmin(b.time);
-            return (pa.h * 60 + pa.m) - (pb.h * 60 + pb.m);
-          });
-
-          activeSlots.forEach((slot, i) => {
-            if (i === bkIndex) return; // skip break
-            // Map slot index to class (break shifts index)
-            const classIndex = i > bkIndex ? i - 1 : i;
-            const cls = sortedClasses[classIndex];
+        if (cancelScheduleMode === "main") {
+          // MAIN ROUTINE: show each class with its saved normal time + subject
+          sortedClasses.forEach((cls) => {
             const opt = document.createElement("option");
-            opt.value = slot; // save the RAMADAN time string
-            opt.dataset.originalTime = cls ? cls.time : ""; // keep original for subject lookup
-            opt.textContent = slot + (cls ? ` — ${cls.subject}` : "");
+            opt.value = cls.time;                                   // normal time saved to Firebase
+            opt.textContent = cls.time + " — " + cls.subject + " (" + cls.room + ")";
             ctime.appendChild(opt);
           });
+
         } else {
-          // Main routine: just show the saved class times
-          classes.forEach((c) => {
+          // RAMADAN ROUTINE: load active Ramadan slots + breakIndex from Firebase
+          const slotsSnap = await getDoc(doc(db, "settings", "timeSlots"));
+          const ramadanSlots = slotsSnap.exists() ? slotsSnap.data().slots || [] : [];
+
+          const breakSnap = await getDoc(doc(db, "settings", "break"));
+          const bk = breakSnap.exists() ? (breakSnap.data().index ?? 4) : 4;
+
+          // Build ordered Ramadan class slots (excluding break) — same logic as renderRoutine
+          const ramadanClassSlots = ramadanSlots.filter((_, i) => i !== bk);
+
+          // Each ramadanClassSlots[pos] maps to CANCEL_SAVED_SLOTS[pos] → sortedClasses match
+          ramadanClassSlots.forEach((ramSlot, pos) => {
+            // Find the class that sits at this position via normal time string
+            const normalTime = CANCEL_SAVED_SLOTS[pos];
+            const cls = normalTime
+              ? sortedClasses.find(c => c.time === normalTime) || null
+              : null;
+
             const opt = document.createElement("option");
-            opt.value = c.time;
-            opt.textContent = c.time;
+            opt.value = ramSlot;                                    // Ramadan time saved to Firebase
+            opt.dataset.originalTime = cls ? cls.time : "";
+            opt.textContent = ramSlot + (cls ? " — " + cls.subject + " (" + cls.room + ")" : " — (empty)");
             ctime.appendChild(opt);
           });
         }
@@ -942,27 +967,15 @@
         if (!snap.exists()) return;
         const classes = snap.data().classes || [];
 
-        if (cancelScheduleMode === "ramadan") {
-          // Get original time from selected option's dataset
+        if (cancelScheduleMode === "main") {
+          const found = classes.find(c => c.time === ctime.value);
+          csubject.value = found ? found.subject + " (" + found.room + ")" : "";
+        } else {
           const selectedOpt = ctime.options[ctime.selectedIndex];
           const originalTime = selectedOpt ? selectedOpt.dataset.originalTime : "";
           const found = classes.find(c => c.time === originalTime);
           csubject.value = found ? found.subject + " (" + found.room + ")" : "";
-        } else {
-          const found = classes.find((c) => c.time === ctime.value);
-          csubject.value = found ? found.subject + " (" + found.room + ")" : "";
         }
-      }
-
-      // Helper: parse 12h time in admin context (same logic as script.js)
-      function parse12hTimeAdmin(str) {
-        if (!str) return { h: 0, m: 0 };
-        const parts = str.trim().split("–")[0].trim().split(" ");
-        const [time, mer] = [parts[0], parts[1]];
-        let [h, m] = time.split(":").map(Number);
-        if (mer === "PM" && h !== 12) h += 12;
-        if (mer === "AM" && h === 12) h = 0;
-        return { h, m };
       }
 
       /* ================= EFFECTIVE DATE MANAGER ================= */
