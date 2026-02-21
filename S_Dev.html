@@ -108,7 +108,26 @@
       <!-- ================= CANCEL CLASS ================= -->
       <div class="card">
         <h3>❌ Cancel Class</h3>
-        
+
+        <!-- Schedule type toggle -->
+        <label>📅 Which Schedule?</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:4px;">
+          <button id="cancelScheduleMain" class="btn-blue" onclick="setCancelSchedule('main')" style="margin:0;">
+            📅 Main Routine
+          </button>
+          <button id="cancelScheduleRamadan" class="btn-orange" onclick="setCancelSchedule('ramadan')" style="margin:0; opacity:0.5;">
+            🌙 Ramadan Routine
+          </button>
+        </div>
+
+        <!-- Active schedule indicator -->
+        <div class="info-box" style="padding:8px 14px; margin-bottom:4px;">
+          <span id="cancelScheduleLabel" style="font-family:monospace; font-size:13px; color:#38bdf8;">
+            &gt;_ Cancelling from: <b style="color:#00ffff;">MAIN ROUTINE</b>
+          </span>
+        </div>
+
+        <label>📆 Day</label>
         <select id="cday">
           <option value="MON">MON</option>
           <option value="TUE">TUE</option>
@@ -119,13 +138,17 @@
           <option value="SUN">SUN</option>
         </select>
 
+        <label>⏰ Time Slot</label>
         <select id="ctime"></select>
 
-        <input id="csubject" placeholder="Subject" disabled />
+        <label>📚 Subject</label>
+        <input id="csubject" placeholder="Auto-filled from routine" disabled />
 
+        <label>📅 Date</label>
         <input id="cdate" type="date" />
 
-        <input id="creason" placeholder="Reason" />
+        <label>💬 Reason</label>
+        <input id="creason" placeholder="e.g. Teacher Unavailable" />
 
         <button id="cancelToggleBtn" onclick="toggleCancel()" class="btn-red">
           Cancel Class
@@ -598,9 +621,32 @@
       };
 
       /* ================= CANCEL CLASS TOGGLE ================= */
+
+      // Track which schedule we're cancelling from
+      let cancelScheduleMode = "main"; // "main" or "ramadan"
+
+      window.setCancelSchedule = function(mode) {
+        cancelScheduleMode = mode;
+        const label = document.getElementById("cancelScheduleLabel");
+        const mainBtn = document.getElementById("cancelScheduleMain");
+        const ramadanBtn = document.getElementById("cancelScheduleRamadan");
+
+        if (mode === "ramadan") {
+          label.innerHTML = `&gt;_ Cancelling from: <b style="color:#fb923c;">RAMADAN ROUTINE</b>`;
+          mainBtn.style.opacity = "0.5";
+          ramadanBtn.style.opacity = "1";
+        } else {
+          label.innerHTML = `&gt;_ Cancelling from: <b style="color:#00ffff;">MAIN ROUTINE</b>`;
+          mainBtn.style.opacity = "1";
+          ramadanBtn.style.opacity = "0.5";
+        }
+
+        // Reload time slots for the selected schedule
+        loadCancelSlots();
+      };
+
       async function findCancelDoc(day, time, date) {
         const snap = await getDocs(collection(db, "cancelled"));
-
         return snap.docs.find((d) => {
           const c = d.data();
           return c.day === day && c.time === time && c.date === date;
@@ -608,13 +654,13 @@
       }
 
       window.toggleCancel = async function () {
-        const day = cday.value;
-        const time = ctime.value;
-        const date = cdate.value;
+        const day    = cday.value;
+        const time   = ctime.value;
+        const date   = cdate.value;
         const reason = creason.value || "Cancelled";
 
         if (!date) {
-          alert("⚠️ Please select a date");
+          showToast({ title: '⚠️ Select a date', type: 'warning' });
           return;
         }
 
@@ -622,15 +668,16 @@
 
         if (found) {
           await deleteDoc(doc(db, "cancelled", found.id));
-          alert("✅ Cancel removed");
+          showToast({ title: '✅ Cancel Removed', message: `${day} — ${time}`, type: 'success' });
         } else {
           await addDoc(collection(db, "cancelled"), {
             day,
             time,
             date,
             reason,
+            schedule: cancelScheduleMode  // save which schedule it belongs to
           });
-          alert("❌ Class cancelled");
+          showToast({ title: '❌ Class Cancelled', message: `${day} — ${time} | ${reason}`, type: 'warning' });
         }
 
         updateToggleText();
@@ -638,7 +685,7 @@
       };
 
       async function updateToggleText() {
-        const btn = document.getElementById("cancelToggleBtn");
+        const btn  = document.getElementById("cancelToggleBtn");
         const date = cdate.value;
 
         if (!date) {
@@ -650,10 +697,10 @@
         const found = await findCancelDoc(cday.value, ctime.value, date);
 
         if (found) {
-          btn.textContent = "Undo Cancel";
+          btn.textContent = "↩️ Undo Cancel";
           btn.className = "btn-green";
         } else {
-          btn.textContent = "Cancel Class";
+          btn.textContent = "❌ Cancel Class";
           btn.className = "btn-red";
         }
       }
@@ -677,12 +724,16 @@
 
         snap.forEach((docSnap) => {
           const c = docSnap.data();
+          const scheduleTag = c.schedule === "ramadan"
+            ? `<span style="background:rgba(251,146,60,0.2);color:#fb923c;border:1px solid rgba(251,146,60,0.4);border-radius:4px;padding:1px 6px;font-size:11px;margin-left:6px;">🌙 RAMADAN</span>`
+            : `<span style="background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3);border-radius:4px;padding:1px 6px;font-size:11px;margin-left:6px;">📅 MAIN</span>`;
 
           const div = document.createElement("div");
           div.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
               <div style="font-family:monospace; line-height:1.7;">
                 <span style="color:#f87171; font-weight:bold;">${c.day}</span>
+                ${scheduleTag}
                 <span style="color:rgba(100,180,255,0.5); margin:0 4px;">|</span>
                 <span style="color:#7dd3fc;">${c.time}</span>
                 <span style="color:rgba(100,180,255,0.5); margin:0 4px;">|</span>
@@ -828,20 +879,57 @@
       async function loadCancelSlots() {
         const day = cday.value;
 
+        // Load the routine classes (always from "routine" collection — same subjects)
         const snap = await getDoc(doc(db, "routine", day));
-
         if (!snap.exists()) return;
+        const classes = snap.data().classes || [];
 
-        const classes = snap.data().classes;
+        // Load current active time slots (could be normal or Ramadan)
+        let activeSlots = [];
+        if (cancelScheduleMode === "ramadan") {
+          // Load Ramadan slots from Firebase settings
+          const slotsSnap = await getDoc(doc(db, "settings", "timeSlots"));
+          activeSlots = slotsSnap.exists() ? slotsSnap.data().slots || [] : [];
+        } else {
+          // Main routine: use the saved times from Firebase routine directly
+          activeSlots = classes.map(c => c.time);
+        }
+
+        // Remove break slot (empty-ish slot)
+        const breakSnap = await getDoc(doc(db, "settings", "break"));
+        const bkIndex = breakSnap.exists() ? (breakSnap.data().index ?? 3) : 3;
 
         ctime.innerHTML = "";
 
-        classes.forEach((c) => {
-          const opt = document.createElement("option");
-          opt.value = c.time;
-          opt.textContent = c.time;
-          ctime.appendChild(opt);
-        });
+        if (cancelScheduleMode === "ramadan") {
+          // Map each Ramadan slot by position to the class at that position
+          // Classes in Firebase are sorted by their original time
+          const sortedClasses = [...classes].sort((a, b) => {
+            const pa = parse12hTimeAdmin(a.time);
+            const pb = parse12hTimeAdmin(b.time);
+            return (pa.h * 60 + pa.m) - (pb.h * 60 + pb.m);
+          });
+
+          activeSlots.forEach((slot, i) => {
+            if (i === bkIndex) return; // skip break
+            // Map slot index to class (break shifts index)
+            const classIndex = i > bkIndex ? i - 1 : i;
+            const cls = sortedClasses[classIndex];
+            const opt = document.createElement("option");
+            opt.value = slot; // save the RAMADAN time string
+            opt.dataset.originalTime = cls ? cls.time : ""; // keep original for subject lookup
+            opt.textContent = slot + (cls ? ` — ${cls.subject}` : "");
+            ctime.appendChild(opt);
+          });
+        } else {
+          // Main routine: just show the saved class times
+          classes.forEach((c) => {
+            const opt = document.createElement("option");
+            opt.value = c.time;
+            opt.textContent = c.time;
+            ctime.appendChild(opt);
+          });
+        }
 
         fillCancelSubject();
       }
@@ -850,17 +938,31 @@
 
       async function fillCancelSubject() {
         const day = cday.value;
-
         const snap = await getDoc(doc(db, "routine", day));
-
         if (!snap.exists()) return;
+        const classes = snap.data().classes || [];
 
-        const classes = snap.data().classes;
-        const found = classes.find((c) => c.time === ctime.value);
-
-        if (found) {
-          csubject.value = found.subject + " (" + found.room + ")";
+        if (cancelScheduleMode === "ramadan") {
+          // Get original time from selected option's dataset
+          const selectedOpt = ctime.options[ctime.selectedIndex];
+          const originalTime = selectedOpt ? selectedOpt.dataset.originalTime : "";
+          const found = classes.find(c => c.time === originalTime);
+          csubject.value = found ? found.subject + " (" + found.room + ")" : "";
+        } else {
+          const found = classes.find((c) => c.time === ctime.value);
+          csubject.value = found ? found.subject + " (" + found.room + ")" : "";
         }
+      }
+
+      // Helper: parse 12h time in admin context (same logic as script.js)
+      function parse12hTimeAdmin(str) {
+        if (!str) return { h: 0, m: 0 };
+        const parts = str.trim().split("–")[0].trim().split(" ");
+        const [time, mer] = [parts[0], parts[1]];
+        let [h, m] = time.split(":").map(Number);
+        if (mer === "PM" && h !== 12) h += 12;
+        if (mer === "AM" && h === 12) h = 0;
+        return { h, m };
       }
 
       /* ================= EFFECTIVE DATE MANAGER ================= */
