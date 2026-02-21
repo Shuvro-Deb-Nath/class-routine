@@ -140,12 +140,12 @@ async function loadEvents() {
   try {
     const snap = await getDocs(collection(window.db, "events"));
     academicEvents = snap.docs.map(d => d.data());
-    highlightExamDays();
     localStorage.setItem("events", JSON.stringify(academicEvents));
   } catch (e) {
     const cached = localStorage.getItem("events");
     if (cached) academicEvents = JSON.parse(cached);
   }
+  highlightExamDays();
 }
 
 /* =========================
@@ -236,19 +236,7 @@ setInterval(runAllTimers, TIMER_INTERVAL);
 
 init();
 
-/* =========================
-   CANCEL CLASS FUNCTION
-   (For future use if needed)
-========================= */
-window.cancelClass = async function () {
-  await addDoc(collection(window.db, "cancelled"), {
-    day: day.value,
-    time: time.value,
-    date: new Date().toISOString().split("T")[0],
-    reason: "Cancelled"
-  });
-  alert("✅ Cancelled");
-};
+
 
 /* =========================
    MASTER TIMER (OPTIMIZED)
@@ -345,20 +333,6 @@ function updateDayProgress() {
 
     const startMin = s.h * 60 + s.m;
     const endMin = e.h * 60 + e.m;
-     const startTime = new Date();
-startTime.setHours(s.h, s.m, 0, 0);
-
-const endTime = new Date();
-endTime.setHours(e.h, e.m, 0, 0);
-
-const durationMs = endTime - startTime;
-const passedMs = now - startTime;
-
-const percent = Math.max(
-  0,
-  Math.min(((now - startTime) / (endTime - startTime)) * 100, 100)
-);
-
     if (earliest === null || startMin < earliest) earliest = startMin;
     if (latest === null || endMin > latest) latest = endMin;
 
@@ -464,24 +438,6 @@ function renderRoutine(days) {
     });
   }
 
-  // Build a sorted list of the NORMAL (saved) time slots from the first day that has classes
-  // so we can map slot positions correctly even when Ramadan/custom times are active
-  let savedSlots = [];
-  for (const day of days) {
-    if (day.classes && day.classes.length > 0) {
-      // Collect all unique times from this day, sorted
-      const times = [...new Set(days.flatMap(d => (d.classes || []).map(c => c.time)))];
-      // Try to sort them by parsing start time
-      times.sort((a, b) => {
-        const pa = parse12hTime(a.split("–")[0]);
-        const pb = parse12hTime(b.split("–")[0]);
-        return (pa.h * 60 + pa.m) - (pb.h * 60 + pb.m);
-      });
-      savedSlots = times;
-      break;
-    }
-  }
-
   days.forEach(day => {
     const row = document.createElement("tr");
     row.dataset.day = day.day;
@@ -494,31 +450,14 @@ function renderRoutine(days) {
       </td>
     `;
 
-    timeSlots.forEach((slot, slotIndex) => {
-      // Skip break slot in matching — it has no class
-      if (slotIndex === (breakIndex ?? 3)) {
-        // break slot — already rendered in header, skip adding td here
-        // (the rowspan on the header handles it visually, no td needed for break)
-        return;
-      }
-
-      // Map current slot position → saved slot position
-      // Adjust index for break: slots after break are shifted by 1 in saved data
-      let savedIndex = slotIndex;
-      const bk = breakIndex ?? 3;
-      if (slotIndex > bk) savedIndex = slotIndex - 1; // after break, shift back
-
-      const savedSlot = savedSlots[savedIndex];
-      // Match by saved slot string first, fallback to current slot string
-      const cls = day.classes.find(c => c.time === savedSlot)
-                || day.classes.find(c => c.time === slot);
-
+    timeSlots.forEach(slot => {
+      const cls = day.classes.find(c => c.time === slot);
       row.innerHTML += cls
-        ? `<td class="${cls.code}" data-time="${slot}" data-saved-time="${savedSlot || slot}">
+        ? `<td class="${cls.code}" data-time="${slot}">
              <strong>${cls.subject}</strong><br>
              <small>${cls.room}</small>
            </td>`
-        : `<td data-time="${slot}" data-saved-time="${savedSlot || slot}"></td>`;
+        : `<td></td>`;
     });
 
     body.appendChild(row);
@@ -632,10 +571,7 @@ startTime.setHours(s.h, s.m, 0, 0);
 const endTime = new Date();
 endTime.setHours(e.h, e.m, 0, 0);
 
-const durationMs = endTime - startTime;
-const passedMs = now - startTime;
-
-const percent = Math.max(0, Math.min((passedMs / durationMs) * 100, 100));
+const percent = Math.max(0, Math.min(((now - startTime) / (endTime - startTime)) * 100, 100));
 
     /* 🔴 LIVE CLASS */
     if (cellDay === today && currentMinutes >= startMin && currentMinutes < endMin) {
@@ -751,22 +687,12 @@ if (percent > 80) {
 function markCancelledClasses() {
   document.querySelectorAll(".cancelled-badge,.cancel-reason").forEach(e => e.remove());
 
-  // Detect which schedule is currently active by checking if Ramadan slots are loaded
-  // We compare the first timeSlot against the known normal first slot
-  const isRamadanActive = timeSlots.length > 0 && !timeSlots[0].includes("08:45");
-
   cancelledClasses.forEach(c => {
-    // Only show cancellations that belong to the current active schedule
-    // If no schedule field (old data), show for main routine only
-    const cSchedule = c.schedule || "main";
-    if (isRamadanActive && cSchedule !== "ramadan") return;
-    if (!isRamadanActive && cSchedule === "ramadan") return;
-
     document.querySelectorAll("td[data-time]").forEach(cell => {
       const row = cell.closest("tr");
       const day = row.querySelector(".day-name");
 
-      if (day.textContent.trim() === c.day && (cell.dataset.savedTime === c.time || cell.dataset.time === c.time)) {
+      if (day.textContent.trim() === c.day && cell.dataset.time === c.time) {
         cell.classList.add("cancelled-class");
 
         const badge = document.createElement("div");
@@ -888,6 +814,37 @@ function updateAssignmentCountdown() {
 
   container.classList.remove("hidden");
 }
+
+/* =========================
+   EXAM COUNTDOWN
+========================= */
+// function updateExamCountdown() {
+//   const container = document.getElementById("examCountdown");
+//   if (!container) return;
+
+//   const now = new Date();
+//   container.innerHTML = "";
+
+//   const exams = academicEvents
+//     .filter(e => e.type === "exam")
+//     .map(e => ({ ...e, d: new Date(`${e.date} ${e.time}`) }))
+//     .filter(e => e.d > now)
+//     .sort((a, b) => a.d - b.d);
+
+//   if (exams.length === 0) {
+//     container.classList.add("hidden");
+//     return;
+//   }
+
+//   exams.forEach(e => {
+//     const box = document.createElement("div");
+//     box.className = "next-class exam-countdown";
+//     box.textContent = `📝 ${e.course} (${e.title}) in ${formatCountdown(e.d - now)}`;
+//     container.appendChild(box);
+//   });
+
+//   container.classList.remove("hidden");
+// }
 
 /* =========================
    EXAM COUNTDOWN
