@@ -7,170 +7,31 @@
     <link rel="stylesheet" href="admin.css" />
     <link rel="icon" href="y.png" type="image/png" sizes="32x32"/> 
     
-    <style>
-      /* Toast Notifications for Admin Panel */
-      .toast-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 100000;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        pointer-events: none;
-      }
-
-      .toast {
-        background: white;
-        color: #1976d2;
-        padding: 16px 20px;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-width: 320px;
-        max-width: 450px;
-        pointer-events: auto;
-        animation: toastSlideIn 0.4s ease;
-        position: relative;
-        overflow: hidden;
-      }
-
-      @keyframes toastSlideIn {
-        from {
-          opacity: 0;
-          transform: translateX(400px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      .toast.hiding {
-        animation: toastSlideOut 0.4s ease forwards;
-      }
-
-      @keyframes toastSlideOut {
-        to {
-          opacity: 0;
-          transform: translateX(400px);
-        }
-      }
-
-      .toast-icon {
-        font-size: 28px;
-        flex-shrink: 0;
-      }
-
-      .toast-content {
-        flex: 1;
-      }
-
-      .toast-title {
-        font-weight: bold;
-        margin: 0 0 4px 0;
-        font-size: 15px;
-      }
-
-      .toast-message {
-        margin: 0;
-        font-size: 13px;
-        opacity: 0.85;
-      }
-
-      .toast-close {
-        background: none;
-        border: none;
-        font-size: 22px;
-        cursor: pointer;
-        color: inherit;
-        opacity: 0.6;
-        padding: 0;
-        width: 28px;
-        height: 28px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.2s ease;
-      }
-
-      .toast-close:hover {
-        opacity: 1;
-        background: rgba(0, 0, 0, 0.1);
-      }
-
-      .toast.success {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-      }
-
-      .toast.error {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
-      }
-
-      .toast.warning {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        color: white;
-      }
-
-      .toast.info {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
-      }
-
-      .toast-progress {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.5);
-        animation: toastProgress 3s linear forwards;
-      }
-
-      @keyframes toastProgress {
-        from { width: 100%; }
-        to { width: 0%; }
-      }
-
-      @media (max-width: 768px) {
-        .toast-container {
-          top: 10px;
-          right: 10px;
-          left: 10px;
-        }
-        
-        .toast {
-          min-width: auto;
-          max-width: 100%;
-        }
-      }
-    </style>
+    
   </head>
   <body>
     <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
     
     <div class="admin-wrapper">
-      <h1 class="admin-title">⚙ Dev Control Dashboard</h1>
+      <h1 class="admin-title">&gt;_ Dev Control</h1>
+      <div class="admin-title-bar"></div>
+      <p class="admin-subtitle">CSE 60 A &nbsp;|&nbsp; SPRING 2026 &nbsp;|&nbsp; ADMIN TERMINAL</p>
       
       <!-- ================= TIME SLOT MANAGER (NEW!) ================= -->
-      <div class="card" style="border: 3px solid #fbbf24;">
+      <div class="card" style="border-color: #fbbf24 !important;">
         <h3>⏰ Time Slot Manager (Ramadan / Custom Schedule)</h3>
-        <p style="color: white; margin-bottom: 15px;">
+        <p >
           <b>⚠️ Important:</b> Changing time slots will affect the entire routine. 
           Use this to switch between normal and Ramadan schedules.
         </p>
 
-        <div style="background: rgba(251, 191, 36, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-          <h4 style="color: #fbbf24; margin-top: 0;">Current Time Slots:</h4>
+        <div class="info-box" style="border-color:rgba(251,191,36,0.3);">
+          <div class="info-box-label" style="color:rgba(251,191,36,0.7);">Current Time Slots</div>
           <div id="currentSlotsList"></div>
         </div>
 
-        <h4 style="color: white;">Add/Edit Time Slot:</h4>
+        <h4 >Add/Edit Time Slot:</h4>
         <select id="slotPosition">
           <option value="0">Slot 1 (First Period)</option>
           <option value="1">Slot 2 (Second Period)</option>
@@ -180,16 +41,14 @@
           <option value="5">Slot 6 (Fifth Period)</option>
         </select>
 
-        <label style="color: white; display: block; margin-top: 10px;">Start Time:</label>
+        <label >Start Time:</label>
         <input id="slotStartTime" type="time" value="08:45" />
 
-        <label style="color: white; display: block; margin-top: 10px;">End Time:</label>
+        <label >End Time:</label>
         <input id="slotEndTime" type="time" value="10:05" />
 
         <button class="btn-orange" onclick="updateTimeSlot()">💾 Update Time Slot</button>
-         <label style="color: white; display:block; margin-top:10px;">
-  Select Break Slot:
-</label>
+         <label>☕ Select Break Slot</label>
 
 <select id="breakSlot">
   
@@ -202,7 +61,7 @@
 </button>
         <hr />
         
-        <h4 style="color: white;">Quick Presets:</h4>
+        <h4 >Quick Presets:</h4>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <button class="btn-blue" onclick="loadNormalSchedule()">
             📅 Normal Schedule<br>
@@ -216,21 +75,19 @@
       </div>
 
       <!-- ================= EFFECTIVE DATE MANAGER ================= -->
-      <div class="card" style="border: 3px solid #10b981;">
+      <div class="card" style="border-color: #10b981 !important;">
         <h3>📅 Routine Effective Date</h3>
-        <p style="color: white; margin-bottom: 15px;">
+        <p >
           Set the "Effective from" date that appears in the routine header.
         </p>
 
-        <div style="background: rgba(16, 185, 129, 0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-          <h4 style="color: #10b981; margin-top: 0;">Current Effective Date:</h4>
-          <div id="currentEffectiveDate" style="color: white; font-size: 18px; font-weight: bold;">
-            Loading...
-          </div>
+        <div class="info-box" style="border-color:rgba(16,185,129,0.3);">
+          <div class="info-box-label" style="color:rgba(16,185,129,0.7);">Current Effective Date</div>
+          <div id="currentEffectiveDate" class="info-box-value">Loading...</div>
         </div>
 
-        <label style="color: white; display: block; margin-bottom: 10px;">New Effective Date:</label>
-        <input id="effectiveDate" type="date" style="margin-bottom: 15px;" />
+        <label >New Effective Date:</label>
+        <input id="effectiveDate" type="date"  />
 
         <button class="btn-green" onclick="updateEffectiveDate()">💾 Update Effective Date</button>
       </div>
@@ -318,56 +175,56 @@
       </div>
       
       <!-- ================= EXAM ROUTINE MANAGER ================= -->
-      <div class="card" style="border: 3px solid #a855f7;">
+      <div class="card" style="border-color: #0ea5e9 !important;">
         <h3>📝 Exam Routine Manager</h3>
-        <p style="color: white; margin-bottom: 15px;">
+        <p >
           <b>📌 Note:</b> Launching the exam routine will <b>replace</b> the main class routine on the main page until you restore it.
         </p>
 
         <!-- Mode control -->
-        <div style="background: rgba(168,85,247,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-          <h4 style="color: #d8b4fe; margin-top: 0;">Current Mode:</h4>
-          <div id="currentExamMode" style="color: white; font-size: 18px; font-weight: bold;">Loading...</div>
+        <div style="background: rgba(14,165,233,0.15); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+          <h4 style="color: #7dd3fc; margin-top: 0;">Current Mode:</h4>
+          <div id="currentExamMode" class="info-box-value">Loading...</div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-          <button style="background: linear-gradient(135deg,#7c3aed,#a855f7); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;" onclick="launchExamRoutine()">🚀 Launch Exam Routine</button>
-          <button style="background: linear-gradient(135deg,#059669,#10b981); color:white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;" onclick="restoreMainRoutine()">↩️ Restore Main Routine</button>
+          <button class="btn-blue" onclick="launchExamRoutine()">🚀 Launch Exam Routine</button>
+          <button class="btn-green" onclick="restoreMainRoutine()">↩️ Restore Main Routine</button>
         </div>
 
-        <hr style="border-color: rgba(168,85,247,0.3);" />
+        <hr style="border-color: rgba(0,200,255,0.2);" />
 
-        <h4 style="color: #d8b4fe;">➕ Add Exam Entry</h4>
+        <h4>➕ Add Exam Entry</h4>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <div>
-            <label style="color: white; display:block; margin-bottom:5px; font-size:13px;">Exam Date</label>
-            <input id="examDate" type="date" style="width:100%; box-sizing:border-box;" />
+            <label>📅 Exam Date</label>
+            <input id="examDate" type="date" />
           </div>
           <div>
-            <label style="color: white; display:block; margin-bottom:5px; font-size:13px;">Start Time</label>
-            <input id="examStartTime" type="time" style="width:100%; box-sizing:border-box;" />
+            <label>⏰ Start Time</label>
+            <input id="examStartTime" type="time" />
           </div>
           <div>
-            <label style="color: white; display:block; margin-bottom:5px; font-size:13px;">End Time</label>
-            <input id="examEndTime" type="time" style="width:100%; box-sizing:border-box;" />
+            <label>⏰ End Time</label>
+            <input id="examEndTime" type="time" />
           </div>
           <div>
-            <label style="color: white; display:block; margin-bottom:5px; font-size:13px;">Room No</label>
-            <input id="examRoom" placeholder="e.g. Room 301" style="width:100%; box-sizing:border-box;" />
+            <label>🏫 Room No</label>
+            <input id="examRoom" placeholder="e.g. Room 301" />
           </div>
         </div>
 
-        <label style="color: white; display:block; margin-top:10px; margin-bottom:5px; font-size:13px;">Course Name</label>
-        <input id="examCourseName" placeholder="e.g. Data Structures" style="width:100%; box-sizing:border-box;" />
+        <label>📚 Course Name</label>
+        <input id="examCourseName" placeholder="e.g. Data Structures" />
 
-        <label style="color: white; display:block; margin-top:10px; margin-bottom:5px; font-size:13px;">Course Code</label>
-        <input id="examCourseCode" placeholder="e.g. CSE 2105" style="width:100%; box-sizing:border-box;" />
+        <label>🔢 Course Code</label>
+        <input id="examCourseCode" placeholder="e.g. CSE 2105" />
 
-        <button style="background: linear-gradient(135deg,#a855f7,#7c3aed); color:white; border:none; padding:12px 20px; border-radius:10px; cursor:pointer; font-weight:bold; margin-top:15px; width:100%;" onclick="addExamEntry()">➕ Add Exam Entry</button>
+        <button class="btn-cyan" onclick="addExamEntry()">➕ Add Exam Entry</button>
 
-        <hr style="border-color: rgba(168,85,247,0.3); margin-top:20px;" />
-        <h4 style="color: #d8b4fe;">📋 Current Exam Entries</h4>
+        <hr style="border-color: rgba(0,200,255,0.2); margin-top:20px;" />
+        <h4>📋 Current Exam Entries</h4>
         <div id="examEntryList"></div>
       </div>
 
@@ -464,7 +321,7 @@
       // Load and display current time slots
       async function loadCurrentTimeSlots() {
         const list = document.getElementById('currentSlotsList');
-        list.innerHTML = '<div style="color: white;">Loading...</div>';
+        list.innerHTML = '<div >Loading...</div>';
 
         try {
           const snap = await getDoc(doc(db, "settings", "timeSlots"));
@@ -475,7 +332,7 @@
             
             slots.forEach((slot, index) => {
               const div = document.createElement('div');
-              div.style = 'background: rgba(255,255,255,0.1); padding: 8px; margin: 5px 0; border-radius: 6px; color: white;';
+              div.className = 'exam-entry-card';
               div.innerHTML = `<b>Slot ${index + 1}:</b> ${slot}`;
               list.appendChild(div);
             });
@@ -806,6 +663,7 @@
       });
 
       /* ================= CANCELLED CLASSES LIST ================= */
+      /* ================= CANCELLED CLASSES LIST ================= */
       async function loadCancelledList() {
         const list = document.getElementById("cancelList");
         list.innerHTML = "";
@@ -813,7 +671,7 @@
         const snap = await getDocs(collection(db, "cancelled"));
 
         if (snap.empty) {
-          list.innerHTML = "<p>No cancelled classes</p>";
+          list.innerHTML = "<p style='color:rgba(0,200,255,0.5);font-family:monospace;'>&gt;_ No cancelled classes</p>";
           return;
         }
 
@@ -821,22 +679,21 @@
           const c = docSnap.data();
 
           const div = document.createElement("div");
-          div.style = `
-            background:#f1f5f9;
-            padding:8px;
-            margin:6px 0;
-            border-radius:8px;
-          `;
-
           div.innerHTML = `
-            <b>${c.day}</b> |
-            ${c.time} |
-            ${c.date} |
-            ${c.reason}
-
-            <button onclick="deleteCancel('${docSnap.id}')" style="float:right;background:#dc2626;color:white;border:none;border-radius:6px;padding:4px 8px">
-              ❌ Delete
-            </button>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+              <div style="font-family:monospace; line-height:1.7;">
+                <span style="color:#f87171; font-weight:bold;">${c.day}</span>
+                <span style="color:rgba(100,180,255,0.5); margin:0 4px;">|</span>
+                <span style="color:#7dd3fc;">${c.time}</span>
+                <span style="color:rgba(100,180,255,0.5); margin:0 4px;">|</span>
+                <span style="color:#bae6fd;">${c.date}</span>
+                <span style="color:rgba(100,180,255,0.5); margin:0 4px;">|</span>
+                <span style="color:#fbbf24;">${c.reason}</span>
+              </div>
+              <button onclick="deleteCancel('${docSnap.id}')" class="btn-red" style="width:auto; padding:5px 12px; font-size:12px; margin:0; flex-shrink:0;">
+                ✕ Delete
+              </button>
+            </div>
           `;
 
           list.appendChild(div);
@@ -1117,7 +974,7 @@
           const snap = await getDoc(doc(db, "settings", "examMode"));
           const active = snap.exists() && snap.data().active === true;
           document.getElementById("currentExamMode").innerHTML = active
-            ? '<span style="color:#d8b4fe;">📝 EXAM ROUTINE is ACTIVE</span>'
+            ? '<span style="color:#7dd3fc;">📝 EXAM ROUTINE is ACTIVE</span>'
             : '<span style="color:#86efac;">📅 MAIN ROUTINE is ACTIVE</span>';
         } catch(e) {
           document.getElementById("currentExamMode").textContent = "Error loading";
@@ -1183,43 +1040,125 @@
 
       async function loadExamEntryList() {
         const list = document.getElementById("examEntryList");
-        list.innerHTML = "<p style='color:white;'>Loading...</p>";
+        list.innerHTML = "<p style='color:#38bdf8; font-family:monospace;'>&gt;_ Loading entries...</p>";
 
         const snap = await getDocs(collection(db, "examRoutine"));
 
         if (snap.empty) {
-          list.innerHTML = "<p style='color:#d8b4fe;'>No exam entries yet.</p>";
+          list.innerHTML = "<p style='color:rgba(0,200,255,0.5); font-family:monospace;'>&gt;_ No exam entries yet. Add one above.</p>";
           return;
         }
 
-        // Sort by date
         const docs = [];
         snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
         docs.sort((a, b) => a.date.localeCompare(b.date));
 
         list.innerHTML = "";
         docs.forEach((e, i) => {
+          // parse stored time back to HH:MM for input fields
+          function parseTimeTo24(tStr) {
+            if (!tStr) return "";
+            const m = tStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+            if (!m) return "";
+            let h = parseInt(m[1]), min = m[2], period = m[3].toUpperCase();
+            if (period === "PM" && h !== 12) h += 12;
+            if (period === "AM" && h === 12) h = 0;
+            return `${String(h).padStart(2,"0")}:${min}`;
+          }
+          const [startRaw, endRaw] = (e.time || "").split(" - ");
+          const startVal = parseTimeTo24(startRaw);
+          const endVal   = parseTimeTo24(endRaw);
+
           const div = document.createElement("div");
-          div.style = "background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.4); padding:12px; margin:8px 0; border-radius:10px;";
+          div.className = "exam-entry-card";
+          div.id = `entry-${e.id}`;
           div.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:start;">
-              <div>
-                <b style="color:#d8b4fe;">#${i+1} — ${e.displayDate}</b>
-                <span style="color:#a78bfa; font-size:12px; margin-left:8px;">(${e.day})</span><br>
-                <span style="color:white; font-size:14px;">📚 ${e.courseName}</span><br>
-                <span style="color:#c4b5fd; font-size:13px;">🔢 ${e.courseCode} &nbsp;|&nbsp; ⏰ ${e.time} &nbsp;|&nbsp; 🏫 ${e.room}</span>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+              <div style="flex:1; min-width:0;">
+                <span class="entry-num">#${i+1}</span>
+                <span class="entry-date" style="margin-left:8px;">${e.displayDate}</span>
+                <span class="entry-day" style="margin-left:6px;">(${e.day})</span>
+                <div class="entry-course">💻 ${e.courseName}</div>
+                <div class="entry-meta">🔢 ${e.courseCode} &nbsp;|&nbsp; ⏰ ${e.time} &nbsp;|&nbsp; 🏫 ${e.room}</div>
               </div>
-              <button onclick="deleteExamEntry('${e.id}')" style="background:#dc2626;color:white;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;flex-shrink:0;">❌</button>
+            </div>
+            <div class="entry-actions">
+              <button class="btn-cyan" onclick="toggleExamEdit('${e.id}')">✏️ Edit</button>
+              <button class="btn-red" onclick="deleteExamEntry('${e.id}')">🗑️ Delete</button>
+            </div>
+
+            <!-- Inline edit form -->
+            <div class="exam-inline-edit" id="edit-${e.id}">
+              <div style="font-family:monospace; color:#00ffff; font-size:12px; letter-spacing:1px; margin-bottom:12px;">&gt;_ EDIT ENTRY</div>
+              <div class="edit-grid">
+                <div>
+                  <label>📅 Exam Date</label>
+                  <input type="date" id="edit-date-${e.id}" value="${e.date}" />
+                </div>
+                <div>
+                  <label>🏫 Room No</label>
+                  <input type="text" id="edit-room-${e.id}" value="${e.room}" placeholder="e.g. Room 301" />
+                </div>
+                <div>
+                  <label>⏰ Start Time</label>
+                  <input type="time" id="edit-start-${e.id}" value="${startVal}" />
+                </div>
+                <div>
+                  <label>⏰ End Time</label>
+                  <input type="time" id="edit-end-${e.id}" value="${endVal}" />
+                </div>
+              </div>
+              <label>📚 Course Name</label>
+              <input type="text" id="edit-course-${e.id}" value="${e.courseName}" placeholder="Course Name" />
+              <label>🔢 Course Code</label>
+              <input type="text" id="edit-code-${e.id}" value="${e.courseCode}" placeholder="Course Code" />
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+                <button class="save-btn btn-green" onclick="saveExamEdit('${e.id}')">💾 Save Changes</button>
+                <button class="cancel-btn" onclick="toggleExamEdit('${e.id}')">✕ Cancel</button>
+              </div>
             </div>
           `;
           list.appendChild(div);
         });
       }
 
+      window.toggleExamEdit = function(id) {
+        const form = document.getElementById(`edit-${id}`);
+        form.classList.toggle("open");
+      };
+
+      window.saveExamEdit = async function(id) {
+        const date       = document.getElementById(`edit-date-${id}`).value;
+        const room       = document.getElementById(`edit-room-${id}`).value.trim();
+        const startTime  = document.getElementById(`edit-start-${id}`).value;
+        const endTime    = document.getElementById(`edit-end-${id}`).value;
+        const courseName = document.getElementById(`edit-course-${id}`).value.trim();
+        const courseCode = document.getElementById(`edit-code-${id}`).value.trim();
+
+        if (!date || !room || !startTime || !endTime || !courseName || !courseCode) {
+          showToast({ title: '⚠️ Fill all fields', type: 'warning' });
+          return;
+        }
+
+        const timeStr    = `${formatTime12hFromInput(startTime)} - ${formatTime12hFromInput(endTime)}`;
+        const displayDate = formatDisplayDate(date);
+        const day        = getDayName(date);
+
+        try {
+          await updateDoc(doc(db, "examRoutine", id), {
+            date, displayDate, day, time: timeStr, room, courseName, courseCode
+          });
+          showToast({ title: '✅ Entry Updated!', message: `${courseName} — ${displayDate}`, type: 'success' });
+          loadExamEntryList();
+        } catch(err) {
+          showToast({ title: '❌ Error updating', message: err.message, type: 'error' });
+        }
+      };
+
       window.deleteExamEntry = async function(id) {
-        if (!confirm("Delete this exam entry?")) return;
+        if (!confirm("🗑️ Delete this exam entry?")) return;
         await deleteDoc(doc(db, "examRoutine", id));
-        showToast({ title: 'Entry Deleted', message: 'Exam entry removed', type: 'warning' });
+        showToast({ title: 'Entry Deleted 🗑️', message: 'Exam entry removed', type: 'warning' });
         loadExamEntryList();
       };
 
