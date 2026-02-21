@@ -464,6 +464,24 @@ function renderRoutine(days) {
     });
   }
 
+  // Build a sorted list of the NORMAL (saved) time slots from the first day that has classes
+  // so we can map slot positions correctly even when Ramadan/custom times are active
+  let savedSlots = [];
+  for (const day of days) {
+    if (day.classes && day.classes.length > 0) {
+      // Collect all unique times from this day, sorted
+      const times = [...new Set(days.flatMap(d => (d.classes || []).map(c => c.time)))];
+      // Try to sort them by parsing start time
+      times.sort((a, b) => {
+        const pa = parse12hTime(a.split("–")[0]);
+        const pb = parse12hTime(b.split("–")[0]);
+        return (pa.h * 60 + pa.m) - (pb.h * 60 + pb.m);
+      });
+      savedSlots = times;
+      break;
+    }
+  }
+
   days.forEach(day => {
     const row = document.createElement("tr");
     row.dataset.day = day.day;
@@ -476,14 +494,31 @@ function renderRoutine(days) {
       </td>
     `;
 
-    timeSlots.forEach(slot => {
-      const cls = day.classes.find(c => c.time === slot);
+    timeSlots.forEach((slot, slotIndex) => {
+      // Skip break slot in matching — it has no class
+      if (slotIndex === (breakIndex ?? 3)) {
+        // break slot — already rendered in header, skip adding td here
+        // (the rowspan on the header handles it visually, no td needed for break)
+        return;
+      }
+
+      // Map current slot position → saved slot position
+      // Adjust index for break: slots after break are shifted by 1 in saved data
+      let savedIndex = slotIndex;
+      const bk = breakIndex ?? 3;
+      if (slotIndex > bk) savedIndex = slotIndex - 1; // after break, shift back
+
+      const savedSlot = savedSlots[savedIndex];
+      // Match by saved slot string first, fallback to current slot string
+      const cls = day.classes.find(c => c.time === savedSlot)
+                || day.classes.find(c => c.time === slot);
+
       row.innerHTML += cls
-        ? `<td class="${cls.code}" data-time="${slot}">
+        ? `<td class="${cls.code}" data-time="${slot}" data-saved-time="${savedSlot || slot}">
              <strong>${cls.subject}</strong><br>
              <small>${cls.room}</small>
            </td>`
-        : `<td></td>`;
+        : `<td data-time="${slot}" data-saved-time="${savedSlot || slot}"></td>`;
     });
 
     body.appendChild(row);
@@ -716,12 +751,22 @@ if (percent > 80) {
 function markCancelledClasses() {
   document.querySelectorAll(".cancelled-badge,.cancel-reason").forEach(e => e.remove());
 
+  // Detect which schedule is currently active by checking if Ramadan slots are loaded
+  // We compare the first timeSlot against the known normal first slot
+  const isRamadanActive = timeSlots.length > 0 && !timeSlots[0].includes("08:45");
+
   cancelledClasses.forEach(c => {
+    // Only show cancellations that belong to the current active schedule
+    // If no schedule field (old data), show for main routine only
+    const cSchedule = c.schedule || "main";
+    if (isRamadanActive && cSchedule !== "ramadan") return;
+    if (!isRamadanActive && cSchedule === "ramadan") return;
+
     document.querySelectorAll("td[data-time]").forEach(cell => {
       const row = cell.closest("tr");
       const day = row.querySelector(".day-name");
 
-      if (day.textContent.trim() === c.day && cell.dataset.time === c.time) {
+      if (day.textContent.trim() === c.day && (cell.dataset.savedTime === c.time || cell.dataset.time === c.time)) {
         cell.classList.add("cancelled-class");
 
         const badge = document.createElement("div");
