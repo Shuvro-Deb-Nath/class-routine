@@ -1,4 +1,4 @@
-const CACHE_NAME = "routine-v22";
+const CACHE_NAME = "routine-v23";
 
 const ASSETS = [
   "/",
@@ -36,6 +36,7 @@ self.addEventListener("fetch", e => {
     );
   }
 });
+
 
 
 
