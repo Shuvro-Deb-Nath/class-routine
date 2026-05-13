@@ -146,6 +146,7 @@ async function loadEvents() {
     if (cached) academicEvents = JSON.parse(cached);
   }
   highlightExamDays();
+  stampExamBadges()
 }
 
 /* =========================
@@ -250,11 +251,11 @@ function runAllTimers() {
   // 🔥 Run once per minute
   if (currentMinute !== lastMinute) {
     checkCurrentClass();
-    updateWeekProgress(); // FIXED
     lastMinute = currentMinute;
   }
 
   // 🔥 Run every second
+  updateWeekProgress();
   updateClassCountdown();
   updateAssignmentCountdown();
   updateExamCountdown();
@@ -286,8 +287,11 @@ function updateWeekProgress() {
   let percent = (passedMinutes / totalMinutes) * 100;
   percent = Math.max(0, Math.min(percent, 100));
 
-  fill.style.width = percent.toFixed(2) + "%";
+  // Show the box first so the CSS transition animates from 0 → percent
   box.classList.remove("hidden");
+  requestAnimationFrame(() => {
+    fill.style.width = percent.toFixed(2) + "%";
+  });
 
   // text
   text.textContent = Math.floor(percent) + "%";
@@ -453,10 +457,10 @@ function renderRoutine(days) {
     timeSlots.forEach(slot => {
       const cls = day.classes.find(c => c.time === slot);
       row.innerHTML += cls
-        ? `<td class="${cls.code}" data-time="${slot}">
-             <strong>${cls.subject}</strong><br>
-             <small>${cls.room}</small>
-           </td>`
+        ? `<td data-time="${slot}" style="background:${cls.color || '#2196f3'};">
+     <strong>${cls.subject}</strong><br>
+     <small>${cls.room}</small>
+   </td>`
         : `<td></td>`;
     });
 
@@ -850,34 +854,50 @@ function updateAssignmentCountdown() {
    EXAM COUNTDOWN
 ========================= */
 function updateExamCountdown() {
-  const box = document.getElementById("examCountdownBox");
+  // ── 1. Fancy countdown box (existing) ──────────────────────────
+  const box    = document.getElementById("examCountdownBox");
   const titleEl = document.getElementById("examTitle");
   const timerEl = document.getElementById("examTimer");
-  const fill = document.getElementById("examProgressFill");
-  const text = document.getElementById("examProgressText");
+  const fill   = document.getElementById("examProgressFill");
+  const text   = document.getElementById("examProgressText");
 
-  if (!box) return;
+  // ── 2. Pill container (like assignments) ───────────────────────
+  const container = document.getElementById("examCountdown");
 
   const now = new Date();
+  const exams = academicEvents.filter(e => e.type?.toLowerCase() === "exam");
 
-  const exams = academicEvents.filter(e =>
-    e.type?.toLowerCase() === "exam"
-  );
+  // ── Pill rendering ─────────────────────────────────────────────
+  if (container) {
+    container.innerHTML = "";
+    const upcomingPills = exams
+      .map(e => ({ ...e, d: new Date(`${e.date}T${e.time}`) }))
+      .filter(e => e.d > now)
+      .sort((a, b) => a.d - b.d);
 
-  if (!exams.length) {
-    box.classList.add("hidden");
-    return;
+    if (upcomingPills.length === 0) {
+      container.classList.add("hidden");
+    } else {
+      upcomingPills.forEach(e => {
+        const pill = document.createElement("div");
+        pill.className = "next-class exam-countdown";
+        pill.textContent = `📝 ${e.course} (${e.title}) in ${formatCountdown(e.d - now)}`;
+        container.appendChild(pill);
+      });
+      container.classList.remove("hidden");
+    }
   }
 
+  // ── Fancy box ──────────────────────────────────────────────────
+  if (!box) return;
+
+  if (!exams.length) { box.classList.add("hidden"); return; }
+
   const upcoming = exams
-    .map(e => {
-      const dateTime = new Date(`${e.date}T${e.time}`);
-      return { ...e, dateTime };
-    })
+    .map(e => ({ ...e, dateTime: new Date(`${e.date}T${e.time}`) }))
     .sort((a, b) => a.dateTime - b.dateTime);
 
   const next = upcoming[0];
-
   const diff = next.dateTime - now;
 
   if (diff <= 0) {
@@ -889,41 +909,27 @@ function updateExamCountdown() {
   box.classList.remove("hidden");
   titleEl.textContent = `${next.course} - ${next.title}`;
 
-  // TIME
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const mins = Math.floor((diff / (1000 * 60)) % 60);
-  const secs = Math.floor((diff / 1000) % 60);
-
+  const days  = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff / 3600000) % 24);
+  const mins  = Math.floor((diff / 60000) % 60);
+  const secs  = Math.floor((diff / 1000) % 60);
   timerEl.textContent = `${days}d ${hours}h ${mins}m ${secs}s`;
 
-  // =========================
-  // 📊 PROGRESS CALCULATION
-  // =========================
-
-  // Dynamic window: from 30 days before exam up to exam time
-  const daysUntil = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const daysUntil = Math.ceil(diff / 86400000);
   const windowDays = Math.max(1, Math.min(daysUntil + 1, 30));
-  const totalDuration = windowDays * 24 * 60 * 60 * 1000;
+  const totalDuration = windowDays * 86400000;
   const windowStart = next.dateTime - totalDuration;
-  const elapsed = now - windowStart;
-
-  let percent = (elapsed / totalDuration) * 100;
+  let percent = ((now - windowStart) / totalDuration) * 100;
   percent = Math.max(0, Math.min(percent, 100));
 
   fill.style.width = percent + "%";
-  text.textContent = daysUntil > 0
-    ? `${daysUntil} day${daysUntil === 1 ? "" : "s"} left`
-    : "Exam is today! 🚨";
+  text.textContent = daysUntil > 0 ? `${daysUntil} day${daysUntil === 1 ? "" : "s"} left` : "Exam is today! 🚨";
 
-  // 🎨 color change
-  if (percent > 80) {
-    fill.style.background = "linear-gradient(90deg,#ef4444,#dc2626)";
-  } else if (percent > 50) {
-    fill.style.background = "linear-gradient(90deg,#f59e0b,#fbbf24)";
-  } else {
-    fill.style.background = "linear-gradient(90deg,#22c55e,#4ade80)";
-  }
+  fill.style.background = percent > 80
+    ? "linear-gradient(90deg,#ef4444,#dc2626)"
+    : percent > 50
+    ? "linear-gradient(90deg,#f59e0b,#fbbf24)"
+    : "linear-gradient(90deg,#22c55e,#4ade80)";
 }
 function highlightExamDays() {
   if (!academicEvents.length) return;
@@ -967,5 +973,42 @@ function highlightExamDays() {
         break;
       }
     }
+  });
+}
+function stampExamBadges() {
+  if (!academicEvents.length) return;
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  const dayCodeToIndex = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
+
+  // Only upcoming/today exams
+  const upcomingExams = academicEvents.filter(
+    e => e.type?.toLowerCase() === "exam" && e.date >= todayStr
+  );
+
+  document.querySelectorAll(".routine-table tbody tr").forEach(row => {
+    const dayCode = row.dataset.day;
+    if (!dayCode) return;
+
+    // Find exam(s) on this row's actual date
+    const rowDate = getDateForDay(dayCode);
+    const rowDateStr = rowDate.toISOString().split("T")[0];
+
+    const examsThisDay = upcomingExams.filter(e => e.date === rowDateStr);
+    if (!examsThisDay.length) return;
+
+    // Stamp on the FIRST non-empty td (or first td after the day cell)
+    const cells = row.querySelectorAll("td[data-time]");
+    if (!cells.length) return;
+
+    const targetCell = cells[0]; // first time-slot cell of the day
+
+    // Avoid duplicate badge
+    if (targetCell.querySelector(".exam-slot-badge")) return;
+
+    const badge = document.createElement("div");
+    badge.className = "exam-slot-badge";
+    badge.innerHTML = `🎓 EXAM`;
+    targetCell.appendChild(badge);
   });
 }
