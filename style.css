@@ -2052,3 +2052,22 @@ tr.today-row {
   text-align: center;
   letter-spacing: 0.5px;
 }
+/* EXAM badge on routine cell */
+.exam-slot-badge {
+  display: inline-block;
+  margin-top: 5px;
+  background: linear-gradient(135deg, #b91c1c, #ef4444);
+  color: white;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  box-shadow: 0 0 8px rgba(239,68,68,0.6);
+  animation: examBadgePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes examBadgePulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+  50%       { box-shadow: 0 0 16px rgba(239,68,68,0.9); }
+}
