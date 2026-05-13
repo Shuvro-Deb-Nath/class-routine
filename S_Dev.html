@@ -190,7 +190,23 @@
 
         <input id="editSubject" placeholder="Subject" />
         <input id="editRoom" placeholder="Room" />
-        <input id="editCode" placeholder="Code" />
+        <label>Gradient Color</label>
+
+<div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+  <input id="gradientColor1" type="color" value="#2196f3" />
+  <input id="gradientColor2" type="color" value="#1976d2" />
+</div>
+
+<div
+  id="gradientPreview"
+  style="
+    height:50px;
+    border-radius:10px;
+    margin-bottom:12px;
+    border:1px solid rgba(255,255,255,0.2);
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+  "
+></div>
 
         <button class="btn-green" onclick="updateSlot()">Update Slot</button>
         <button class="btn-blue" onclick="addSlot()">Add Slot</button>
@@ -330,7 +346,19 @@
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+const gradientColor1 = document.getElementById("gradientColor1");
+const gradientColor2 = document.getElementById("gradientColor2");
+const gradientPreview = document.getElementById("gradientPreview");
 
+function updateGradientPreview() {
+  gradientPreview.style.background =
+    `linear-gradient(135deg, ${gradientColor1.value}, ${gradientColor2.value})`;
+}
+
+gradientColor1.addEventListener("input", updateGradientPreview);
+gradientColor2.addEventListener("input", updateGradientPreview);
+
+updateGradientPreview();
       /* ================= TIME SLOT MANAGEMENT ================= */
       
       // Convert 24h time to 12h format
@@ -775,13 +803,24 @@
         if (!found) {
           editSubject.value = "";
           editRoom.value = "";
-          editCode.value = "";
+          gradientColor1.value = "#2196f3";
+gradientColor2.value = "#1976d2";
+updateGradientPreview();
           return;
         }
 
         editSubject.value = found.subject;
         editRoom.value = found.room;
-        editCode.value = found.code;
+        if (found.color && found.color.includes("linear-gradient")) {
+  const matches = found.color.match(/#(?:[0-9a-fA-F]{3}){1,2}/g);
+
+  if (matches && matches.length >= 2) {
+    gradientColor1.value = matches[0];
+    gradientColor2.value = matches[1];
+  }
+}
+
+updateGradientPreview();
       }
 
       window.updateSlot = async function () {
@@ -806,7 +845,7 @@
           time: editTime.value,
           subject: editSubject.value,
           room: editRoom.value,
-          code: editCode.value,
+          color: `linear-gradient(135deg, ${gradientColor1.value}, ${gradientColor2.value})`,
         };
 
         await updateDoc(doc(db, "routine", day), {
@@ -841,7 +880,7 @@
           time: editTime.value,
           subject: editSubject.value,
           room: editRoom.value,
-          code: editCode.value,
+          color: `linear-gradient(135deg, ${gradientColor1.value}, ${gradientColor2.value})`,
         });
 
         await updateDoc(doc(db, "routine", day), {
