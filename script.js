@@ -24,6 +24,7 @@ let routineDays = [];
 let academicEvents = [];
 let cancelledClasses = [];
 let notices = [];
+let vacations = [];
 let breakIndex = 3; // default fallback
 
 
@@ -210,6 +211,133 @@ async function loadNotices() {
 }
 
 /* =========================
+   LOAD VACATIONS FROM FIREBASE
+========================= */
+async function loadVacations() {
+  try {
+    const snap = await getDocs(collection(window.db, "vacations"));
+    vacations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    localStorage.setItem("vacations", JSON.stringify(vacations));
+  } catch (e) {
+    console.log("📱 Offline → loading vacations from cache");
+    const cached = localStorage.getItem("vacations");
+    if (cached) vacations = JSON.parse(cached);
+    else vacations = [];
+  }
+  checkVacationBanner();
+  markVacationRows();
+}
+
+/* =========================
+   VACATION BANNER (main page)
+========================= */
+function checkVacationBanner() {
+  const todayStr = new Date().toISOString().split("T")[0];
+  const board = document.getElementById("noticeBoard");
+  if (!board) return;
+
+  // Remove any existing vacation banners
+  board.querySelectorAll(".vacation-banner").forEach(e => e.remove());
+
+  const active = vacations.find(v => todayStr >= v.startDate && todayStr <= v.endDate);
+  if (!active) return;
+
+  const banner = document.createElement("div");
+  banner.className = "notice vacation-banner";
+  banner.style.cssText = `
+    background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #2196f3 100%);
+    border-left: 4px solid rgba(255,255,255,0.5) !important;
+    border-radius: 14px;
+    text-align: center;
+    padding: 20px 24px;
+    box-shadow: 0 8px 24px rgba(13,71,161,0.35), 0 0 40px rgba(33,150,243,0.2);
+  `;
+
+  const endDate = new Date(active.endDate + "T00:00:00");
+  const today = new Date(todayStr + "T00:00:00");
+  const daysLeft = Math.round((endDate - today) / 86400000);
+
+  banner.innerHTML = `
+    <div style="font-size:40px; margin-bottom:8px; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.25));">🏖️</div>
+    <h4 style="color:#ffffff; font-size:1.15rem; margin:0 0 6px; letter-spacing:2px; font-weight:800; text-shadow:0 2px 8px rgba(0,0,0,0.25);">
+      ${active.reason} VACATION
+    </h4>
+    <p style="margin:0; color:rgba(255,255,255,0.88); font-size:14px; font-weight:500;">
+      ${formatDate(active.startDate)} – ${formatDate(active.endDate)}
+    </p>
+    <p style="margin:8px 0 0; font-size:13px; display:inline-block; background:rgba(255,255,255,0.18); color:#ffffff; padding:4px 14px; border-radius:20px; border:1px solid rgba(255,255,255,0.3);">
+      📅 ${daysLeft === 0 ? "Last day today!" : daysLeft + " day" + (daysLeft > 1 ? "s" : "") + " remaining"}
+    </p>
+  `;
+
+  board.insertBefore(banner, board.firstChild);
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+/* =========================
+   MARK VACATION ROWS IN TABLE
+========================= */
+function markVacationRows() {
+  if (!vacations.length) return;
+
+  document.querySelectorAll(".routine-table tbody tr").forEach(row => {
+    const dayCode = row.dataset.day;
+    if (!dayCode) return;
+
+    const rowDate = getDateForDay(dayCode);
+    const rowDateStr = rowDate.toISOString().split("T")[0];
+
+    const activeVac = vacations.find(v => rowDateStr >= v.startDate && rowDateStr <= v.endDate);
+    if (!activeVac) return;
+
+    // Remove existing vacation overlay
+    row.querySelectorAll(".vacation-row-overlay").forEach(e => e.remove());
+
+    // Style the row
+    row.style.position = "relative";
+    row.querySelectorAll("td:not(.day)").forEach(cell => {
+      cell.style.background = "rgba(16,185,129,0.08)";
+      cell.style.opacity = "0.7";
+    });
+
+    // Add vacation label over the first data cell
+    const firstCell = row.querySelector("td:not(.day)");
+    if (firstCell && !firstCell.querySelector(".vacation-row-overlay")) {
+      const overlay = document.createElement("div");
+      overlay.className = "vacation-row-overlay";
+      overlay.style.cssText = `
+        position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
+        text-align:center; pointer-events:none; z-index:10;
+        font-size:13px; font-weight:700; letter-spacing:2px;
+        color:#10b981; text-shadow:0 0 10px rgba(16,185,129,0.5);
+      `;
+      overlay.innerHTML = `🏖️ ${activeVac.reason} VACATION`;
+
+      // Span all data cells by adding to the row itself  
+      row.style.position = "relative";
+      const dayCell = row.querySelector("td.day");
+      if (dayCell) {
+        const vacBadge = document.createElement("div");
+        vacBadge.className = "vacation-row-overlay";
+        vacBadge.style.cssText = `
+          display:block; margin-top:4px; padding:3px 8px;
+          background:rgba(16,185,129,0.2); border-radius:6px;
+          font-size:11px; font-weight:700; letter-spacing:1px;
+          color:#10b981; border:1px solid rgba(16,185,129,0.4);
+          white-space:nowrap;
+        `;
+        vacBadge.textContent = "🏖️ " + activeVac.reason;
+        dayCell.appendChild(vacBadge);
+      }
+    }
+  });
+}
+
+/* =========================
    INITIALIZE APP
 ========================= */
 async function init() {
@@ -222,7 +350,8 @@ async function init() {
       loadRoutine(),
       loadCancelled(),
       loadNotices(),
-      loadEvents()
+      loadEvents(),
+      loadVacations()
     ]);
   } catch (error) {
     console.error("❌ Failed to load data:", error);
@@ -237,7 +366,48 @@ setInterval(runAllTimers, TIMER_INTERVAL);
 
 init();
 
+requestNotificationPermission();
+async function requestNotificationPermission() {
+  if (!("Notification" in window)) return;
 
+  if (Notification.permission === "default") {
+    await Notification.requestPermission();
+  }
+}
+function sendNotification(title, body) {
+  if (Notification.permission !== "granted") return;
+
+  new Notification(title, {
+    body,
+    icon: "y.png",
+    badge: "y.png"
+  });
+}
+function checkClassReminders() {
+  const now = new Date();
+  const today = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
+
+  routineDays.forEach(day => {
+    if (day.day !== today) return;
+
+    day.classes.forEach(cls => {
+      const [start] = cls.time.split("–");
+      const t = parse12hTime(start);
+
+      const classTime = new Date();
+      classTime.setHours(t.h, t.m, 0, 0);
+
+      const diff = Math.floor((classTime - now) / 60000);
+
+      if (diff === 15) {
+        sendNotification(
+          "📘 Upcoming Class",
+          `${cls.subject} starts in 15 minutes`
+        );
+      }
+    });
+  });
+}
 
 /* =========================
    MASTER TIMER (OPTIMIZED)
@@ -260,6 +430,7 @@ function runAllTimers() {
   updateAssignmentCountdown();
   updateExamCountdown();
   updateDayProgress();
+  checkClassReminders();
 }
 
 
@@ -716,6 +887,14 @@ function markCancelledClasses() {
 /* =========================
    GLOBAL NEXT CLASS COUNTDOWN
 ========================= */
+function isVacationDate(dateObj) {
+  const dateStr = dateObj.toISOString().split("T")[0];
+
+  return vacations.some(v =>
+    dateStr >= v.startDate && dateStr <= v.endDate
+  );
+}
+
 function updateClassCountdown() {
   const box = document.getElementById("classCountdown");
   if (!box) return;
@@ -724,8 +903,13 @@ function updateClassCountdown() {
   let next = null;
 
   const dayMap = {
-    SUN: 0, MON: 1, TUE: 2, WED: 3,
-    THU: 4, FRI: 5, SAT: 6
+    SUN: 0,
+    MON: 1,
+    TUE: 2,
+    WED: 3,
+    THU: 4,
+    FRI: 5,
+    SAT: 6
   };
 
   routineDays.forEach(day => {
@@ -735,59 +919,68 @@ function updateClassCountdown() {
       const [start] = cls.time.split("–");
       const t = parse12hTime(start);
 
-      const d = new Date();
-      const todayIndex = d.getDay();
+      // Search ahead up to 60 days
+      for (let offset = 0; offset < 60; offset++) {
+        const d = new Date(now);
+        d.setDate(now.getDate() + offset);
 
-      let diff = targetDayIndex - todayIndex;
-      if (diff < 0) diff += 7;
+        if (d.getDay() !== targetDayIndex) continue;
 
-      d.setDate(d.getDate() + diff);
-      d.setHours(t.h, t.m, 0, 0);
+        d.setHours(t.h, t.m, 0, 0);
 
-      // If time already passed today → next week
-      if (d <= now) {
-        d.setDate(d.getDate() + 7);
-      }
+        if (d <= now) continue;
 
-      // Skip cancelled classes
-      const isCancelled = cancelledClasses.some(c => {
-        const cancelDate = new Date(c.date);
-        return (
-          c.day === day.day &&
-          c.time === cls.time &&
-          cancelDate.toDateString() === d.toDateString()
-        );
-      });
+        // Skip vacations
+        if (isVacationDate(d)) continue;
 
-      if (isCancelled) return;
+        // Skip cancelled classes
+        const isCancelled = cancelledClasses.some(c => {
+          const cancelDate = new Date(c.date + "T00:00:00");
+          return (
+            c.day === day.day &&
+            c.time === cls.time &&
+            cancelDate.toDateString() === d.toDateString()
+          );
+        });
 
-      // Find nearest class
-      if (!next || d < next.date) {
-        next = {
-          date: d,
-          subject: cls.subject
-        };
+        if (isCancelled) continue;
+
+        if (!next || d < next.date) {
+          next = {
+            date: d,
+            subject: cls.subject
+          };
+        }
+
+        break;
       }
     });
   });
 
   if (!next) {
     box.textContent = "🎉 No upcoming classes";
+    box.className = "next-class class-countdown blue";
     box.classList.remove("hidden");
     return;
   }
 
   const diffMs = next.date - now;
-  box.textContent = `📘 Next Class (${next.subject}) in ${formatCountdown(diffMs)}`;
+
+  box.textContent =
+    `📘 Next Class (${next.subject}) in ${formatCountdown(diffMs)}`;
+
   box.className = "next-class class-countdown blue";
 
   const minsLeft = diffMs / 60000;
-  if (minsLeft <= 5) box.classList.replace("blue", "red");
-  else if (minsLeft <= 30) box.classList.replace("blue", "orange");
+
+  if (minsLeft <= 5) {
+    box.classList.replace("blue", "red");
+  } else if (minsLeft <= 30) {
+    box.classList.replace("blue", "orange");
+  }
 
   box.classList.remove("hidden");
 }
-
 /* =========================
    ASSIGNMENT COUNTDOWN
 ========================= */
@@ -1012,3 +1205,90 @@ function stampExamBadges() {
     targetCell.appendChild(badge);
   });
 }
+window.exportRoutinePNG = async function () {
+  const target = document.querySelector(".table-container");
+
+  const canvas = await html2canvas(target, {
+    scale: 2,
+    useCORS: true
+  });
+
+  const link = document.createElement("a");
+  link.download = "class-routine.png";
+  link.href = canvas.toDataURL();
+  link.click();
+};
+
+window.exportRoutinePDF = async function () {
+  const target = document.querySelector(".table-container");
+
+  const opt = {
+    margin: 0.3,
+    filename: "class-routine.pdf",
+    image: {
+      type: "jpeg",
+      quality: 1
+    },
+    html2canvas: {
+      scale: 3,
+      useCORS: true,
+      scrollY: 0,
+      windowWidth: target.scrollWidth,
+      windowHeight: target.scrollHeight
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "landscape"
+    },
+    pagebreak: {
+      mode: ["avoid-all", "css", "legacy"]
+    }
+  };
+
+  await html2pdf().set(opt).from(target).save();
+};
+
+window.printRoutine = function () {
+  window.print();
+};
+
+window.shareRoutine = async function () {
+  if (navigator.share) {
+    await navigator.share({
+      title: "Class Routine",
+      text: "My class routine"
+    });
+  } else {
+    alert("Sharing not supported on this device");
+  }
+};
+
+const themeBtn = document.getElementById("themeToggleBtn");
+const themeMenu = document.getElementById("themeMenu");
+
+themeBtn?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  themeMenu.classList.toggle("show");
+});
+document.addEventListener("click", (e) => {
+  if (
+    themeMenu &&
+    !themeMenu.contains(e.target) &&
+    !themeBtn.contains(e.target)
+  ) {
+    themeMenu.classList.remove("show");
+  }
+});
+
+window.setTheme = function(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+  themeMenu.classList.remove("show");
+};
+
+(function loadTheme() {
+  const saved = localStorage.getItem("theme") || "glass";
+  document.documentElement.setAttribute("data-theme", saved);
+})();
+
