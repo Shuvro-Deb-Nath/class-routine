@@ -267,6 +267,41 @@
         <div id="examEntryList"></div>
       </div>
 
+      <!-- ================= VACATION MANAGER ================= -->
+      <div class="card" style="border-color: #10b981 !important;">
+        <h3>🏖️ Vacation Manager</h3>
+        <p>Set vacation periods (Eid, Summer, Winter, etc.). The main routine will show a vacation banner and mark those days for students.</p>
+
+        <div class="info-box" style="border-color:rgba(16,185,129,0.3);">
+          <div class="info-box-label" style="color:rgba(16,185,129,0.7);">Active &amp; Upcoming Vacations</div>
+          <div id="vacationList"><span style="color:rgba(100,200,255,0.5); font-family:monospace; font-size:13px;">&gt;_ Loading...</span></div>
+        </div>
+
+        <h4>➕ Add New Vacation</h4>
+
+        <label>📅 Start Date</label>
+        <input id="vacStartDate" type="date" />
+
+        <label>📅 End Date</label>
+        <input id="vacEndDate" type="date" />
+
+        <label>🏷️ Reason</label>
+        <select id="vacReason" onchange="toggleCustomReason()">
+          <option value="EID UL-FITR">🌙 Eid ul-Fitr</option>
+          <option value="EID UL-ADHA">🐑 Eid ul-Adha</option>
+          <option value="SUMMER">☀️ Summer Vacation</option>
+          <option value="WINTER">❄️ Winter Vacation</option>
+          <option value="AFTER SEMESTER">📚 After Semester Break</option>
+          <option value="MIDTERM BREAK">📝 Midterm Break</option>
+          <option value="NATIONAL HOLIDAY">🇧🇩 National Holiday</option>
+          <option value="CUSTOM">✏️ Custom (type below)</option>
+        </select>
+
+        <input id="vacReasonCustom" placeholder="Type custom reason..." style="display:none;" />
+
+        <button class="btn-green" onclick="addVacation()">➕ Add Vacation</button>
+      </div>
+
       <hr />
       <h3>📋 Cancelled Classes List</h3>
       <div id="cancelList"></div>
@@ -1327,6 +1362,109 @@ updateGradientPreview();
       loadCancelSlots();
       loadEditTimeDropdown();
       loadCurrentEffectiveDate();
+      loadVacationList();
+
+      /* ==========================================
+         VACATION MANAGER FUNCTIONS
+      ========================================== */
+
+      window.toggleCustomReason = function() {
+        const sel = document.getElementById("vacReason");
+        const custom = document.getElementById("vacReasonCustom");
+        custom.style.display = sel.value === "CUSTOM" ? "block" : "none";
+      };
+
+      window.addVacation = async function() {
+        const startDate = document.getElementById("vacStartDate").value;
+        const endDate   = document.getElementById("vacEndDate").value;
+        const reasonSel = document.getElementById("vacReason").value;
+        const custom    = document.getElementById("vacReasonCustom").value.trim().toUpperCase();
+        const reason    = reasonSel === "CUSTOM" ? (custom || "VACATION") : reasonSel;
+
+        if (!startDate || !endDate) {
+          showToast({ title: "Missing Dates", message: "Please select start and end dates.", type: "warning" });
+          return;
+        }
+        if (endDate < startDate) {
+          showToast({ title: "Invalid Range", message: "End date must be after start date.", type: "error" });
+          return;
+        }
+
+        try {
+          await addDoc(collection(db, "vacations"), { startDate, endDate, reason, createdAt: Date.now() });
+          showToast({ title: "🏖️ Vacation Added!", message: `${reason}: ${startDate} → ${endDate}`, type: "success" });
+          document.getElementById("vacStartDate").value = "";
+          document.getElementById("vacEndDate").value   = "";
+          loadVacationList();
+        } catch (e) {
+          showToast({ title: "Error", message: e.message, type: "error" });
+        }
+      };
+
+      async function loadVacationList() {
+        const container = document.getElementById("vacationList");
+        if (!container) return;
+
+        try {
+          const snap = await getDocs(collection(db, "vacations"));
+          const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          list.sort((a, b) => a.startDate.localeCompare(b.startDate));
+
+          if (list.length === 0) {
+            container.innerHTML = '<div style="color:rgba(100,200,255,0.5); font-family:monospace; font-size:13px;">&gt;_ No vacations set.</div>';
+            return;
+          }
+
+          const today = new Date().toISOString().split("T")[0];
+          container.innerHTML = "";
+
+          list.forEach(v => {
+            const isActive = today >= v.startDate && today <= v.endDate;
+            const isPast   = today > v.endDate;
+
+            const div = document.createElement("div");
+            div.style.cssText = `
+              background: rgba(0,25,50,0.7);
+              border: 1px solid ${isActive ? "rgba(16,185,129,0.5)" : "rgba(0,150,255,0.2)"};
+              border-radius: 10px; padding: 12px 14px; margin: 8px 0;
+              opacity: ${isPast ? "0.5" : "1"};
+              display: flex; justify-content: space-between; align-items: center; gap:10px; flex-wrap:wrap;
+            `;
+
+            const info = document.createElement("div");
+            info.innerHTML = `
+              <div style="font-family:monospace; font-weight:bold; font-size:14px; color:${isActive ? "#10b981" : "#38bdf8"};">
+                ${isActive ? "🟢" : isPast ? "⚫" : "🔵"} ${v.reason}
+              </div>
+              <div style="font-size:12px; color:rgba(150,210,255,0.7); font-family:monospace; margin-top:4px;">
+                📅 ${v.startDate} → ${v.endDate}
+              </div>
+              ${isActive ? '<div style="font-size:11px; color:#10b981; margin-top:3px;">✅ ACTIVE NOW</div>' : ""}
+            `;
+
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "🗑 Delete";
+            delBtn.className = "btn-red";
+            delBtn.style.cssText = "width:auto; padding:5px 12px; font-size:12px; margin:0; border-radius:7px;";
+            delBtn.onclick = async () => {
+              if (!confirm(`Delete vacation "${v.reason}" (${v.startDate} → ${v.endDate})?`)) return;
+              try {
+                await deleteDoc(doc(db, "vacations", v.id));
+                showToast({ title: "Deleted", message: `"${v.reason}" vacation removed.`, type: "success" });
+                loadVacationList();
+              } catch (e) {
+                showToast({ title: "Error", message: e.message, type: "error" });
+              }
+            };
+
+            div.appendChild(info);
+            div.appendChild(delBtn);
+            container.appendChild(div);
+          });
+        } catch (e) {
+          container.innerHTML = `<div style="color:#f87171; font-family:monospace;">❌ Error: ${e.message}</div>`;
+        }
+      }
     </script>
   </body>
 </html>
