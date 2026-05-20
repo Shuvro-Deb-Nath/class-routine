@@ -1,1178 +1,1232 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
-    />
-    <meta name="theme-color" content="#2196f3" />
-    <title>Class Routine</title>
 
-    <link rel="stylesheet" href="style.css" />
-    <link rel="icon" href="y.png" type="image/png" sizes="32x32" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#2196f3" />
+  <title>Class Routine</title>
 
-    <!-- Performance hints -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
-    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://www.gstatic.com" />
-    <link rel="preload" href="style.css" as="style" />
-    <!-- Preload critical images -->
-    <link rel="preload" as="image" href="UULogo.webp" />
-    <link rel="preload" as="image" href="y.png" />
-    <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="effects.css" />
+  <link rel="icon" href="y.png" type="image/png" sizes="32x32" />
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-      import {
-        getFirestore,
-        collection,
-        getDocs,
-        doc,
-        getDoc,
-      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  <!-- Performance hints -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://www.gstatic.com" />
+  <link rel="preload" href="style.css" as="style" />
+  <link rel="preload" href="effects.css" as="style" />
+  <!-- Preload critical images -->
+  <link rel="preload" as="image" href="UULogo.webp" />
+  <link rel="preload" as="image" href="y.png" />
+  <link rel="manifest" href="/manifest.json" />
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyDoJVuE1cZTSRCMKen3DqlInJyZjQFs4UI",
-        authDomain: "class-routine-8b46c.firebaseapp.com",
-        projectId: "class-routine-8b46c",
-        storageBucket: "class-routine-8b46c.firebasestorage.app",
-        messagingSenderId: "666402119675",
-        appId: "1:666402119675:web:8fdc82c87af8303ed1355e",
-      };
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      getDoc,
+    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      window.app = app;
-      window.db = db; // allow other scripts to use it
-      window._fbDoc = doc;
-      window._fbGetDoc = getDoc;
-      window._fbGetDocs = getDocs;
-      window._fbCollection = collection;
-    </script>
-  </head>
-  <!-- Dark Mode Toggle Button -->
+    const firebaseConfig = {
+      apiKey: "AIzaSyDoJVuE1cZTSRCMKen3DqlInJyZjQFs4UI",
+      authDomain: "class-routine-8b46c.firebaseapp.com",
+      projectId: "class-routine-8b46c",
+      storageBucket: "class-routine-8b46c.firebasestorage.app",
+      messagingSenderId: "666402119675",
+      appId: "1:666402119675:web:8fdc82c87af8303ed1355e",
+    };
 
-  <body>
-    <!-- Splash Screen -->
-    <div id="splashScreen" class="splash-screen">
-      <div class="splash-content">
-        <img src="y.png" alt="Logo" class="splash-logo" />
-        <h1 class="splash-title">Class Routine</h1>
-        <div class="splash-loader">
-          <div class="spinner"></div>
-        </div>
-        <p class="splash-text">Loading your schedule...</p>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.app = app;
+    window.db = db; // allow other scripts to use it
+    window._fbDoc = doc;
+    window._fbGetDoc = getDoc;
+    window._fbGetDocs = getDocs;
+    window._fbCollection = collection;
+  </script>
+</head>
+<!-- Dark Mode Toggle Button -->
+
+<body>
+  <!-- Splash Screen -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+      <img src="y.png" alt="Logo" class="splash-logo" />
+      <h1 class="splash-title">Class Routine</h1>
+      <div class="splash-loader">
+        <div class="spinner"></div>
       </div>
+      <p class="splash-text">Loading your schedule...</p>
     </div>
-
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <!-- Install App Banner -->
-    <div id="installBanner" class="install-banner hidden">
-      <div class="install-banner-content">
-        <div class="install-banner-icon">📲</div>
-        <div class="install-banner-text">
-          <strong>Install Class Routine App</strong>
-          <p>Quick access to your schedule - works offline!</p>
-        </div>
-        <div class="install-banner-actions">
-          <button id="bannerInstallBtn" class="banner-install-btn">
-            Install Now
-          </button>
-          <button id="bannerDismissBtn" class="banner-dismiss-btn">
-            Maybe Later
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="hero">
-      <div class="hero-top">
-        <img
-          src="UULogo.webp"
-          class="logo"
-          alt="Logo"
-          loading="eager"
-          decoding="async"
-        />
-
-        <h1 class="title">
-          <span class="line1">CSE 60 A</span>
-          <span class="line2">Class Routine & Updates (Summer 2026)</span>
-        </h1>
-
-        <img
-          src="y.png"
-          class="banner"
-          alt="Banner"
-          loading="eager"
-          decoding="async"
-        />
-      </div>
-
-      <p class="effective">
-        <b
-          >Effective from <span id="effectiveFromDate">7 FEBRUARY 2026</span></b
-        >
-      </p>
-    </div>
-
-    <!-- ========== ROUTINE SWITCHER ========== -->
-    <div id="routineSwitcher" class="routine-switcher hidden">
-      <button id="switchMain" class="switcher-btn active" onclick="switchToMain()">
-        📅 Class Routine
-      </button>
-      <button id="switchExam" class="switcher-btn" onclick="switchToExam()">
-        📝 Exam Routine
-      </button>
-    </div>
-
-    <div class="table-container">
-      <!-- Today's Date Section -->
-      <div id="todayDate" class="today-date-section">
-        <div class="date-content">
-          <div class="date-main">
-            <span id="englishDate">14 February 2026</span>
-            <span class="date-separator">|</span>
-            <span id="dayName">SATURDAY</span>
-          </div>
-          <div class="date-secondary">
-            <span id="bengaliDate">১লা ফাল্গুন ১৪৩২</span>
-            <span id="specialEvent" class="special-event"></span>
-          </div>
-        </div>
-      </div>
-      <div id="noticeBoard"></div>
-      <!-- Weekly Progress -->
-
-      <!-- Class Duration Timer -->
-      <div id="classDurationTimer" class="class-duration-timer hidden">
-        <div class="timer-header">
-          <span class="timer-icon">⏱️</span>
-          <div class="timer-info">
-            <h3 id="timerClassName">Current Class</h3>
-            <p id="timerRoom">Room 301</p>
-          </div>
-        </div>
-
-        <div class="timer-body">
-          <div class="timer-countdown">
-            <span id="timerStatus">Class ends in</span>
-            <span id="timerMinutes">35 minutes</span>
-          </div>
-
-          <div class="progress-bar-container">
-            <div id="timerProgressBar" class="progress-bar"></div>
-          </div>
-
-          <div class="timer-details">
-            <span id="timerStartTime">Started: 10:05 AM</span>
-            <span id="timerEndTime">Ends: 11:25 AM</span>
-          </div>
-        </div>
-      </div>
-
-      <div id="countdownStack">
-        <div id="classCountdown" class="next-class hidden"></div>
-        <div id="assignmentCountdown" class="next-class hidden"></div>
-        <div id="examCountdown" class="next-class hidden"></div>
-      </div>
-
-      <table class="routine-table">
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>08:45 AM –10:05 AM</th>
-            <th>10:05 AM –11:25 AM</th>
-            <th>11:25 AM –12:45 PM</th>
-            <th class="break-header" rowspan="3">
-              BREAK<br />12:45 PM –01:15 PM
-            </th>
-            <th>01:15 PM –02:35 PM</th>
-            <th>02:35 PM –03:55 PM</th>
-          </tr>
-        </thead>
-        <tbody id="routineBody"></tbody>
-      </table>
-    </div>
-
-
-<div id="examCountdownBox" class="exam-countdown hidden">
-  <h3>📝 Next Exam</h3>
-  <p id="examTitle">Loading...</p>
-
-  <div id="examTimer">--:--:--</div>
-
-  <!-- Progress Bar -->
-  <div class="exam-progress">
-    <div id="examProgressFill"></div>
   </div>
 
-  <small id="examProgressText"></small>
-</div>
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
 
-    <!-- ========== CYBERPUNK EXAM ROUTINE ========== -->
-    <style>
-      /* ── Container ── */
-      #examRoutineSection {
-        background: linear-gradient(135deg, #0a0f1e 0%, #0d1b2a 50%, #0a1628 100%);
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow:
-          0 0 0 1px rgba(0,255,255,0.15),
-          0 20px 60px rgba(0,0,0,0.6),
-          0 0 80px rgba(0,200,255,0.08);
-        position: relative;
+  <!-- Install App Banner -->
+  <div id="installBanner" class="install-banner hidden">
+    <div class="install-banner-content">
+      <div class="install-banner-icon">📲</div>
+      <div class="install-banner-text">
+        <strong>Install Class Routine App</strong>
+        <p>Quick access to your schedule - works offline!</p>
+      </div>
+      <div class="install-banner-actions">
+        <button id="bannerInstallBtn" class="banner-install-btn">
+          Install Now
+        </button>
+        <button id="bannerDismissBtn" class="banner-dismiss-btn">
+          Maybe Later
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-top">
+      <img src="UULogo.webp" class="logo" alt="Logo" loading="eager" decoding="async" />
+
+      <h1 class="title">
+        <span class="line1">CSE 60 A</span>
+        <span class="line2">Class Routine & Updates (Summer 2026)</span>
+      </h1>
+
+      <img src="y.png" class="banner" alt="Banner" loading="eager" decoding="async" />
+    </div>
+
+    <p class="effective">
+      <b>Effective from <span id="effectiveFromDate">7 FEBRUARY 2026</span></b>
+    </p>
+  </div>
+
+  <!-- ========== ROUTINE SWITCHER ========== -->
+  <div id="routineSwitcher" class="routine-switcher hidden">
+    <button id="switchMain" class="switcher-btn active" onclick="switchToMain()">
+      📅 Class Routine
+    </button>
+
+    <button id="switchExam" class="switcher-btn" onclick="switchToExam()">
+      📝 Exam Routine
+    </button>
+
+    
+  </div>
+
+  <div class="table-container">
+    <!-- Today's Date Section -->
+    <div id="todayDate" class="today-date-section">
+      <div class="date-content">
+        <div class="date-main">
+          <span id="englishDate">14 February 2026</span>
+          <span class="date-separator">|</span>
+          <span id="dayName">SATURDAY</span>
+        </div>
+        <div class="date-secondary">
+          <span id="bengaliDate">১লা ফাল্গুন ১৪৩২</span>
+          <span id="specialEvent" class="special-event"></span>
+        </div>
+      </div>
+    </div>
+    <div id="noticeBoard"></div>
+    <!-- Weekly Progress -->
+
+    <!-- Class Duration Timer -->
+    <div id="classDurationTimer" class="class-duration-timer hidden">
+      <div class="timer-header">
+        <span class="timer-icon">⏱️</span>
+        <div class="timer-info">
+          <h3 id="timerClassName">Current Class</h3>
+          <p id="timerRoom">Room 301</p>
+        </div>
+      </div>
+
+      <div class="timer-body">
+        <div class="timer-countdown">
+          <span id="timerStatus">Class ends in</span>
+          <span id="timerMinutes">35 minutes</span>
+        </div>
+
+        <div class="progress-bar-container">
+          <div id="timerProgressBar" class="progress-bar"></div>
+        </div>
+
+        <div class="timer-details">
+          <span id="timerStartTime">Started: 10:05 AM</span>
+          <span id="timerEndTime">Ends: 11:25 AM</span>
+        </div>
+      </div>
+    </div>
+    <div class="export-toolbar">
+      <button onclick="exportRoutinePNG()">🖼 Export PNG</button>
+      <button onclick="exportRoutinePDF()">📄 Export PDF</button>
+      <button onclick="printRoutine()">🖨 Print</button>
+      <button onclick="shareRoutine()">📤 Share</button>
+    </div>
+    <div id="countdownStack">
+      <div id="classCountdown" class="next-class hidden"></div>
+      <div id="assignmentCountdown" class="next-class hidden"></div>
+      <div id="examCountdown" class="next-class hidden"></div>
+    </div>
+
+    <table class="routine-table">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>08:45 AM –10:05 AM</th>
+          <th>10:05 AM –11:25 AM</th>
+          <th>11:25 AM –12:45 PM</th>
+          <th class="break-header" rowspan="3">
+            BREAK<br />12:45 PM –01:15 PM
+          </th>
+          <th>01:15 PM –02:35 PM</th>
+          <th>02:35 PM –03:55 PM</th>
+        </tr>
+      </thead>
+      <tbody id="routineBody"></tbody>
+    </table>
+  </div>
+<section id="calendarSection" class="hidden">
+  <div class="calendar-shell">
+    <div id="fullCalendar"></div>
+  </div>
+</section>
+
+  <div id="examCountdownBox" class="exam-countdown hidden">
+    <h3>📝 Next Exam</h3>
+    <p id="examTitle">Loading...</p>
+
+    <div id="examTimer">--:--:--</div>
+
+    <!-- Progress Bar -->
+    <div class="exam-progress">
+      <div id="examProgressFill"></div>
+    </div>
+
+    <small id="examProgressText"></small>
+  </div>
+
+  <!-- ========== CYBERPUNK EXAM ROUTINE ========== -->
+  <style>
+    /* ── Container ── */
+    #examRoutineSection {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0d1b2a 50%, #0a1628 100%);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(0, 255, 255, 0.15),
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 80px rgba(0, 200, 255, 0.08);
+      position: relative;
+    }
+
+    /* ── Animated header ── */
+    #examRoutineHeader {
+      position: relative;
+      overflow: hidden;
+      padding: 28px 24px 22px;
+      text-align: center;
+      background: linear-gradient(270deg, #0ea5e9, #06b6d4, #3b82f6, #0284c7, #22d3ee);
+      background-size: 400% 400%;
+      animation: headerShift 6s ease infinite;
+    }
+
+    @keyframes headerShift {
+      0% {
+        background-position: 0% 50%;
       }
 
-      /* ── Animated header ── */
-      #examRoutineHeader {
-        position: relative;
-        overflow: hidden;
-        padding: 28px 24px 22px;
-        text-align: center;
-        background: linear-gradient(270deg, #0ea5e9, #06b6d4, #3b82f6, #0284c7, #22d3ee);
-        background-size: 400% 400%;
-        animation: headerShift 6s ease infinite;
+      50% {
+        background-position: 100% 50%;
       }
 
-      @keyframes headerShift {
-        0%   { background-position: 0% 50%; }
-        50%  { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+      100% {
+        background-position: 0% 50%;
       }
+    }
 
-      /* scanline overlay on header */
-      #examRoutineHeader::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: repeating-linear-gradient(
-          0deg,
+    /* scanline overlay on header */
+    #examRoutineHeader::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
           transparent,
           transparent 2px,
-          rgba(0,0,0,0.08) 2px,
-          rgba(0,0,0,0.08) 4px
-        );
-        pointer-events: none;
+          rgba(0, 0, 0, 0.08) 2px,
+          rgba(0, 0, 0, 0.08) 4px);
+      pointer-events: none;
+    }
+
+    /* glowing circuit lines */
+    #examRoutineHeader::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00ffff, #ffffff, #00ffff, transparent);
+      animation: scanLine 2.5s linear infinite;
+    }
+
+    @keyframes scanLine {
+      0% {
+        opacity: 0.4;
       }
 
-      /* glowing circuit lines */
-      #examRoutineHeader::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #00ffff, #ffffff, #00ffff, transparent);
-        animation: scanLine 2.5s linear infinite;
+      50% {
+        opacity: 1;
       }
 
-      @keyframes scanLine {
-        0%   { opacity: 0.4; }
-        50%  { opacity: 1; }
-        100% { opacity: 0.4; }
+      100% {
+        opacity: 0.4;
+      }
+    }
+
+    .exam-header-icon {
+      font-size: 36px;
+      margin-bottom: 8px;
+      display: block;
+      animation: iconFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+    }
+
+    @keyframes iconFloat {
+
+      0%,
+      100% {
+        transform: translateY(0);
       }
 
-      .exam-header-icon {
-        font-size: 36px;
-        margin-bottom: 8px;
-        display: block;
-        animation: iconFloat 3s ease-in-out infinite;
-        filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    .exam-header-title {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: white;
+      text-shadow:
+        0 0 10px rgba(0, 255, 255, 0.9),
+        0 0 30px rgba(0, 200, 255, 0.6),
+        0 0 60px rgba(0, 150, 255, 0.3);
+    }
+
+    .exam-header-sub {
+      margin: 8px 0 0;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: 2px;
+      font-family: monospace;
+    }
+
+    /* ── Table wrapper ── */
+    #examRoutineSection .exam-table-wrap {
+      overflow-x: auto;
+      padding: 0 16px 16px;
+    }
+
+    /* ── Table ── */
+    #examRoutineTable {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    /* ── TH ── */
+    #examRoutineTable thead tr {
+      background: linear-gradient(90deg, #0c4a6e, #075985, #0369a1, #075985, #0c4a6e) !important;
+      background-size: 200% 100% !important;
+      animation: thShimmer 4s linear infinite !important;
+    }
+
+    @keyframes thShimmer {
+      0% {
+        background-position: 200% 0;
       }
 
-      @keyframes iconFloat {
-        0%, 100% { transform: translateY(0); }
-        50%       { transform: translateY(-6px); }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    #examRoutineTable th {
+      color: #7dd3fc !important;
+      text-align: center;
+      padding: 14px 10px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: monospace;
+      border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+      position: relative;
+    }
+
+    #examRoutineTable th::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    }
+
+    /* ── TD ── */
+    #examRoutineTable td {
+      text-align: center;
+      padding: 14px 12px;
+      vertical-align: middle;
+      border-bottom: 1px solid rgba(0, 180, 255, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    /* alternating rows */
+    #examRoutineTable tbody tr:nth-child(odd) td {
+      background: rgba(3, 50, 90, 0.5);
+    }
+
+    #examRoutineTable tbody tr:nth-child(even) td {
+      background: rgba(2, 30, 60, 0.7);
+    }
+
+    /* ── Hover glow ── */
+    #examRoutineTable tbody tr:hover td {
+      background: rgba(0, 180, 255, 0.12) !important;
+      box-shadow: inset 0 0 20px rgba(0, 200, 255, 0.08);
+      transform: scale(1.005);
+    }
+
+    #examRoutineTable tbody tr:hover .exam-course-name {
+      color: #38bdf8;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+    }
+
+    /* ── Serial number ── */
+    .exam-serial {
+      font-weight: bold;
+      font-size: 15px;
+      color: #00ffff;
+      font-family: monospace;
+      text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+    }
+
+    /* ── Date cell ── */
+    .exam-date-val {
+      font-weight: bold;
+      font-size: 14px;
+      display: block;
+      color: #e0f2fe;
+    }
+
+    .exam-day-val {
+      font-size: 11px;
+      color: #38bdf8;
+      display: block;
+      margin-top: 3px;
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+
+    /* ── Course name ── */
+    .exam-course-name {
+      font-weight: bold;
+      font-size: 14px;
+      color: #f0f9ff;
+      transition: all 0.3s;
+    }
+
+    /* ── Course code badge ── */
+    .exam-code {
+      background: linear-gradient(135deg, #0369a1, #0ea5e9, #22d3ee);
+      background-size: 200% 200%;
+      animation: badgePulse 3s ease infinite;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      font-family: monospace;
+      letter-spacing: 1px;
+      display: inline-block;
+      box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+    }
+
+    @keyframes badgePulse {
+      0% {
+        background-position: 0% 50%;
+        box-shadow: 0 0 8px rgba(14, 165, 233, 0.4);
       }
 
-      .exam-header-title {
-        margin: 0;
-        font-size: 26px;
-        font-weight: 900;
-        letter-spacing: 4px;
-        text-transform: uppercase;
-        color: white;
-        text-shadow:
-          0 0 10px rgba(0,255,255,0.9),
-          0 0 30px rgba(0,200,255,0.6),
-          0 0 60px rgba(0,150,255,0.3);
+      50% {
+        background-position: 100% 50%;
+        box-shadow: 0 0 18px rgba(34, 211, 238, 0.8);
       }
 
-      .exam-header-sub {
-        margin: 8px 0 0;
-        font-size: 13px;
-        color: rgba(255,255,255,0.85);
-        letter-spacing: 2px;
-        font-family: monospace;
+      100% {
+        background-position: 0% 50%;
+        box-shadow: 0 0 8px rgba(14, 165, 233, 0.4);
+      }
+    }
+
+    /* ── Time ── */
+    .exam-time {
+      font-size: 13px;
+      color: #7dd3fc;
+      white-space: nowrap;
+      font-family: monospace;
+    }
+
+    /* ── Room ── */
+    .exam-room {
+      font-weight: bold;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    /* ── TODAY row — neon pulse ── */
+    .exam-today-row td {
+      background: linear-gradient(135deg,
+          rgba(0, 200, 255, 0.18),
+          rgba(0, 100, 200, 0.22)) !important;
+      border-left: 4px solid #00ffff !important;
+      animation: todayNeon 2s ease-in-out infinite !important;
+    }
+
+    @keyframes todayNeon {
+
+      0%,
+      100% {
+        box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.1),
+          inset 4px 0 15px rgba(0, 255, 255, 0.2);
       }
 
-      /* ── Table wrapper ── */
-      #examRoutineSection .exam-table-wrap {
-        overflow-x: auto;
-        padding: 0 16px 16px;
+      50% {
+        box-shadow: inset 0 0 30px rgba(0, 255, 255, 0.2),
+          inset 4px 0 25px rgba(0, 255, 255, 0.4);
       }
+    }
 
-      /* ── Table ── */
-      #examRoutineTable {
-        width: 100%;
-        border-collapse: collapse;
-        border-radius: 12px;
-        overflow: hidden;
-        margin-top: 16px;
-      }
+    .exam-today-row .exam-course-name {
+      color: #00ffff;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+    }
 
-      /* ── TH ── */
-      #examRoutineTable thead tr {
-        background: linear-gradient(90deg, #0c4a6e, #075985, #0369a1, #075985, #0c4a6e) !important;
-        background-size: 200% 100% !important;
-        animation: thShimmer 4s linear infinite !important;
-      }
+    .exam-today-row .exam-serial {
+      color: #ffffff;
+      text-shadow: 0 0 12px #00ffff, 0 0 25px #00ffff;
+    }
 
-      @keyframes thShimmer {
-        0%   { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
-      }
+    /* ── TODAY badge on serial ── */
+    .exam-today-badge {
+      display: block;
+      font-size: 9px;
+      background: #00ffff;
+      color: #0a0f1e;
+      border-radius: 4px;
+      padding: 1px 4px;
+      margin-top: 3px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      font-family: monospace;
+    }
 
-      #examRoutineTable th {
-        color: #7dd3fc !important;
-        text-align: center;
-        padding: 14px 10px;
-        font-size: 12px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        font-family: monospace;
-        border-bottom: 2px solid rgba(0,255,255,0.2);
-        position: relative;
-      }
+    /* ── No entries / loading text ── */
+    #examRoutineBody .empty-msg {
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 15px;
+      padding: 40px;
+      text-align: center;
+    }
+  </style>
 
-      #examRoutineTable th::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: 10%; right: 10%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #00ffff, transparent);
-      }
-
-      /* ── TD ── */
-      #examRoutineTable td {
-        text-align: center;
-        padding: 14px 12px;
-        vertical-align: middle;
-        border-bottom: 1px solid rgba(0,180,255,0.1);
-        transition: all 0.3s ease;
-        position: relative;
-      }
-
-      /* alternating rows */
-      #examRoutineTable tbody tr:nth-child(odd) td {
-        background: rgba(3, 50, 90, 0.5);
-      }
-      #examRoutineTable tbody tr:nth-child(even) td {
-        background: rgba(2, 30, 60, 0.7);
-      }
-
-      /* ── Hover glow ── */
-      #examRoutineTable tbody tr:hover td {
-        background: rgba(0, 180, 255, 0.12) !important;
-        box-shadow: inset 0 0 20px rgba(0,200,255,0.08);
-        transform: scale(1.005);
-      }
-
-      #examRoutineTable tbody tr:hover .exam-course-name {
-        color: #38bdf8;
-        text-shadow: 0 0 8px rgba(56,189,248,0.6);
-      }
-
-      /* ── Serial number ── */
-      .exam-serial {
-        font-weight: bold;
-        font-size: 15px;
-        color: #00ffff;
-        font-family: monospace;
-        text-shadow: 0 0 8px rgba(0,255,255,0.6);
-      }
-
-      /* ── Date cell ── */
-      .exam-date-val {
-        font-weight: bold;
-        font-size: 14px;
-        display: block;
-        color: #e0f2fe;
-      }
-      .exam-day-val {
-        font-size: 11px;
-        color: #38bdf8;
-        display: block;
-        margin-top: 3px;
-        font-family: monospace;
-        letter-spacing: 1px;
-      }
-
-      /* ── Course name ── */
-      .exam-course-name {
-        font-weight: bold;
-        font-size: 14px;
-        color: #f0f9ff;
-        transition: all 0.3s;
-      }
-
-      /* ── Course code badge ── */
-      .exam-code {
-        background: linear-gradient(135deg, #0369a1, #0ea5e9, #22d3ee);
-        background-size: 200% 200%;
-        animation: badgePulse 3s ease infinite;
-        color: white;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: bold;
-        font-family: monospace;
-        letter-spacing: 1px;
-        display: inline-block;
-        box-shadow: 0 0 10px rgba(14,165,233,0.5);
-      }
-
-      @keyframes badgePulse {
-        0%   { background-position: 0% 50%; box-shadow: 0 0 8px rgba(14,165,233,0.4); }
-        50%  { background-position: 100% 50%; box-shadow: 0 0 18px rgba(34,211,238,0.8); }
-        100% { background-position: 0% 50%; box-shadow: 0 0 8px rgba(14,165,233,0.4); }
-      }
-
-      /* ── Time ── */
-      .exam-time {
-        font-size: 13px;
-        color: #7dd3fc;
-        white-space: nowrap;
-        font-family: monospace;
-      }
-
-      /* ── Room ── */
-      .exam-room {
-        font-weight: bold;
-        color: #38bdf8;
-        font-family: monospace;
-        font-size: 13px;
-      }
-
-      /* ── TODAY row — neon pulse ── */
-      .exam-today-row td {
-        background: linear-gradient(135deg,
-          rgba(0,200,255,0.18),
-          rgba(0,100,200,0.22)) !important;
-        border-left: 4px solid #00ffff !important;
-        animation: todayNeon 2s ease-in-out infinite !important;
-      }
-
-      @keyframes todayNeon {
-        0%, 100% {
-          box-shadow: inset 0 0 15px rgba(0,255,255,0.1),
-                      inset 4px 0 15px rgba(0,255,255,0.2);
-        }
-        50% {
-          box-shadow: inset 0 0 30px rgba(0,255,255,0.2),
-                      inset 4px 0 25px rgba(0,255,255,0.4);
-        }
-      }
-
-      .exam-today-row .exam-course-name {
-        color: #00ffff;
-        text-shadow: 0 0 10px rgba(0,255,255,0.7);
-      }
-
-      .exam-today-row .exam-serial {
-        color: #ffffff;
-        text-shadow: 0 0 12px #00ffff, 0 0 25px #00ffff;
-      }
-
-      /* ── TODAY badge on serial ── */
-      .exam-today-badge {
-        display: block;
-        font-size: 9px;
-        background: #00ffff;
-        color: #0a0f1e;
-        border-radius: 4px;
-        padding: 1px 4px;
-        margin-top: 3px;
-        font-weight: 900;
-        letter-spacing: 1px;
-        font-family: monospace;
-      }
-
-      /* ── No entries / loading text ── */
-      #examRoutineBody .empty-msg {
-        color: #38bdf8;
-        font-family: monospace;
-        font-size: 15px;
-        padding: 40px;
-        text-align: center;
-      }
-    </style>
-
-    <div class="table-container" id="examRoutineSection" style="display:none;">
-      <div id="examRoutineHeader">
-        <span class="exam-header-icon">💻</span>
-        <h2 class="exam-header-title">Exam Routine</h2>
-        <p class="exam-header-sub">&gt;_ CSE 60 A &nbsp;|&nbsp; Spring 2026 &nbsp;|&nbsp; Good Luck! 🚀</p>
-      </div>
-
-      <div class="exam-table-wrap">
-        <table id="examRoutineTable">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Date</th>
-              <th>Course Name</th>
-              <th>Course Code</th>
-              <th>Time</th>
-              <th>Room No</th>
-            </tr>
-          </thead>
-          <tbody id="examRoutineBody">
-            <tr><td colspan="6" class="empty-msg">&gt;_ Loading exam schedule...</td></tr>
-          </tbody>
-        </table>
-      </div>
-       </div>
-   <div id="weekProgressBox" class="day-progress hidden">
-      <div class="day-progress-header">
-        📅 Weekly Progress: <span id="weekProgressText">0%</span>
-      </div>
-      <div class="day-progress-bar">
-        <div id="weekProgressFill" class="day-progress-fill"></div>
-      </div>
+  <div class="table-container" id="examRoutineSection" style="display:none;">
+    <div id="examRoutineHeader">
+      <span class="exam-header-icon">💻</span>
+      <h2 class="exam-header-title">Exam Routine</h2>
+      <p class="exam-header-sub">&gt;_ CSE 60 A &nbsp;|&nbsp; Spring 2026 &nbsp;|&nbsp; Good Luck! 🚀</p>
     </div>
 
-    <!-- Day Progress -->
-    <div id="dayProgressBox" class="day-progress hidden">
-      <div class="day-progress-header">
-        📊 Day Progress: <span id="dayProgressText">0%</span>
+    <div class="exam-table-wrap">
+      <table id="examRoutineTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Course Name</th>
+            <th>Course Code</th>
+            <th>Time</th>
+            <th>Room No</th>
+          </tr>
+        </thead>
+        <tbody id="examRoutineBody">
+          <tr>
+            <td colspan="6" class="empty-msg">&gt;_ Loading exam schedule...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="dayProgressBox" class="day-progress hidden">
+    <div class="day-progress-header">
+      📊 Day Progress: <span id="dayProgressText">0%</span>
+    </div>
+
+    <div class="day-progress-bar">
+      <div id="dayProgressFill" class="day-progress-fill"></div>
+    </div>
+  </div>
+  <div id="weekProgressBox" class="day-progress hidden">
+    <div class="day-progress-header">
+      📅 Weekly Progress: <span id="weekProgressText">0%</span>
+    </div>
+    <div class="day-progress-bar">
+      <div id="weekProgressFill" class="day-progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Day Progress -->
+
+
+  <section class="features-info">
+    <h2>📅 How This Routine Works</h2>
+
+    <div class="feature-list">
+      <div class="feature-item today-demo">
+        <span class="feature-badge">📅 TODAY</span>
+        <p>
+          The <b>entire row</b> for <b>today's date</b> is automatically
+          highlighted, so you instantly know which day's classes are relevant.
+        </p>
       </div>
 
-      <div class="day-progress-bar">
-        <div id="dayProgressFill" class="day-progress-fill"></div>
+      <div class="feature-item current-demo">
+        <span class="feature-badge">🔴 LIVE</span>
+        <p>
+          The <b>currently running class</b> is highlighted in green with a
+          <b>LIVE indicator</b>. This updates automatically based on the
+          current time.
+        </p>
+      </div>
+
+      <div class="feature-item upcoming-demo">
+        <span class="feature-badge">⏰ NEXT</span>
+        <p>
+          The <b>next upcoming class</b> after the current one is highlighted
+          in orange, helping you prepare in advance.
+        </p>
+      </div>
+
+      <div class="feature-item auto-demo">
+        <span class="feature-badge">⚙️ AUTO</span>
+        <p>
+          All highlights update <b>automatically</b> based on your device's
+          <b>date and time</b>. No manual refresh is needed.
+        </p>
       </div>
     </div>
-      
-    <section class="features-info">
-      <h2>📅 How This Routine Works</h2>
+  </section>
 
-      <div class="feature-list">
-        <div class="feature-item today-demo">
-          <span class="feature-badge">📅 TODAY</span>
-          <p>
-            The <b>entire row</b> for <b>today's date</b> is automatically
-            highlighted, so you instantly know which day's classes are relevant.
-          </p>
-        </div>
+  <footer>© 2026 | Class Routine & Updates | Powered by SHUVRO DEB NATH</footer>
 
-        <div class="feature-item current-demo">
-          <span class="feature-badge">🔴 LIVE</span>
-          <p>
-            The <b>currently running class</b> is highlighted in green with a
-            <b>LIVE indicator</b>. This updates automatically based on the
-            current time.
-          </p>
-        </div>
+  <button id="installBtn" hidden class="install-btn">📲 Install App</button>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-        <div class="feature-item upcoming-demo">
-          <span class="feature-badge">⏰ NEXT</span>
-          <p>
-            The <b>next upcoming class</b> after the current one is highlighted
-            in orange, helping you prepare in advance.
-          </p>
-        </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet" />
 
-        <div class="feature-item auto-demo">
-          <span class="feature-badge">⚙️ AUTO</span>
-          <p>
-            All highlights update <b>automatically</b> based on your device's
-            <b>date and time</b>. No manual refresh is needed.
-          </p>
-        </div>
-      </div>
-    </section>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+  
+  <script type="module" src="script.js"></script>
 
-    <footer>© 2026 | Class Routine & Updates | Created by SHUVRO DEB NATH</footer>
+  <script type="module">
+    // Load effective date from Firebase
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-    <button id="installBtn" hidden class="install-btn">📲 Install App</button>
+    async function loadEffectiveDate() {
+      try {
+        const db = window.db; // Use the db initialized in head
+        const snap = await getDoc(doc(db, "settings", "effectiveDate"));
 
-    <script type="module" src="script.js"></script>
-
-    <script type="module">
-      // Load effective date from Firebase
-      import {
-        getFirestore,
-        doc,
-        getDoc,
-      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-      async function loadEffectiveDate() {
-        try {
-          const db = window.db; // Use the db initialized in head
-          const snap = await getDoc(doc(db, "settings", "effectiveDate"));
-
-          if (snap.exists()) {
-            document.getElementById("effectiveFromDate").textContent =
-              snap.data().date;
-          }
-          // If doesn't exist, keep default "7 FEBRUARY 2026"
-        } catch (error) {
-          console.error("Error loading effective date:", error);
-          // Keep default on error
+        if (snap.exists()) {
+          document.getElementById("effectiveFromDate").textContent =
+            snap.data().date;
         }
+        // If doesn't exist, keep default "7 FEBRUARY 2026"
+      } catch (error) {
+        console.error("Error loading effective date:", error);
+        // Keep default on error
       }
+    }
 
-      loadEffectiveDate();
-    </script>
+    loadEffectiveDate();
+  </script>
 
-    <script>
-      // Bengali number conversion
-      const bengaliNumbers = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-      const toBengaliNumber = (num) =>
-        String(num)
-          .split("")
-          .map((d) => bengaliNumbers[d])
-          .join("");
+  <script>
+    // Bengali number conversion
+    const bengaliNumbers = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+    const toBengaliNumber = (num) =>
+      String(num)
+        .split("")
+        .map((d) => bengaliNumbers[d])
+        .join("");
 
-      // Bengali months
-      const bengaliMonths = [
-        "বৈশাখ",
-        "জ্যৈষ্ঠ",
-        "আষাঢ়",
-        "শ্রাবণ",
-        "ভাদ্র",
-        "আশ্বিন",
-        "কার্তিক",
-        "অগ্রহায়ণ",
-        "পৌষ",
-        "মাঘ",
-        "ফাল্গুন",
-        "চৈত্র",
+    // Bengali months
+    const bengaliMonths = [
+      "বৈশাখ",
+      "জ্যৈষ্ঠ",
+      "আষাঢ়",
+      "শ্রাবণ",
+      "ভাদ্র",
+      "আশ্বিন",
+      "কার্তিক",
+      "অগ্রহায়ণ",
+      "পৌষ",
+      "মাঘ",
+      "ফাল্গুন",
+      "চৈত্র",
+    ];
+
+    // Bengali date suffixes
+    const getBengaliDateSuffix = (day) => {
+      if (day === 1) return "লা";
+      if (day === 2 || day === 3) return "রা";
+      if (day === 4) return "ঠা";
+      if (day === 5 || day === 6) return "ই";
+      return "ই";
+    };
+
+    // Convert Gregorian to Bengali calendar (approximation)
+    function toBengaliDate(date) {
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const day = date.getDate();
+
+      // Bengali year is roughly Gregorian year - 593/594
+      // Bengali new year starts around April 14-15
+      let bengaliYear = year - 593;
+
+      // Month mapping (approximate)
+      const monthStart = [
+        { g: 3, d: 14 }, // Baishakh starts ~April 14
+        { g: 4, d: 15 }, // Jyoishtho starts ~May 15
+        { g: 5, d: 15 }, // Asharh starts ~June 15
+        { g: 6, d: 16 }, // Shravan starts ~July 16
+        { g: 7, d: 16 }, // Bhadro starts ~Aug 16
+        { g: 8, d: 16 }, // Ashwin starts ~Sep 16
+        { g: 9, d: 16 }, // Kartik starts ~Oct 16
+        { g: 10, d: 15 }, // Ogrohayon starts ~Nov 15
+        { g: 11, d: 15 }, // Poush starts ~Dec 15
+        { g: 0, d: 14 }, // Magh starts ~Jan 14
+        { g: 1, d: 14 }, // Falgun starts ~Feb 14
+        { g: 2, d: 14 }, // Choitro starts ~Mar 14
       ];
 
-      // Bengali date suffixes
-      const getBengaliDateSuffix = (day) => {
-        if (day === 1) return "লা";
-        if (day === 2 || day === 3) return "রা";
-        if (day === 4) return "ঠা";
-        if (day === 5 || day === 6) return "ই";
-        return "ই";
-      };
+      let bengaliMonth = 0;
+      let bengaliDay = 0;
 
-      // Convert Gregorian to Bengali calendar (approximation)
-      function toBengaliDate(date) {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const day = date.getDate();
+      for (let i = 0; i < monthStart.length; i++) {
+        const nextMonth = (i + 1) % 12;
+        const currentStart = monthStart[i];
+        const nextStart = monthStart[nextMonth];
 
-        // Bengali year is roughly Gregorian year - 593/594
-        // Bengali new year starts around April 14-15
-        let bengaliYear = year - 593;
+        let currentDate = new Date(year, currentStart.g, currentStart.d);
+        let nextDate = new Date(year, nextStart.g, nextStart.d);
 
-        // Month mapping (approximate)
-        const monthStart = [
-          { g: 3, d: 14 }, // Baishakh starts ~April 14
-          { g: 4, d: 15 }, // Jyoishtho starts ~May 15
-          { g: 5, d: 15 }, // Asharh starts ~June 15
-          { g: 6, d: 16 }, // Shravan starts ~July 16
-          { g: 7, d: 16 }, // Bhadro starts ~Aug 16
-          { g: 8, d: 16 }, // Ashwin starts ~Sep 16
-          { g: 9, d: 16 }, // Kartik starts ~Oct 16
-          { g: 10, d: 15 }, // Ogrohayon starts ~Nov 15
-          { g: 11, d: 15 }, // Poush starts ~Dec 15
-          { g: 0, d: 14 }, // Magh starts ~Jan 14
-          { g: 1, d: 14 }, // Falgun starts ~Feb 14
-          { g: 2, d: 14 }, // Choitro starts ~Mar 14
-        ];
+        // Adjust year for months that wrap around
+        if (nextStart.g < currentStart.g) {
+          nextDate = new Date(year + 1, nextStart.g, nextStart.d);
+        }
+        if (currentStart.g === 0 && month > 6) {
+          currentDate = new Date(year + 1, currentStart.g, currentStart.d);
+          nextDate = new Date(year + 1, nextStart.g, nextStart.d);
+        }
 
-        let bengaliMonth = 0;
-        let bengaliDay = 0;
+        if (date >= currentDate && date < nextDate) {
+          bengaliMonth = i;
+          const diffTime = date - currentDate;
+          bengaliDay = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+          break;
+        }
+      }
 
-        for (let i = 0; i < monthStart.length; i++) {
-          const nextMonth = (i + 1) % 12;
-          const currentStart = monthStart[i];
-          const nextStart = monthStart[nextMonth];
+      // Adjust year if we're in months before Baishakh
+      if (bengaliMonth >= 9) {
+        bengaliYear = year - 594;
+      }
 
-          let currentDate = new Date(year, currentStart.g, currentStart.d);
-          let nextDate = new Date(year, nextStart.g, nextStart.d);
+      const suffix = getBengaliDateSuffix(bengaliDay);
+      return `${toBengaliNumber(bengaliDay)}${suffix} ${bengaliMonths[bengaliMonth]} ${toBengaliNumber(bengaliYear)}`;
+    }
 
-          // Adjust year for months that wrap around
-          if (nextStart.g < currentStart.g) {
-            nextDate = new Date(year + 1, nextStart.g, nextStart.d);
-          }
-          if (currentStart.g === 0 && month > 6) {
-            currentDate = new Date(year + 1, currentStart.g, currentStart.d);
-            nextDate = new Date(year + 1, nextStart.g, nextStart.d);
-          }
+    // Special events calendar
+    const specialEvents = {
+      // Bangladesh National Days
+      "2-21": "International Mother Language Day 🇧🇩",
+      "3-17": "Sheikh Mujibur Rahman's Birthday 🇧🇩",
+      "3-26": "Independence Day 🇧🇩",
+      "4-14": "Pohela Boishakh (Bengali New Year) 🎊",
+      "5-1": "May Day",
+      "8-15": "National Mourning Day 🇧🇩",
+      "11-7": "National Revolution & Solidarity Day 🇧🇩",
+      "12-16": "Victory Day 🇧🇩",
 
-          if (date >= currentDate && date < nextDate) {
-            bengaliMonth = i;
-            const diffTime = date - currentDate;
-            bengaliDay = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      // Religious Holidays 2026 (Islamic Calendar - approximate)
+      "2-28": "Shab-e-Barat 🌙",
+      "3-1": "Eid-ul-Fitr 🌙 (Day 1)",
+      "3-2": "Eid-ul-Fitr 🌙 (Day 2)",
+      "3-3": "Eid-ul-Fitr 🌙 (Day 3)",
+      "5-7": "Eid-ul-Adha 🐑 (Day 1)",
+      "5-8": "Eid-ul-Adha 🐑 (Day 2)",
+      "5-9": "Eid-ul-Adha 🐑 (Day 3)",
+      "5-28": "Muharram (Ashura) 🌙",
+      "7-6": "Milad-un-Nabi 🌙",
+
+      // Hindu Festivals 2026
+      "2-3": "Saraswati Puja 📚",
+      "3-14": "Holi (Festival of Colors) 🎨",
+      "4-6": "Ram Navami",
+      "5-5": "Buddha Purnima 🙏",
+      "8-15": "Janmashtami (Krishna Birthday)",
+      "10-17": "Durga Puja (Maha Saptami)",
+      "10-18": "Durga Puja (Maha Ashtami)",
+      "10-19": "Durga Puja (Maha Navami)",
+      "10-20": "Durga Puja (Vijaya Dashami)",
+      "11-1": "Kali Puja 🪔",
+      "11-2": "Diwali (Festival of Lights) 🪔",
+
+      // Christian Holidays
+      "4-3": "Good Friday ✝️",
+      "4-5": "Easter Sunday 🐣",
+      "12-24": "Christmas Eve 🎄",
+      "12-25": "Christmas Day 🎄",
+
+      // International Days
+      "1-1": "New Year's Day 🎉",
+      "1-4": "World Braille Day",
+      "1-24": "International Day of Education",
+      "1-26": "International Customs Day",
+      "2-4": "World Cancer Day",
+      "2-11": "International Day of Women and Girls in Science",
+      "2-13": "World Radio Day",
+      "2-14": "Valentine's Day 💝",
+      "2-20": "World Day of Social Justice",
+      "3-8": "International Women's Day 👩",
+      "3-15": "World Consumer Rights Day",
+      "3-20": "International Day of Happiness",
+      "3-21": "World Poetry Day",
+      "3-22": "World Water Day 💧",
+      "3-23": "World Meteorological Day",
+      "4-2": "World Autism Awareness Day",
+      "4-7": "World Health Day 🏥",
+      "4-22": "Earth Day 🌍",
+      "4-23": "World Book Day 📚",
+      "5-3": "World Press Freedom Day",
+      "5-8": "World Red Cross Day",
+      "5-15": "International Day of Families",
+      "5-17": "World Telecommunication Day",
+      "5-31": "World No Tobacco Day",
+      "6-5": "World Environment Day 🌱",
+      "6-8": "World Ocean Day 🌊",
+      "6-14": "World Blood Donor Day",
+      "6-20": "World Refugee Day",
+      "6-26": "International Day Against Drug Abuse",
+      "7-11": "World Population Day",
+      "8-9": "International Day of World's Indigenous Peoples",
+      "8-12": "International Youth Day",
+      "8-19": "World Humanitarian Day",
+      "9-8": "International Literacy Day 📖",
+      "9-15": "International Day of Democracy",
+      "9-16": "International Day for Preservation of Ozone Layer",
+      "9-21": "International Day of Peace ☮️",
+      "9-27": "World Tourism Day",
+      "10-1": "International Day of Older Persons",
+      "10-2": "International Day of Non-Violence",
+      "10-5": "World Teachers' Day 👨‍🏫",
+      "10-10": "World Mental Health Day",
+      "10-16": "World Food Day 🍚",
+      "10-24": "United Nations Day 🇺🇳",
+      "11-14": "World Diabetes Day",
+      "11-16": "International Day for Tolerance",
+      "11-19": "World Toilet Day",
+      "11-20": "Universal Children's Day 👶",
+      "11-25": "International Day for Elimination of Violence Against Women",
+      "12-1": "World AIDS Day",
+      "12-2": "International Day for Abolition of Slavery",
+      "12-3": "International Day of Persons with Disabilities",
+      "12-5": "International Volunteer Day",
+      "12-10": "Human Rights Day",
+      "12-31": "New Year's Eve 🎆",
+    };
+
+    // Update today's date display
+    function updateTodayDate() {
+      const today = new Date();
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const days = [
+        "SUNDAY",
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY",
+        "SATURDAY",
+      ];
+
+      // English date
+      const day = today.getDate();
+      const month = months[today.getMonth()];
+      const year = today.getFullYear();
+      const dayName = days[today.getDay()];
+
+      document.getElementById("englishDate").textContent =
+        `${day} ${month} ${year}`;
+      document.getElementById("dayName").textContent = dayName;
+
+      // Bengali date
+      const bengaliDate = toBengaliDate(today);
+      document.getElementById("bengaliDate").textContent = bengaliDate;
+
+      // Special event
+      const monthDay = `${today.getMonth() + 1}-${day}`;
+      const event = specialEvents[monthDay];
+      if (event) {
+        document.getElementById("specialEvent").textContent = `(${event})`;
+      } else {
+        document.getElementById("specialEvent").textContent = "";
+      }
+    }
+
+    // Initialize
+    updateTodayDate();
+
+    // Auto-update at midnight
+    function scheduleNextMidnightUpdate() {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+
+      const timeUntilMidnight = tomorrow - now;
+
+      setTimeout(() => {
+        updateTodayDate();
+        // Schedule next update
+        scheduleNextMidnightUpdate();
+
+        // Also reload the routine to highlight today's row correctly
+        if (typeof window.loadRoutine === "function") {
+          window.loadRoutine();
+        }
+      }, timeUntilMidnight);
+    }
+
+    scheduleNextMidnightUpdate();
+  </script>
+
+  <script type="module">
+    /* =========================
+   CLASS DURATION TIMER
+   Shows live progress of current class
+========================= */
+
+    import {
+      getDoc,
+      doc,
+    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+    let currentClassData = null;
+    let timerInterval = null;
+
+    async function updateClassTimer() {
+      const now = new Date();
+      const currentDay = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][
+        now.getDay()
+      ];
+      const currentTime = now.getHours() * 60 + now.getMinutes(); // minutes since midnight
+
+      try {
+        // Load time slots
+        const slotsSnap = await getDoc(
+          doc(window.db, "settings", "timeSlots"),
+        );
+        const timeSlots = slotsSnap.exists() ? slotsSnap.data().slots : [];
+
+        // Load today's routine
+        const routineSnap = await getDoc(
+          doc(window.db, "routine", currentDay),
+        );
+        if (!routineSnap.exists()) {
+          hideTimer();
+          return;
+        }
+
+        const classes = routineSnap.data().classes || [];
+
+        // Find current class
+        let foundClass = null;
+        let classSlot = null;
+
+        for (const cls of classes) {
+          const slot = timeSlots.find((s) => s.time === cls.time);
+          if (!slot) continue;
+
+          const [startHour, startMin] = slot.start.split(":").map(Number);
+          const [endHour, endMin] = slot.end.split(":").map(Number);
+
+          const startTime = startHour * 60 + startMin;
+          const endTime = endHour * 60 + endMin;
+
+          if (currentTime >= startTime && currentTime < endTime) {
+            foundClass = cls;
+            classSlot = slot;
             break;
           }
         }
 
-        // Adjust year if we're in months before Baishakh
-        if (bengaliMonth >= 9) {
-          bengaliYear = year - 594;
-        }
-
-        const suffix = getBengaliDateSuffix(bengaliDay);
-        return `${toBengaliNumber(bengaliDay)}${suffix} ${bengaliMonths[bengaliMonth]} ${toBengaliNumber(bengaliYear)}`;
-      }
-
-      // Special events calendar
-      const specialEvents = {
-        // Bangladesh National Days
-        "2-21": "International Mother Language Day 🇧🇩",
-        "3-17": "Sheikh Mujibur Rahman's Birthday 🇧🇩",
-        "3-26": "Independence Day 🇧🇩",
-        "4-14": "Pohela Boishakh (Bengali New Year) 🎊",
-        "5-1": "May Day",
-        "8-15": "National Mourning Day 🇧🇩",
-        "11-7": "National Revolution & Solidarity Day 🇧🇩",
-        "12-16": "Victory Day 🇧🇩",
-
-        // Religious Holidays 2026 (Islamic Calendar - approximate)
-        "2-28": "Shab-e-Barat 🌙",
-        "3-1": "Eid-ul-Fitr 🌙 (Day 1)",
-        "3-2": "Eid-ul-Fitr 🌙 (Day 2)",
-        "3-3": "Eid-ul-Fitr 🌙 (Day 3)",
-        "5-7": "Eid-ul-Adha 🐑 (Day 1)",
-        "5-8": "Eid-ul-Adha 🐑 (Day 2)",
-        "5-9": "Eid-ul-Adha 🐑 (Day 3)",
-        "5-28": "Muharram (Ashura) 🌙",
-        "7-6": "Milad-un-Nabi 🌙",
-
-        // Hindu Festivals 2026
-        "2-3": "Saraswati Puja 📚",
-        "3-14": "Holi (Festival of Colors) 🎨",
-        "4-6": "Ram Navami",
-        "5-5": "Buddha Purnima 🙏",
-        "8-15": "Janmashtami (Krishna Birthday)",
-        "10-17": "Durga Puja (Maha Saptami)",
-        "10-18": "Durga Puja (Maha Ashtami)",
-        "10-19": "Durga Puja (Maha Navami)",
-        "10-20": "Durga Puja (Vijaya Dashami)",
-        "11-1": "Kali Puja 🪔",
-        "11-2": "Diwali (Festival of Lights) 🪔",
-
-        // Christian Holidays
-        "4-3": "Good Friday ✝️",
-        "4-5": "Easter Sunday 🐣",
-        "12-24": "Christmas Eve 🎄",
-        "12-25": "Christmas Day 🎄",
-
-        // International Days
-        "1-1": "New Year's Day 🎉",
-        "1-4": "World Braille Day",
-        "1-24": "International Day of Education",
-        "1-26": "International Customs Day",
-        "2-4": "World Cancer Day",
-        "2-11": "International Day of Women and Girls in Science",
-        "2-13": "World Radio Day",
-        "2-14": "Valentine's Day 💝",
-        "2-20": "World Day of Social Justice",
-        "3-8": "International Women's Day 👩",
-        "3-15": "World Consumer Rights Day",
-        "3-20": "International Day of Happiness",
-        "3-21": "World Poetry Day",
-        "3-22": "World Water Day 💧",
-        "3-23": "World Meteorological Day",
-        "4-2": "World Autism Awareness Day",
-        "4-7": "World Health Day 🏥",
-        "4-22": "Earth Day 🌍",
-        "4-23": "World Book Day 📚",
-        "5-3": "World Press Freedom Day",
-        "5-8": "World Red Cross Day",
-        "5-15": "International Day of Families",
-        "5-17": "World Telecommunication Day",
-        "5-31": "World No Tobacco Day",
-        "6-5": "World Environment Day 🌱",
-        "6-8": "World Ocean Day 🌊",
-        "6-14": "World Blood Donor Day",
-        "6-20": "World Refugee Day",
-        "6-26": "International Day Against Drug Abuse",
-        "7-11": "World Population Day",
-        "8-9": "International Day of World's Indigenous Peoples",
-        "8-12": "International Youth Day",
-        "8-19": "World Humanitarian Day",
-        "9-8": "International Literacy Day 📖",
-        "9-15": "International Day of Democracy",
-        "9-16": "International Day for Preservation of Ozone Layer",
-        "9-21": "International Day of Peace ☮️",
-        "9-27": "World Tourism Day",
-        "10-1": "International Day of Older Persons",
-        "10-2": "International Day of Non-Violence",
-        "10-5": "World Teachers' Day 👨‍🏫",
-        "10-10": "World Mental Health Day",
-        "10-16": "World Food Day 🍚",
-        "10-24": "United Nations Day 🇺🇳",
-        "11-14": "World Diabetes Day",
-        "11-16": "International Day for Tolerance",
-        "11-19": "World Toilet Day",
-        "11-20": "Universal Children's Day 👶",
-        "11-25": "International Day for Elimination of Violence Against Women",
-        "12-1": "World AIDS Day",
-        "12-2": "International Day for Abolition of Slavery",
-        "12-3": "International Day of Persons with Disabilities",
-        "12-5": "International Volunteer Day",
-        "12-10": "Human Rights Day",
-        "12-31": "New Year's Eve 🎆",
-      };
-
-      // Update today's date display
-      function updateTodayDate() {
-        const today = new Date();
-        const months = [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ];
-        const days = [
-          "SUNDAY",
-          "MONDAY",
-          "TUESDAY",
-          "WEDNESDAY",
-          "THURSDAY",
-          "FRIDAY",
-          "SATURDAY",
-        ];
-
-        // English date
-        const day = today.getDate();
-        const month = months[today.getMonth()];
-        const year = today.getFullYear();
-        const dayName = days[today.getDay()];
-
-        document.getElementById("englishDate").textContent =
-          `${day} ${month} ${year}`;
-        document.getElementById("dayName").textContent = dayName;
-
-        // Bengali date
-        const bengaliDate = toBengaliDate(today);
-        document.getElementById("bengaliDate").textContent = bengaliDate;
-
-        // Special event
-        const monthDay = `${today.getMonth() + 1}-${day}`;
-        const event = specialEvents[monthDay];
-        if (event) {
-          document.getElementById("specialEvent").textContent = `(${event})`;
+        if (foundClass && classSlot) {
+          showTimer(foundClass, classSlot, currentTime);
         } else {
-          document.getElementById("specialEvent").textContent = "";
-        }
-      }
-
-      // Initialize
-      updateTodayDate();
-
-      // Auto-update at midnight
-      function scheduleNextMidnightUpdate() {
-        const now = new Date();
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
-
-        const timeUntilMidnight = tomorrow - now;
-
-        setTimeout(() => {
-          updateTodayDate();
-          // Schedule next update
-          scheduleNextMidnightUpdate();
-
-          // Also reload the routine to highlight today's row correctly
-          if (typeof window.loadRoutine === "function") {
-            window.loadRoutine();
-          }
-        }, timeUntilMidnight);
-      }
-
-      scheduleNextMidnightUpdate();
-    </script>
-
-    <script type="module">
-      /* =========================
-     CLASS DURATION TIMER
-     Shows live progress of current class
-  ========================= */
-
-      import {
-        getDoc,
-        doc,
-      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-      let currentClassData = null;
-      let timerInterval = null;
-
-      async function updateClassTimer() {
-        const now = new Date();
-        const currentDay = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][
-          now.getDay()
-        ];
-        const currentTime = now.getHours() * 60 + now.getMinutes(); // minutes since midnight
-
-        try {
-          // Load time slots
-          const slotsSnap = await getDoc(
-            doc(window.db, "settings", "timeSlots"),
-          );
-          const timeSlots = slotsSnap.exists() ? slotsSnap.data().slots : [];
-
-          // Load today's routine
-          const routineSnap = await getDoc(
-            doc(window.db, "routine", currentDay),
-          );
-          if (!routineSnap.exists()) {
-            hideTimer();
-            return;
-          }
-
-          const classes = routineSnap.data().classes || [];
-
-          // Find current class
-          let foundClass = null;
-          let classSlot = null;
-
-          for (const cls of classes) {
-            const slot = timeSlots.find((s) => s.time === cls.time);
-            if (!slot) continue;
-
-            const [startHour, startMin] = slot.start.split(":").map(Number);
-            const [endHour, endMin] = slot.end.split(":").map(Number);
-
-            const startTime = startHour * 60 + startMin;
-            const endTime = endHour * 60 + endMin;
-
-            if (currentTime >= startTime && currentTime < endTime) {
-              foundClass = cls;
-              classSlot = slot;
-              break;
-            }
-          }
-
-          if (foundClass && classSlot) {
-            showTimer(foundClass, classSlot, currentTime);
-          } else {
-            hideTimer();
-          }
-        } catch (error) {
-          console.error("Error updating class timer:", error);
           hideTimer();
         }
+      } catch (error) {
+        console.error("Error updating class timer:", error);
+        hideTimer();
       }
+    }
 
-      function showTimer(classData, slot, currentTime) {
-        const timer = document.getElementById("classDurationTimer");
-        timer.classList.remove("hidden");
+    function showTimer(classData, slot, currentTime) {
+      const timer = document.getElementById("classDurationTimer");
+      timer.classList.remove("hidden");
 
-        // Parse times
-        const [startHour, startMin] = slot.start.split(":").map(Number);
-        const [endHour, endMin] = slot.end.split(":").map(Number);
+      // Parse times
+      const [startHour, startMin] = slot.start.split(":").map(Number);
+      const [endHour, endMin] = slot.end.split(":").map(Number);
 
-        const startTime = startHour * 60 + startMin;
-        const endTime = endHour * 60 + endMin;
+      const startTime = startHour * 60 + startMin;
+      const endTime = endHour * 60 + endMin;
 
-        const totalDuration = endTime - startTime;
-        const elapsed = currentTime - startTime;
-        const remaining = endTime - currentTime;
+      const totalDuration = endTime - startTime;
+      const elapsed = currentTime - startTime;
+      const remaining = endTime - currentTime;
 
-        // Update UI
-        document.getElementById("timerClassName").textContent =
-          classData.subject;
-        document.getElementById("timerRoom").textContent =
-          `Room ${classData.room} • ${classData.code}`;
+      // Update UI
+      document.getElementById("timerClassName").textContent =
+        classData.subject;
+      document.getElementById("timerRoom").textContent =
+        `Room ${classData.room} • ${classData.code}`;
 
-        // Format times for display
-        const formatTime = (hour, min) => {
-          const period = hour >= 12 ? "PM" : "AM";
-          const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-          return `${displayHour}:${min.toString().padStart(2, "0")} ${period}`;
-        };
+      // Format times for display
+      const formatTime = (hour, min) => {
+        const period = hour >= 12 ? "PM" : "AM";
+        const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+        return `${displayHour}:${min.toString().padStart(2, "0")} ${period}`;
+      };
 
-        document.getElementById("timerStartTime").textContent =
-          `Started: ${formatTime(startHour, startMin)}`;
-        document.getElementById("timerEndTime").textContent =
-          `Ends: ${formatTime(endHour, endMin)}`;
+      document.getElementById("timerStartTime").textContent =
+        `Started: ${formatTime(startHour, startMin)}`;
+      document.getElementById("timerEndTime").textContent =
+        `Ends: ${formatTime(endHour, endMin)}`;
 
-        // Update countdown
-        if (remaining <= 5) {
-          document.getElementById("timerStatus").textContent =
-            "⚠️ Class ending in";
-          document.getElementById("timerMinutes").textContent =
-            `${remaining} ${remaining === 1 ? "minute" : "minutes"}!`;
-          timer.classList.add("ending-soon");
+      // Update countdown
+      if (remaining <= 5) {
+        document.getElementById("timerStatus").textContent =
+          "⚠️ Class ending in";
+        document.getElementById("timerMinutes").textContent =
+          `${remaining} ${remaining === 1 ? "minute" : "minutes"}!`;
+        timer.classList.add("ending-soon");
 
-          // Show browser notification for last minute
-          if (remaining === 1 && Notification.permission === "granted") {
-            new Notification("Class Ending Soon!", {
-              body: `${classData.subject} ends in 1 minute`,
-              icon: "/y.png",
-            });
-          }
-        } else {
-          document.getElementById("timerStatus").textContent = "Class ends in";
-          document.getElementById("timerMinutes").textContent =
-            `${remaining} minutes`;
-          timer.classList.remove("ending-soon");
+        // Show browser notification for last minute
+        if (remaining === 1 && Notification.permission === "granted") {
+          new Notification("Class Ending Soon!", {
+            body: `${classData.subject} ends in 1 minute`,
+            icon: "/y.png",
+          });
         }
-
-        // Update progress bar
-        const progress = (elapsed / totalDuration) * 100;
-        document.getElementById("timerProgressBar").style.width =
-          `${Math.min(progress, 100)}%`;
+      } else {
+        document.getElementById("timerStatus").textContent = "Class ends in";
+        document.getElementById("timerMinutes").textContent =
+          `${remaining} minutes`;
+        timer.classList.remove("ending-soon");
       }
 
-      function hideTimer() {
-        document.getElementById("classDurationTimer").classList.add("hidden");
+      // Update progress bar
+      const progress = (elapsed / totalDuration) * 100;
+      document.getElementById("timerProgressBar").style.width =
+        `${Math.min(progress, 100)}%`;
+    }
+
+    function hideTimer() {
+      document.getElementById("classDurationTimer").classList.add("hidden");
+    }
+
+    // Request notification permission
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
+    // Update timer every minute
+    updateClassTimer();
+    timerInterval = setInterval(updateClassTimer, 60000); // Update every 60 seconds
+
+    // Also update every 10 seconds for more accurate progress bar
+    setInterval(() => {
+      const timer = document.getElementById("classDurationTimer");
+      if (!timer.classList.contains("hidden")) {
+        updateClassTimer();
       }
+    }, 10000);
+  </script>
 
-      // Request notification permission
-      if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission();
-      }
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js");
+    }
+  </script>
 
-      // Update timer every minute
-      updateClassTimer();
-      timerInterval = setInterval(updateClassTimer, 60000); // Update every 60 seconds
+  <script>
+    let deferredPrompt;
+    const installBtn = document.getElementById("installBtn");
+    const installBanner = document.getElementById("installBanner");
+    const bannerInstallBtn = document.getElementById("bannerInstallBtn");
+    const bannerDismissBtn = document.getElementById("bannerDismissBtn");
 
-      // Also update every 10 seconds for more accurate progress bar
-      setInterval(() => {
-        const timer = document.getElementById("classDurationTimer");
-        if (!timer.classList.contains("hidden")) {
-          updateClassTimer();
-        }
-      }, 10000);
-    </script>
+    // Check if banner was already dismissed
+    const bannerDismissed = localStorage.getItem("installBannerDismissed");
 
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/service-worker.js");
-      }
-    </script>
+    // Show banner after 3 seconds if not dismissed before
+    if (!bannerDismissed) {
+      setTimeout(() => {
+        installBanner.classList.remove("hidden");
+      }, 3000);
+    }
 
-    <script>
-      let deferredPrompt;
-      const installBtn = document.getElementById("installBtn");
-      const installBanner = document.getElementById("installBanner");
-      const bannerInstallBtn = document.getElementById("bannerInstallBtn");
-      const bannerDismissBtn = document.getElementById("bannerDismissBtn");
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.hidden = false;
 
-      // Check if banner was already dismissed
-      const bannerDismissed = localStorage.getItem("installBannerDismissed");
-
-      // Show banner after 3 seconds if not dismissed before
+      // Show banner if not dismissed
       if (!bannerDismissed) {
-        setTimeout(() => {
-          installBanner.classList.remove("hidden");
-        }, 3000);
+        installBanner.classList.remove("hidden");
       }
+    });
 
-      window.addEventListener("beforeinstallprompt", (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installBtn.hidden = false;
-
-        // Show banner if not dismissed
-        if (!bannerDismissed) {
-          installBanner.classList.remove("hidden");
-        }
-      });
-
-      // Install from bottom button
-      installBtn.addEventListener("click", async () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          const { outcome } = await deferredPrompt.userChoice;
-          if (outcome === "accepted") {
-            installBanner.classList.add("hidden");
-            localStorage.setItem("installBannerDismissed", "true");
-          }
-          installBtn.hidden = true;
-          deferredPrompt = null;
-        }
-      });
-
-      // Install from banner button
-      bannerInstallBtn.addEventListener("click", async () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          const { outcome } = await deferredPrompt.userChoice;
-          if (outcome === "accepted") {
-            installBanner.classList.add("hidden");
-            localStorage.setItem("installBannerDismissed", "true");
-          }
-          deferredPrompt = null;
-        } else {
-          // If browser prompt not available, just hide banner
+    // Install from bottom button
+    installBtn.addEventListener("click", async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") {
           installBanner.classList.add("hidden");
           localStorage.setItem("installBannerDismissed", "true");
         }
-      });
+        installBtn.hidden = true;
+        deferredPrompt = null;
+      }
+    });
 
-      // Dismiss banner
-      bannerDismissBtn.addEventListener("click", () => {
+    // Install from banner button
+    bannerInstallBtn.addEventListener("click", async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") {
+          installBanner.classList.add("hidden");
+          localStorage.setItem("installBannerDismissed", "true");
+        }
+        deferredPrompt = null;
+      } else {
+        // If browser prompt not available, just hide banner
         installBanner.classList.add("hidden");
         localStorage.setItem("installBannerDismissed", "true");
-      });
-    </script>
+      }
+    });
 
-    <script>
-      /* ==========================================
-     PREMIUM FEATURES: SPLASH, TOAST, SKELETON
-  ========================================== */
+    // Dismiss banner
+    bannerDismissBtn.addEventListener("click", () => {
+      installBanner.classList.add("hidden");
+      localStorage.setItem("installBannerDismissed", "true");
+    });
+  </script>
 
-      // 1. SPLASH SCREEN - Auto hide after 2 seconds
-      window.addEventListener("load", () => {
-        setTimeout(() => {
-          const splash = document.getElementById("splashScreen");
-          if (splash) {
-            splash.style.display = "none";
-          }
-        }, 2500); // 2.5 seconds total (includes fade out)
-      });
+  <script>
+    /* ==========================================
+   PREMIUM FEATURES: SPLASH, TOAST, SKELETON
+========================================== */
 
-      // 2. TOAST NOTIFICATION SYSTEM
-      window.showToast = function (options) {
-        const {
-          title = "Notification",
-          message = "",
-          type = "info", // success, error, warning, info
-          duration = 3000,
-          icon = null,
-        } = options;
+    // 1. SPLASH SCREEN - Auto hide after 2 seconds
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        const splash = document.getElementById("splashScreen");
+        if (splash) {
+          splash.style.display = "none";
+        }
+      }, 2500); // 2.5 seconds total (includes fade out)
+    });
 
-        const container = document.getElementById("toastContainer");
-        if (!container) return;
+    // 2. TOAST NOTIFICATION SYSTEM
+    window.showToast = function (options) {
+      const {
+        title = "Notification",
+        message = "",
+        type = "info", // success, error, warning, info
+        duration = 3000,
+        icon = null,
+      } = options;
 
-        // Create toast element
-        const toast = document.createElement("div");
-        toast.className = `toast ${type}`;
+      const container = document.getElementById("toastContainer");
+      if (!container) return;
 
-        // Default icons based on type
-        const icons = {
-          success: "✓",
-          error: "✕",
-          warning: "⚠",
-          info: "ℹ",
-        };
+      // Create toast element
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
 
-        const toastIcon = icon || icons[type] || "ℹ";
+      // Default icons based on type
+      const icons = {
+        success: "✓",
+        error: "✕",
+        warning: "⚠",
+        info: "ℹ",
+      };
 
-        toast.innerHTML = `
+      const toastIcon = icon || icons[type] || "ℹ";
+
+      toast.innerHTML = `
       <div class="toast-icon">${toastIcon}</div>
       <div class="toast-content">
         <div class="toast-title">${title}</div>
@@ -1182,115 +1236,115 @@
       <div class="toast-progress"></div>
     `;
 
-        container.appendChild(toast);
+      container.appendChild(toast);
 
-        // Auto remove after duration
-        setTimeout(() => {
-          toast.classList.add("hiding");
-          setTimeout(() => toast.remove(), 400);
-        }, duration);
-      };
+      // Auto remove after duration
+      setTimeout(() => {
+        toast.classList.add("hiding");
+        setTimeout(() => toast.remove(), 400);
+      }, duration);
+    };
 
-      // 3. SKELETON LOADERS - Show while content loads
-      function showSkeletonLoaders() {
-        const tableContainer = document.querySelector(".table-container");
-        if (!tableContainer) return;
+    // 3. SKELETON LOADERS - Show while content loads
+    function showSkeletonLoaders() {
+      const tableContainer = document.querySelector(".table-container");
+      if (!tableContainer) return;
 
-        // Create skeleton HTML
-        const skeletonHTML = `
+      // Create skeleton HTML
+      const skeletonHTML = `
       <div class="skeleton skeleton-date"></div>
       <div class="skeleton skeleton-countdown"></div>
       <div class="skeleton skeleton-table"></div>
     `;
 
-        // Show skeletons temporarily
-        const skeletonWrapper = document.createElement("div");
-        skeletonWrapper.id = "skeletonLoader";
-        skeletonWrapper.innerHTML = skeletonHTML;
-        tableContainer.insertBefore(skeletonWrapper, tableContainer.firstChild);
+      // Show skeletons temporarily
+      const skeletonWrapper = document.createElement("div");
+      skeletonWrapper.id = "skeletonLoader";
+      skeletonWrapper.innerHTML = skeletonHTML;
+      tableContainer.insertBefore(skeletonWrapper, tableContainer.firstChild);
+    }
+
+    function hideSkeletonLoaders() {
+      const skeletonLoader = document.getElementById("skeletonLoader");
+      if (skeletonLoader) {
+        skeletonLoader.remove();
+      }
+    }
+
+    // Show skeletons on page load
+    showSkeletonLoaders();
+
+    // Hide skeletons when content is loaded (after script.js loads the routine)
+    window.addEventListener("load", () => {
+      // Wait for Firebase data to load
+      setTimeout(() => {
+        hideSkeletonLoaders();
+
+        // Show welcome toast
+        showToast({
+          title: "Welcome! 👋",
+          message: "Your class routine is ready",
+          type: "success",
+          duration: 3000,
+        });
+      }, 1500);
+    });
+
+    // Make toast function globally available for other scripts
+    window.addEventListener("message", (event) => {
+      if (event.data.type === "showToast") {
+        showToast(event.data.options);
+      }
+    });
+  </script>
+  <script type="module">
+    /* ==========================================
+       EXAM ROUTINE MODE DETECTION + SWITCHER
+    ========================================== */
+
+    let examEntriesCache = [];
+
+    function showMainView() {
+      const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
+      const examSection = document.getElementById("examRoutineSection");
+      if (mainTable) {
+        mainTable.querySelectorAll(".routine-table, #classDurationTimer, #countdownStack")
+          .forEach(el => el.style.display = "");
+      }
+      if (examSection) examSection.style.display = "none";
+      document.getElementById("switchMain").classList.add("active");
+      document.getElementById("switchExam").classList.remove("active");
+    }
+
+    function showExamView() {
+      const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
+      const examSection = document.getElementById("examRoutineSection");
+      if (mainTable) {
+        mainTable.querySelectorAll(".routine-table, #classDurationTimer, #countdownStack")
+          .forEach(el => el.style.display = "none");
+      }
+      if (examSection) examSection.style.display = "block";
+      document.getElementById("switchMain").classList.remove("active");
+      document.getElementById("switchExam").classList.add("active");
+    }
+
+    function renderExamEntries() {
+      const tbody = document.getElementById("examRoutineBody");
+      tbody.innerHTML = "";
+      const todayStr = new Date().toISOString().split("T")[0];
+
+      if (examEntriesCache.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">&gt;_ No exam entries found.</td></tr>';
+        return;
       }
 
-      function hideSkeletonLoaders() {
-        const skeletonLoader = document.getElementById("skeletonLoader");
-        if (skeletonLoader) {
-          skeletonLoader.remove();
-        }
-      }
-
-      // Show skeletons on page load
-      showSkeletonLoaders();
-
-      // Hide skeletons when content is loaded (after script.js loads the routine)
-      window.addEventListener("load", () => {
-        // Wait for Firebase data to load
-        setTimeout(() => {
-          hideSkeletonLoaders();
-
-          // Show welcome toast
-          showToast({
-            title: "Welcome! 👋",
-            message: "Your class routine is ready",
-            type: "success",
-            duration: 3000,
-          });
-        }, 1500);
-      });
-
-      // Make toast function globally available for other scripts
-      window.addEventListener("message", (event) => {
-        if (event.data.type === "showToast") {
-          showToast(event.data.options);
-        }
-      });
-    </script>
-    <script type="module">
-      /* ==========================================
-         EXAM ROUTINE MODE DETECTION + SWITCHER
-      ========================================== */
-
-      let examEntriesCache = [];
-
-      function showMainView() {
-        const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
-        const examSection = document.getElementById("examRoutineSection");
-        if (mainTable) {
-          mainTable.querySelectorAll(".routine-table, #classDurationTimer, #countdownStack")
-            .forEach(el => el.style.display = "");
-        }
-        if (examSection) examSection.style.display = "none";
-        document.getElementById("switchMain").classList.add("active");
-        document.getElementById("switchExam").classList.remove("active");
-      }
-
-      function showExamView() {
-        const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
-        const examSection = document.getElementById("examRoutineSection");
-        if (mainTable) {
-          mainTable.querySelectorAll(".routine-table, #classDurationTimer, #countdownStack")
-            .forEach(el => el.style.display = "none");
-        }
-        if (examSection) examSection.style.display = "block";
-        document.getElementById("switchMain").classList.remove("active");
-        document.getElementById("switchExam").classList.add("active");
-      }
-
-      function renderExamEntries() {
-        const tbody = document.getElementById("examRoutineBody");
-        tbody.innerHTML = "";
-        const todayStr = new Date().toISOString().split("T")[0];
-
-        if (examEntriesCache.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">&gt;_ No exam entries found.</td></tr>';
-          return;
-        }
-
-        examEntriesCache.forEach((e, i) => {
-          const isToday = e.date === todayStr;
-          const isPast  = e.date < todayStr;
-          const tr = document.createElement("tr");
-          if (isToday) tr.className = "exam-today-row";
-          if (isPast)  tr.style.opacity = "0.45";
-          tr.innerHTML = `
+      examEntriesCache.forEach((e, i) => {
+        const isToday = e.date === todayStr;
+        const isPast = e.date < todayStr;
+        const tr = document.createElement("tr");
+        if (isToday) tr.className = "exam-today-row";
+        if (isPast) tr.style.opacity = "0.45";
+        tr.innerHTML = `
             <td>
               <span class="exam-serial">${i + 1}</span>
               ${isToday ? '<span class="exam-today-badge">TODAY</span>' : ''}
@@ -1304,69 +1358,79 @@
             <td><span class="exam-time">⏰ ${e.time}</span></td>
             <td><span class="exam-room">🏫 ${e.room}</span></td>
           `;
-          tbody.appendChild(tr);
-        });
-      }
+        tbody.appendChild(tr);
+      });
+    }
 
-      // Switcher buttons
-      window.switchToMain = function() { showMainView(); };
-      window.switchToExam = function() { showExamView(); renderExamEntries(); };
+    // Switcher buttons
+    window.switchToMain = function () { showMainView(); };
+    window.switchToExam = function () { showExamView(); renderExamEntries(); };
 
-      async function checkExamMode() {
-        const db = window.db;
-        if (!db) { setTimeout(checkExamMode, 500); return; }
+    async function checkExamMode() {
+      const db = window.db;
+      if (!db) { setTimeout(checkExamMode, 500); return; }
 
-        try {
-          const docFn        = window._fbDoc;
-          const getDocFn     = window._fbGetDoc;
-          const getDocsFn    = window._fbGetDocs;
-          const collectionFn = window._fbCollection;
+      try {
+        const docFn = window._fbDoc;
+        const getDocFn = window._fbGetDoc;
+        const getDocsFn = window._fbGetDocs;
+        const collectionFn = window._fbCollection;
 
-          // 1. Fetch admin's default mode
-          const modeSnap   = await getDocFn(docFn(db, "settings", "examMode"));
-          const isExamMode = modeSnap.exists() && modeSnap.data().active === true;
+        // 1. Fetch admin's default mode
+        const modeSnap = await getDocFn(docFn(db, "settings", "examMode"));
+        const isExamMode = modeSnap.exists() && modeSnap.data().active === true;
 
-          // 2. Pre-load exam entries into cache
-          const snap = await getDocsFn(collectionFn(db, "examRoutine"));
-          examEntriesCache = [];
-          snap.forEach(d => examEntriesCache.push({ id: d.id, ...d.data() }));
-          examEntriesCache.sort((a, b) => a.date.localeCompare(b.date));
+        // 2. Pre-load exam entries into cache
+        const snap = await getDocsFn(collectionFn(db, "examRoutine"));
+        examEntriesCache = [];
+        snap.forEach(d => examEntriesCache.push({ id: d.id, ...d.data() }));
+        examEntriesCache.sort((a, b) => a.date.localeCompare(b.date));
 
-          // 3. Show switcher only if exam entries exist
-          if (examEntriesCache.length > 0) {
-            document.getElementById("routineSwitcher").classList.remove("hidden");
-          }
-
-          // 4. Apply admin's default view (no sessionStorage — resets on every reload)
-          if (isExamMode) {
-            showExamView();
-            renderExamEntries();
-            setTimeout(() => {
-              if (window.showToast) {
-                window.showToast({
-                  title: "📝 Exam Routine Active",
-                  message: "Showing exam schedule — good luck!",
-                  type: "info",
-                  duration: 4000
-                });
-              }
-            }, 2000);
-          } else {
-            showMainView();
-          }
-
-        } catch(err) {
-          console.error("Exam mode check failed:", err);
+        // 3. Show switcher only if exam entries exist
+        if (examEntriesCache.length > 0) {
+          document.getElementById("routineSwitcher").classList.remove("hidden");
         }
-      }
 
-      if (window.db) {
-        checkExamMode();
-      } else {
-        window.addEventListener("load", () => setTimeout(checkExamMode, 800));
+        // 4. Apply admin's default view (no sessionStorage — resets on every reload)
+        if (isExamMode) {
+          showExamView();
+          renderExamEntries();
+          setTimeout(() => {
+            if (window.showToast) {
+              window.showToast({
+                title: "📝 Exam Routine Active",
+                message: "Showing exam schedule — good luck!",
+                type: "info",
+                duration: 4000
+              });
+            }
+          }, 2000);
+        } else {
+          showMainView();
+        }
+
+      } catch (err) {
+        console.error("Exam mode check failed:", err);
       }
-    </script>
-      <button id="darkModeToggle" class="dark-toggle-btn">🌙</button>
+    }
+
+    if (window.db) {
+      checkExamMode();
+    } else {
+      window.addEventListener("load", () => setTimeout(checkExamMode, 800));
+    }
+  </script>
+  <div class="theme-switcher">
+    <button id="themeToggleBtn" class="dark-toggle-btn">🎨</button>
+
+    <div id="themeMenu" class="theme-menu hidden">
+      <button onclick="setTheme('amoled')">🌙 AMOLED</button>
+      <button onclick="setTheme('glass')">🔵 Glass Blue</button>
+      <button onclick="setTheme('matrix')">🟢 Matrix</button>
+      <button onclick="setTheme('cyberpunk')">🟣 Cyberpunk</button>
+      <button onclick="setTheme('light')">⚪ Minimal</button>
+    </div>
+  </div>
 
   <style>
     /* ==========================================
@@ -1378,12 +1442,10 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(
-        135deg,
-        #0d47a1 0%,
-        #1976d2 50%,
-        #2196f3 100%
-      );
+      background: linear-gradient(135deg,
+          #0d47a1 0%,
+          #1976d2 50%,
+          #2196f3 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1408,6 +1470,7 @@
         opacity: 0;
         transform: translateY(30px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -1423,10 +1486,12 @@
     }
 
     @keyframes splashBounce {
+
       0%,
       100% {
         transform: translateY(0);
       }
+
       50% {
         transform: translateY(-10px);
       }
@@ -1468,10 +1533,12 @@
     }
 
     @keyframes splashPulse {
+
       0%,
       100% {
         opacity: 0.7;
       }
+
       50% {
         opacity: 1;
       }
@@ -1515,6 +1582,7 @@
         opacity: 0;
         transform: translateX(400px);
       }
+
       to {
         opacity: 1;
         transform: translateX(0);
@@ -1608,6 +1676,7 @@
       from {
         width: 100%;
       }
+
       to {
         width: 0%;
       }
@@ -1657,12 +1726,10 @@
    SKELETON LOADERS
 ========================================== */
     .skeleton {
-      background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.2) 50%,
-        rgba(255, 255, 255, 0.1) 100%
-      );
+      background: linear-gradient(90deg,
+          rgba(255, 255, 255, 0.1) 0%,
+          rgba(255, 255, 255, 0.2) 50%,
+          rgba(255, 255, 255, 0.1) 100%);
       background-size: 200% 100%;
       animation: skeletonLoading 1.5s ease-in-out infinite;
       border-radius: 8px;
@@ -1672,6 +1739,7 @@
       0% {
         background-position: 200% 0;
       }
+
       100% {
         background-position: -200% 0;
       }
@@ -1695,22 +1763,18 @@
     }
 
     body.manual-dark .skeleton {
-      background: linear-gradient(
-        90deg,
-        rgba(100, 181, 246, 0.05) 0%,
-        rgba(100, 181, 246, 0.1) 50%,
-        rgba(100, 181, 246, 0.05) 100%
-      );
+      background: linear-gradient(90deg,
+          rgba(100, 181, 246, 0.05) 0%,
+          rgba(100, 181, 246, 0.1) 50%,
+          rgba(100, 181, 246, 0.05) 100%);
     }
 
     @media (prefers-color-scheme: dark) {
       .skeleton {
-        background: linear-gradient(
-          90deg,
-          rgba(100, 181, 246, 0.05) 0%,
-          rgba(100, 181, 246, 0.1) 50%,
-          rgba(100, 181, 246, 0.05) 100%
-        );
+        background: linear-gradient(90deg,
+            rgba(100, 181, 246, 0.05) 0%,
+            rgba(100, 181, 246, 0.1) 50%,
+            rgba(100, 181, 246, 0.05) 100%);
       }
     }
 
@@ -1837,12 +1901,10 @@
 
     /* Today's Date Section */
     .today-date-section {
-      background: linear-gradient(
-        135deg,
-        #1565c0 0%,
-        #1976d2 50%,
-        #2196f3 100%
-      );
+      background: linear-gradient(135deg,
+          #1565c0 0%,
+          #1976d2 50%,
+          #2196f3 100%);
       color: white;
       padding: 20px;
       margin-bottom: 20px;
@@ -1942,12 +2004,10 @@
 
     /* Dark mode for date section */
     body.manual-dark .today-date-section {
-      background: linear-gradient(
-        135deg,
-        #1a237e 0%,
-        #0d47a1 50%,
-        #1565c0 100%
-      );
+      background: linear-gradient(135deg,
+          #1a237e 0%,
+          #0d47a1 50%,
+          #1565c0 100%);
       box-shadow:
         0 8px 24px rgba(0, 0, 0, 0.5),
         0 0 40px rgba(33, 150, 243, 0.3);
@@ -1955,12 +2015,10 @@
 
     @media (prefers-color-scheme: dark) {
       .today-date-section {
-        background: linear-gradient(
-          135deg,
-          #1a237e 0%,
-          #0d47a1 50%,
-          #1565c0 100%
-        );
+        background: linear-gradient(135deg,
+            #1a237e 0%,
+            #0d47a1 50%,
+            #1565c0 100%);
         box-shadow:
           0 8px 24px rgba(0, 0, 0, 0.5),
           0 0 40px rgba(33, 150, 243, 0.3);
@@ -1983,12 +2041,14 @@
     }
 
     @keyframes timerPulse {
+
       0%,
       100% {
         box-shadow:
           0 10px 30px rgba(22, 163, 74, 0.4),
           0 0 50px rgba(34, 197, 94, 0.2);
       }
+
       50% {
         box-shadow:
           0 12px 35px rgba(22, 163, 74, 0.5),
@@ -2002,12 +2062,14 @@
     }
 
     @keyframes urgentPulse {
+
       0%,
       100% {
         box-shadow:
           0 10px 30px rgba(220, 38, 38, 0.5),
           0 0 50px rgba(239, 68, 68, 0.3);
       }
+
       50% {
         box-shadow:
           0 15px 40px rgba(220, 38, 38, 0.7),
@@ -2028,10 +2090,12 @@
     }
 
     @keyframes iconBounce {
+
       0%,
       100% {
         transform: translateY(0);
       }
+
       50% {
         transform: translateY(-5px);
       }
@@ -2101,12 +2165,10 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.3),
-        transparent
-      );
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent);
       animation: shimmer 2s infinite;
     }
 
@@ -2114,6 +2176,7 @@
       0% {
         transform: translateX(-100%);
       }
+
       100% {
         transform: translateX(100%);
       }
@@ -2220,44 +2283,34 @@
 
     /* Force dark mode when active */
     body.manual-dark {
-      background: linear-gradient(
-        135deg,
-        #0a0e27 0%,
-        #16213e 25%,
-        #1a1a2e 50%,
-        #0f3460 75%,
-        #0a0e27 100%
-      ) !important;
+      background: linear-gradient(135deg,
+          #0a0e27 0%,
+          #16213e 25%,
+          #1a1a2e 50%,
+          #0f3460 75%,
+          #0a0e27 100%) !important;
     }
 
     body.manual-dark::before {
       background:
-        radial-gradient(
-          circle at 20% 50%,
+        radial-gradient(circle at 20% 50%,
           rgba(79, 172, 254, 0.15) 0%,
-          transparent 50%
-        ),
-        radial-gradient(
-          circle at 80% 80%,
+          transparent 50%),
+        radial-gradient(circle at 80% 80%,
           rgba(52, 152, 219, 0.15) 0%,
-          transparent 50%
-        ),
-        radial-gradient(
-          circle at 40% 20%,
+          transparent 50%),
+        radial-gradient(circle at 40% 20%,
           rgba(41, 128, 185, 0.2) 0%,
-          transparent 50%
-        ) !important;
+          transparent 50%) !important;
     }
 
     body.manual-dark .hero {
-      background: linear-gradient(
-        135deg,
-        #1a1a2e 0%,
-        #16213e 25%,
-        #0f3460 50%,
-        #1a237e 75%,
-        #0d47a1 100%
-      ) !important;
+      background: linear-gradient(135deg,
+          #1a1a2e 0%,
+          #16213e 25%,
+          #0f3460 50%,
+          #1a237e 75%,
+          #0d47a1 100%) !important;
       box-shadow:
         0 10px 40px rgba(0, 0, 0, 0.6),
         0 0 60px rgba(33, 150, 243, 0.2),
@@ -2314,11 +2367,9 @@
     }
 
     body.manual-dark .active-class {
-      background: linear-gradient(
-        135deg,
-        rgba(27, 94, 32, 0.4),
-        rgba(46, 125, 50, 0.4)
-      ) !important;
+      background: linear-gradient(135deg,
+          rgba(27, 94, 32, 0.4),
+          rgba(46, 125, 50, 0.4)) !important;
       border: 2px solid #66bb6a !important;
     }
 
@@ -2332,11 +2383,9 @@
     }
 
     body.manual-dark .upcoming-class {
-      background: linear-gradient(
-        135deg,
-        rgba(230, 81, 0, 0.3),
-        rgba(245, 124, 0, 0.3)
-      ) !important;
+      background: linear-gradient(135deg,
+          rgba(230, 81, 0, 0.3),
+          rgba(245, 124, 0, 0.3)) !important;
       border: 2px solid #ff9800 !important;
     }
 
@@ -2356,11 +2405,9 @@
     }
 
     body.manual-dark .cancelled-class {
-      background: linear-gradient(
-        135deg,
-        rgba(183, 28, 28, 0.3),
-        rgba(211, 47, 47, 0.3)
-      ) !important;
+      background: linear-gradient(135deg,
+          rgba(183, 28, 28, 0.3),
+          rgba(211, 47, 47, 0.3)) !important;
       border: 2px solid #e53935 !important;
     }
 
@@ -2406,7 +2453,7 @@
       color: #90caf9 !important;
       border-top: 1px solid rgba(100, 181, 246, 0.2) !important;
     }
-  
+
     /* ========== ROUTINE SWITCHER ========== */
     .routine-switcher {
       display: flex;
@@ -2415,13 +2462,15 @@
       margin: 16px auto 0;
       max-width: 400px;
       padding: 6px;
-      background: rgba(255,255,255,0.07);
+      background: rgba(255, 255, 255, 0.07);
       border-radius: 50px;
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(10px);
     }
 
-    .routine-switcher.hidden { display: none; }
+    .routine-switcher.hidden {
+      display: none;
+    }
 
     .switcher-btn {
       flex: 1;
@@ -2433,27 +2482,26 @@
       cursor: pointer;
       transition: all 0.3s ease;
       background: transparent;
-      color: rgba(255,255,255,0.55);
+      color: rgba(255, 255, 255, 0.55);
       letter-spacing: 0.5px;
     }
 
     .switcher-btn.active {
       background: linear-gradient(135deg, #0ea5e9, #38bdf8);
       color: white;
-      box-shadow: 0 4px 15px rgba(14,165,233,0.45);
+      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.45);
     }
 
     .switcher-btn:not(.active):hover {
-      color: rgba(255,255,255,0.85);
-      background: rgba(255,255,255,0.1);
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.1);
     }
 
     body.manual-dark .routine-switcher {
-      background: rgba(0,20,50,0.6);
-      border-color: rgba(0,180,255,0.2);
+      background: rgba(0, 20, 50, 0.6);
+      border-color: rgba(0, 180, 255, 0.2);
     }
-
-</style>
+  </style>
 
   <script>
     const darkToggle = document.getElementById("darkModeToggle");
@@ -2477,5 +2525,6 @@
       }
     });
   </script>
-  </body>
+</body>
+
 </html>
