@@ -240,7 +240,7 @@ async function loadVacations() {
    VACATION BANNER (main page)
 ========================= */
 function checkVacationBanner() {
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = toLocalDateStr(new Date());
   const board = document.getElementById("noticeBoard");
   if (!board) return;
 
@@ -297,7 +297,7 @@ function markVacationRows() {
     if (!dayCode) return;
 
     const rowDate = getDateForDay(dayCode);
-    const rowDateStr = rowDate.toISOString().split("T")[0];
+    const rowDateStr = toLocalDateStr(rowDate);
 
     const activeVac = vacations.find(v => rowDateStr >= v.startDate && rowDateStr <= v.endDate);
     if (!activeVac) return;
@@ -394,6 +394,7 @@ function sendNotification(title, body) {
 function checkClassReminders() {
   const now = new Date();
   const today = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
+  const todayStr = toLocalDateStr(now);
 
   routineDays.forEach(day => {
     if (day.day !== today) return;
@@ -408,6 +409,18 @@ function checkClassReminders() {
       const diff = Math.floor((classTime - now) / 60000);
 
       if (diff === 15) {
+        // Don't notify for a class that isn't actually happening
+        if (isVacationDate(now)) return;
+        if (findExamForDateSlot(todayStr, cls.time)) return;
+        if (findCancellationForCell(day.day, cls.time, todayStr)) return;
+
+        // Don't notify for a "phantom" entry that doesn't match any
+        // real, displayed period (see the Engineering Drawing issue)
+        const matchesRealSlot = timeSlots.some(
+          slot => normalizeTimeSlot(slot) === normalizeTimeSlot(cls.time)
+        );
+        if (!matchesRealSlot) return;
+
         sendNotification(
           "📘 Upcoming Class",
           `${cls.subject} starts in 15 minutes`
@@ -678,6 +691,19 @@ function highlightToday() {
 /* =========================
    TIME HELPER FUNCTIONS
 ========================= */
+/* Formats a Date as a local YYYY-MM-DD calendar-date string.
+   IMPORTANT: don't use toISOString() for this — it converts to UTC,
+   which is 6 hours behind Bangladesh time. Between midnight and
+   6:00 AM local time, toISOString() would still report the
+   *previous* calendar day, causing vacation/exam/cancellation dates
+   (which are stored as local calendar dates) to mismatch by one day. */
+function toLocalDateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function parse12hTime(str) {
   const [time, mer] = str.trim().split(" ");
   let [h, m] = time.split(":").map(Number);
@@ -770,7 +796,7 @@ function findExamForDateSlot(dateStr, slot) {
 
 function findExamForCell(dayCode, slot) {
   const rowDate = getDateForDay(dayCode);
-  const rowDateStr = rowDate.toISOString().split("T")[0];
+  const rowDateStr = toLocalDateStr(rowDate);
   return findExamForDateSlot(rowDateStr, slot);
 }
 
@@ -817,7 +843,7 @@ function checkCurrentClass() {
     if (!cellDay) return;
 
     const rowDate = getDateForDay(cellDay);
-    const rowDateStr = rowDate.toISOString().split("T")[0];
+    const rowDateStr = toLocalDateStr(rowDate);
 
     /* 🏖️ HOLIDAY — vacation days override everything else */
     if (isVacationDate(rowDate)) {
@@ -983,7 +1009,7 @@ if (percent > 80) {
    GLOBAL NEXT CLASS COUNTDOWN
 ========================= */
 function isVacationDate(dateObj) {
-  const dateStr = dateObj.toISOString().split("T")[0];
+  const dateStr = toLocalDateStr(dateObj);
 
   return vacations.some(v =>
     dateStr >= v.startDate && dateStr <= v.endDate
@@ -1038,7 +1064,7 @@ function updateClassCountdown() {
         // Skip vacations
         if (isVacationDate(d)) continue;
 
-        const dStr = d.toISOString().split("T")[0];
+        const dStr = toLocalDateStr(d);
 
         // Skip occurrences superseded by an exam in this slot
         if (findExamForDateSlot(dStr, slot)) continue;
@@ -1231,7 +1257,7 @@ function highlightExamDays() {
   const dayCodeToIndex = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
 
   // Get upcoming exam dates only (today or future), as YYYY-MM-DD strings
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = toLocalDateStr(new Date());
   const examDates = new Set(
     academicEvents
       .filter(e => isExamEvent(e) && e.date >= todayStr)
@@ -1259,7 +1285,7 @@ function highlightExamDays() {
         const diff = dayIndex - now.getDay();
         const rowDate = new Date(now);
         rowDate.setDate(now.getDate() + diff);
-        const rowDateStr = rowDate.toISOString().split("T")[0];
+        const rowDateStr = toLocalDateStr(rowDate);
 
         if (dateStr === rowDateStr) {
           row.classList.add("exam-day");

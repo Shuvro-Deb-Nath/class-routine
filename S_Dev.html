@@ -233,6 +233,15 @@
 
         <hr style="border-color: rgba(0,200,255,0.2);" />
 
+        <h4 style="color: #7dd3fc;">🏷️ Exam Page Header Text</h4>
+        <p style="font-size: 13px; opacity: 0.8; margin-top: -6px;">
+          This is the line shown under "Exam Routine" on the student page (e.g. course, semester, tagline).
+        </p>
+        <input id="examLabelInput" type="text" placeholder="CSE 60 A | Spring 2026 | Good Luck! 🚀" />
+        <button class="btn-blue" onclick="saveExamLabel()" style="margin-top: 8px;">💾 Save Header Text</button>
+
+        <hr style="border-color: rgba(0,200,255,0.2);" />
+
         <h4>➕ Add Exam Entry</h4>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -1170,6 +1179,37 @@ updateGradientPreview();
         }
       }
 
+      async function loadExamLabel() {
+        try {
+          const snap = await getDoc(doc(db, "settings", "examLabel"));
+          const input = document.getElementById("examLabelInput");
+          if (snap.exists() && snap.data().text) {
+            input.value = snap.data().text;
+          } else {
+            input.value = "CSE 60 A | Spring 2026 | Good Luck! 🚀";
+          }
+        } catch (e) {
+          console.log("Could not load exam label", e);
+        }
+      }
+
+      window.saveExamLabel = async function() {
+        const text = document.getElementById("examLabelInput").value.trim();
+        if (!text) {
+          alert("⚠️ Header text can't be empty.");
+          return;
+        }
+        try {
+          await setDoc(doc(db, "settings", "examLabel"), {
+            text,
+            updatedAt: Date.now()
+          });
+          showToast({ title: 'Header Updated! 🏷️', message: 'The exam page header text has been saved', type: 'success' });
+        } catch (e) {
+          alert("❌ Failed to save: " + e.message);
+        }
+      };
+
       window.launchExamRoutine = async function() {
         const snap = await getDocs(collection(db, "examRoutine"));
         if (snap.empty) {
@@ -1353,6 +1393,7 @@ updateGradientPreview();
 
       loadExamMode();
       loadExamEntryList();
+      loadExamLabel();
 
       // Load on page start
       loadCurrentTimeSlots();
