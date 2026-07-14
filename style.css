@@ -1165,6 +1165,60 @@ body::after {
   opacity: 0.5;
 }
 
+/* ========== HOLIDAY / VACATION CELL ========== */
+.holiday-class {
+  filter: saturate(0.6) brightness(0.95);
+  box-shadow: inset 0 0 0 9999px rgba(16, 185, 129, 0.16);
+  border: 2px dashed rgba(5, 150, 105, 0.5) !important;
+  opacity: 0.95;
+}
+
+.holiday-class strong,
+.holiday-class small {
+  opacity: 0.55;
+  text-decoration: none;
+}
+
+.holiday-label {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #059669, #10b981);
+  padding: 3px 10px;
+  border-radius: 999px;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+/* ========== EXAM OVERRIDE CELL ========== */
+.exam-override-class {
+  filter: saturate(0.75) brightness(0.95);
+  box-shadow: inset 0 0 0 9999px rgba(147, 51, 234, 0.16);
+  border: 2px dashed rgba(126, 34, 206, 0.55) !important;
+  opacity: 0.97;
+}
+
+.exam-override-class strong,
+.exam-override-class small {
+  opacity: 0.55;
+  text-decoration: none;
+}
+
+.exam-override-label {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #7e22ce, #a855f7);
+  padding: 3px 10px;
+  border-radius: 999px;
+  display: inline-block;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+}
+
 footer {
   text-align: center;
   padding: 1rem;

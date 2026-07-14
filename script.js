@@ -147,7 +147,11 @@ async function loadEvents() {
     if (cached) academicEvents = JSON.parse(cached);
   }
   highlightExamDays();
-  stampExamBadges()
+  // Cell-level exam display is now handled inside checkCurrentClass(),
+  // which matches the exam to the correct period by date+time instead
+  // of always stamping the first period of the day. Re-run it now in
+  // case events arrived after the table was first rendered.
+  checkCurrentClass();
 }
 
 /* =========================
@@ -168,7 +172,11 @@ async function loadCancelled() {
     }
   }
 
-  markCancelledClasses();
+  // Cell-level cancellation display is now handled inside checkCurrentClass(),
+  // which matches by exact date (not just weekday) and respects the
+  // main/ramadan schedule field. Re-run it now in case data arrived
+  // after the table was first rendered.
+  checkCurrentClass();
 }
 
 /* =========================
@@ -626,7 +634,7 @@ function renderRoutine(days) {
     `;
 
     timeSlots.forEach(slot => {
-      const cls = day.classes.find(c => c.time === slot);
+      const cls = day.classes.find(c => normalizeTimeSlot(c.time) === normalizeTimeSlot(slot));
       row.innerHTML += cls
         ? `<td data-time="${slot}" style="background:${cls.color || '#2196f3'};">
      <strong>${cls.subject}</strong><br>
@@ -678,6 +686,18 @@ function parse12hTime(str) {
   return { h, m };
 }
 
+/* Normalizes a time-slot string so minor formatting differences
+   (en-dash vs hyphen, extra/missing spaces) don't cause a class's
+   `time` field to silently fail to match a real period. Without
+   this, a mismatched class becomes invisible in the grid yet can
+   still be picked up by anything reading raw Firestore data. */
+function normalizeTimeSlot(str) {
+  return (str || "")
+    .replace(/[\u2010-\u2015\u2212]/g, "-") // hyphen/dash variants → "-"
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function getDateForDay(dayCode) {
   const map = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
   const now = new Date();
@@ -709,6 +729,67 @@ function formatCountdown(ms) {
 }
 
 /* =========================
+   EVENT TYPE HELPERS
+   (case/whitespace-safe — the admin panel's
+   "type" field is free text, so "Exam ", "EXAM",
+   "exam" etc. must all match)
+========================= */
+function isExamEvent(e) {
+  return (e.type || "").trim().toLowerCase() === "exam";
+}
+function isAssignmentEvent(e) {
+  return (e.type || "").trim().toLowerCase() === "assignment";
+}
+
+/* =========================
+   EXAM ↔ SLOT MATCHING
+   Maps an exam's exact date+time to the routine
+   period it actually falls in, instead of assuming
+   the first period of the day.
+========================= */
+function findExamForDateSlot(dateStr, slot) {
+  if (!academicEvents.length) return null;
+
+  const [start, end] = slot.split("–");
+  const s = parse12hTime(start);
+  const e = parse12hTime(end);
+  const startMin = s.h * 60 + s.m;
+  const endMin = e.h * 60 + e.m;
+
+  return academicEvents.find(ev => {
+    if (!isExamEvent(ev)) return false;
+    if (ev.date !== dateStr) return false;
+    if (!ev.time) return false;
+
+    const [eh, em] = ev.time.split(":").map(Number);
+    const evMin = eh * 60 + em;
+
+    return evMin >= startMin && evMin < endMin;
+  }) || null;
+}
+
+function findExamForCell(dayCode, slot) {
+  const rowDate = getDateForDay(dayCode);
+  const rowDateStr = rowDate.toISOString().split("T")[0];
+  return findExamForDateSlot(rowDateStr, slot);
+}
+
+/* =========================
+   CANCELLATION MATCHING
+   Matches a cell to a cancellation record by exact
+   date (not just weekday+time), and respects which
+   schedule ("main" vs "ramadan") it was cancelled for.
+========================= */
+function findCancellationForCell(dayCode, slot, dateStr) {
+  return cancelledClasses.find(c =>
+    c.day === dayCode &&
+    normalizeTimeSlot(c.time) === normalizeTimeSlot(slot) &&
+    c.date === dateStr &&
+    (!c.schedule || c.schedule === "main")
+  ) || null;
+}
+
+/* =========================
    LIVE / NEXT / DONE CLASSES
 ========================= */
 function checkCurrentClass() {
@@ -722,17 +803,59 @@ function checkCurrentClass() {
   document.querySelectorAll("tr").forEach(r => r.classList.remove("current-row"));
 
   document.querySelectorAll("td[data-time]").forEach(cell => {
-    cell.classList.remove("active-class", "upcoming-class", "done-class");
+    cell.classList.remove(
+      "active-class", "upcoming-class", "done-class",
+      "holiday-class", "exam-override-class", "cancelled-class"
+    );
     cell.querySelectorAll(
-  ".live-badge,.live-countdown,.done-label,.upcoming-countdown"
-).forEach(e => e.remove());
-
-
-
-    if (cell.classList.contains("cancelled-class")) return;
+      ".live-badge,.live-countdown,.done-label,.upcoming-countdown," +
+      ".holiday-label,.exam-override-label,.cancelled-badge,.cancel-reason"
+    ).forEach(e => e.remove());
 
     const row = cell.closest("tr");
-    const cellDay = row.querySelector(".day-name")?.textContent.trim();
+    const cellDay = row.dataset.day;
+    if (!cellDay) return;
+
+    const rowDate = getDateForDay(cellDay);
+    const rowDateStr = rowDate.toISOString().split("T")[0];
+
+    /* 🏖️ HOLIDAY — vacation days override everything else */
+    if (isVacationDate(rowDate)) {
+      cell.classList.add("holiday-class");
+      const label = document.createElement("div");
+      label.className = "holiday-label";
+      label.textContent = "🏖️ Holiday";
+      cell.appendChild(label);
+      return;
+    }
+
+    /* 📝 EXAM — this exact date+slot has an exam scheduled */
+    const exam = findExamForDateSlot(rowDateStr, cell.dataset.time);
+    if (exam) {
+      cell.classList.add("exam-override-class");
+      const label = document.createElement("div");
+      label.className = "exam-override-label";
+      label.textContent = `📝 EXAM${exam.title ? " — " + exam.title : ""}`;
+      cell.appendChild(label);
+      return;
+    }
+
+    /* ❌ CANCELLED — matched by exact date + schedule, not just weekday */
+    const cancellation = findCancellationForCell(cellDay, cell.dataset.time, rowDateStr);
+    if (cancellation) {
+      cell.classList.add("cancelled-class");
+
+      const badge = document.createElement("div");
+      badge.className = "cancelled-badge";
+      badge.textContent = "❌ CANCELLED";
+      cell.appendChild(badge);
+
+      const reason = document.createElement("div");
+      reason.className = "cancel-reason";
+      reason.textContent = cancellation.reason || "Teacher Unavailable";
+      cell.appendChild(reason);
+      return;
+    }
 
     const [start, end] = cell.dataset.time.split("–");
     const s = parse12hTime(start);
@@ -857,34 +980,6 @@ if (percent > 80) {
 }
 
 /* =========================
-   MARK CANCELLED CLASSES
-========================= */
-function markCancelledClasses() {
-  document.querySelectorAll(".cancelled-badge,.cancel-reason").forEach(e => e.remove());
-
-  cancelledClasses.forEach(c => {
-    document.querySelectorAll("td[data-time]").forEach(cell => {
-      const row = cell.closest("tr");
-      const day = row.querySelector(".day-name");
-
-      if (day.textContent.trim() === c.day && cell.dataset.time === c.time) {
-        cell.classList.add("cancelled-class");
-
-        const badge = document.createElement("div");
-        badge.className = "cancelled-badge";
-        badge.textContent = "❌ CANCELLED";
-        cell.appendChild(badge);
-
-        const reason = document.createElement("div");
-        reason.className = "cancel-reason";
-        reason.textContent = c.reason || "Teacher Unavailable";
-        cell.appendChild(reason);
-      }
-    });
-  });
-}
-
-/* =========================
    GLOBAL NEXT CLASS COUNTDOWN
 ========================= */
 function isVacationDate(dateObj) {
@@ -915,8 +1010,18 @@ function updateClassCountdown() {
   routineDays.forEach(day => {
     const targetDayIndex = dayMap[day.day];
 
-    day.classes.forEach(cls => {
-      const [start] = cls.time.split("–");
+    // Only consider the canonical, currently-configured periods —
+    // the same ones renderRoutine() actually draws. A class whose
+    // `time` field doesn't match any real slot (typo, stray dash
+    // character, stale data) is invisible in the grid and must not
+    // be allowed to drive this countdown either.
+    timeSlots.forEach(slot => {
+      const cls = day.classes.find(
+        c => normalizeTimeSlot(c.time) === normalizeTimeSlot(slot)
+      );
+      if (!cls) return; // no real class rendered in this slot
+
+      const [start] = slot.split("–");
       const t = parse12hTime(start);
 
       // Search ahead up to 60 days
@@ -933,17 +1038,13 @@ function updateClassCountdown() {
         // Skip vacations
         if (isVacationDate(d)) continue;
 
-        // Skip cancelled classes
-        const isCancelled = cancelledClasses.some(c => {
-          const cancelDate = new Date(c.date + "T00:00:00");
-          return (
-            c.day === day.day &&
-            c.time === cls.time &&
-            cancelDate.toDateString() === d.toDateString()
-          );
-        });
+        const dStr = d.toISOString().split("T")[0];
 
-        if (isCancelled) continue;
+        // Skip occurrences superseded by an exam in this slot
+        if (findExamForDateSlot(dStr, slot)) continue;
+
+        // Skip cancelled classes (exact date + schedule)
+        if (findCancellationForCell(day.day, slot, dStr)) continue;
 
         if (!next || d < next.date) {
           next = {
@@ -992,8 +1093,8 @@ function updateAssignmentCountdown() {
   container.innerHTML = "";
 
   const assignments = academicEvents
-    .filter(e => e.type === "assignment")
-    .map(e => ({ ...e, d: new Date(`${e.date} ${e.time}`) }))
+    .filter(isAssignmentEvent)
+    .map(e => ({ ...e, d: new Date(`${e.date}T${e.time}`) }))
     .filter(e => e.d > now)
     .sort((a, b) => a.d - b.d);
 
@@ -1058,7 +1159,7 @@ function updateExamCountdown() {
   const container = document.getElementById("examCountdown");
 
   const now = new Date();
-  const exams = academicEvents.filter(e => e.type?.toLowerCase() === "exam");
+  const exams = academicEvents.filter(isExamEvent);
 
   // ── Pill rendering ─────────────────────────────────────────────
   if (container) {
@@ -1133,7 +1234,7 @@ function highlightExamDays() {
   const todayStr = new Date().toISOString().split("T")[0];
   const examDates = new Set(
     academicEvents
-      .filter(e => e.type?.toLowerCase() === "exam" && e.date >= todayStr)
+      .filter(e => isExamEvent(e) && e.date >= todayStr)
       .map(e => e.date)
   );
 
@@ -1168,43 +1269,7 @@ function highlightExamDays() {
     }
   });
 }
-function stampExamBadges() {
-  if (!academicEvents.length) return;
 
-  const todayStr = new Date().toISOString().split("T")[0];
-  const dayCodeToIndex = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
-
-  // Only upcoming/today exams
-  const upcomingExams = academicEvents.filter(
-    e => e.type?.toLowerCase() === "exam" && e.date >= todayStr
-  );
-
-  document.querySelectorAll(".routine-table tbody tr").forEach(row => {
-    const dayCode = row.dataset.day;
-    if (!dayCode) return;
-
-    // Find exam(s) on this row's actual date
-    const rowDate = getDateForDay(dayCode);
-    const rowDateStr = rowDate.toISOString().split("T")[0];
-
-    const examsThisDay = upcomingExams.filter(e => e.date === rowDateStr);
-    if (!examsThisDay.length) return;
-
-    // Stamp on the FIRST non-empty td (or first td after the day cell)
-    const cells = row.querySelectorAll("td[data-time]");
-    if (!cells.length) return;
-
-    const targetCell = cells[0]; // first time-slot cell of the day
-
-    // Avoid duplicate badge
-    if (targetCell.querySelector(".exam-slot-badge")) return;
-
-    const badge = document.createElement("div");
-    badge.className = "exam-slot-badge";
-    badge.innerHTML = `🎓 EXAM`;
-    targetCell.appendChild(badge);
-  });
-}
 window.exportRoutinePNG = async function () {
   const target = document.querySelector(".table-container");
 
@@ -1291,4 +1356,3 @@ window.setTheme = function(theme) {
   const saved = localStorage.getItem("theme") || "glass";
   document.documentElement.setAttribute("data-theme", saved);
 })();
-
