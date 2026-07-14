@@ -560,7 +560,7 @@
     <div id="examRoutineHeader">
       <span class="exam-header-icon">💻</span>
       <h2 class="exam-header-title">Exam Routine</h2>
-      <p class="exam-header-sub">&gt;_ CSE 60 A &nbsp;|&nbsp; Spring 2026 &nbsp;|&nbsp; Good Luck! 🚀</p>
+      <p class="exam-header-sub" id="examHeaderSub">&gt;_ CSE 60 A &nbsp;|&nbsp; Spring 2026 &nbsp;|&nbsp; Good Luck! 🚀</p>
     </div>
 
     <div class="exam-table-wrap">
@@ -1379,6 +1379,17 @@
         // 1. Fetch admin's default mode
         const modeSnap = await getDocFn(docFn(db, "settings", "examMode"));
         const isExamMode = modeSnap.exists() && modeSnap.data().active === true;
+
+        // 1b. Fetch admin-configurable exam page header text
+        try {
+          const labelSnap = await getDocFn(docFn(db, "settings", "examLabel"));
+          if (labelSnap.exists() && labelSnap.data().text) {
+            const subEl = document.getElementById("examHeaderSub");
+            if (subEl) subEl.textContent = ">_ " + labelSnap.data().text;
+          }
+        } catch (e) {
+          console.log("Could not load exam header text, using default", e);
+        }
 
         // 2. Pre-load exam entries into cache
         const snap = await getDocsFn(collectionFn(db, "examRoutine"));
@@ -2409,6 +2420,20 @@
           rgba(183, 28, 28, 0.3),
           rgba(211, 47, 47, 0.3)) !important;
       border: 2px solid #e53935 !important;
+    }
+
+    body.manual-dark .holiday-class {
+      background: linear-gradient(135deg,
+          rgba(5, 150, 105, 0.3),
+          rgba(16, 185, 129, 0.3)) !important;
+      border: 2px solid #10b981 !important;
+    }
+
+    body.manual-dark .exam-override-class {
+      background: linear-gradient(135deg,
+          rgba(126, 34, 206, 0.3),
+          rgba(168, 85, 247, 0.3)) !important;
+      border: 2px solid #a855f7 !important;
     }
 
     body.manual-dark .notice {
