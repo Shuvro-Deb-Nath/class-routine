@@ -107,7 +107,16 @@ async function loadRoutine() {
     routineDays = [];
 
     snap.forEach(doc => {
-      routineDays.push(doc.data());
+      let data = doc.data();
+      // Hotfix: Replace Computer and Cyber Security with Artificial Intelligence
+      if (data.classes) {
+        data.classes.forEach(cls => {
+          if (cls.subject === "COMPUTER AND CYBER SECURITY" || (cls.subject && cls.subject.includes("CYBER SECURITY"))) {
+            cls.subject = "ARTIFICIAL INTELLIGENCE";
+          }
+        });
+      }
+      routineDays.push(data);
     });
 
     // Sort days in correct order
@@ -126,6 +135,16 @@ async function loadRoutine() {
     const cached = localStorage.getItem("routine");
     if (cached) {
       routineDays = JSON.parse(cached);
+      // Hotfix for offline cache too
+      routineDays.forEach(data => {
+        if (data.classes) {
+          data.classes.forEach(cls => {
+            if (cls.subject === "COMPUTER AND CYBER SECURITY" || (cls.subject && cls.subject.includes("CYBER SECURITY"))) {
+              cls.subject = "ARTIFICIAL INTELLIGENCE";
+            }
+          });
+        }
+      });
       renderRoutine(routineDays);
       highlightToday();
     } else {
