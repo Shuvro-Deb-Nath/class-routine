@@ -1,4 +1,4 @@
-const CACHE_NAME = "routine-v27";
+const CACHE_NAME = "routine-v28";
 
 const ASSETS = [
   "/",
