@@ -10,6 +10,9 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="effects.css" />
   <link rel="icon" href="y.png" type="image/png" sizes="32x32" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
   <!-- Performance hints -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
@@ -1302,7 +1305,58 @@
        EXAM ROUTINE MODE DETECTION + SWITCHER
     ========================================== */
 
-    let examEntriesCache = [];
+    let examEntriesCache = [];   // entries of the CURRENT exam session only
+    let examEntriesAll = [];     // everything stored in Firestore (may include old terms)
+
+    /* ---- auto show/hide helpers ----
+       Entries have no "term" field, so exams are grouped into sessions:
+       dates less than EXAM_SESSION_GAP_DAYS apart belong to one exam period.
+       The page shows the first session whose LAST exam date has not passed.
+       When that session is over it disappears by itself; when new exams
+       (e.g. Fall 2026) are added, they become the active session. */
+    const EXAM_SESSION_GAP_DAYS = 21;
+
+    function localTodayStr() {
+      const d = new Date();
+      return d.getFullYear() + "-" +
+        String(d.getMonth() + 1).padStart(2, "0") + "-" +
+        String(d.getDate()).padStart(2, "0");
+    }
+
+    function dayDiff(a, b) {
+      return (new Date(a + "T00:00:00") - new Date(b + "T00:00:00")) / 86400000;
+    }
+
+    function pickActiveExamSession(entries) {
+      const sorted = entries
+        .filter(e => e && typeof e.date === "string" && e.date)
+        .slice()
+        .sort((a, b) => a.date.localeCompare(b.date));
+      const sessions = [];
+      sorted.forEach(e => {
+        const cur = sessions[sessions.length - 1];
+        if (cur && dayDiff(e.date, cur[cur.length - 1].date) <= EXAM_SESSION_GAP_DAYS) {
+          cur.push(e);
+        } else {
+          sessions.push([e]);
+        }
+      });
+      const today = localTodayStr();
+      return sessions.find(s => s[s.length - 1].date >= today) || [];
+    }
+
+    // Recompute which session is active and show/hide the switcher accordingly
+    function refreshExamVisibility() {
+      examEntriesCache = pickActiveExamSession(examEntriesAll);
+      const hasActive = examEntriesCache.length > 0;
+      const switcher = document.getElementById("routineSwitcher");
+      if (switcher) switcher.classList.toggle("hidden", !hasActive);
+      if (!hasActive) {
+        const examSection = document.getElementById("examRoutineSection");
+        if (examSection && examSection.style.display !== "none") showMainView();
+      }
+      return hasActive;
+    }
 
     function showMainView() {
       const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
@@ -1331,7 +1385,7 @@
     function renderExamEntries() {
       const tbody = document.getElementById("examRoutineBody");
       tbody.innerHTML = "";
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = localTodayStr();
 
       if (examEntriesCache.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">&gt;_ No exam entries found.</td></tr>';
@@ -1393,17 +1447,19 @@
 
         // 2. Pre-load exam entries into cache
         const snap = await getDocsFn(collectionFn(db, "examRoutine"));
-        examEntriesCache = [];
-        snap.forEach(d => examEntriesCache.push({ id: d.id, ...d.data() }));
-        examEntriesCache.sort((a, b) => a.date.localeCompare(b.date));
+        examEntriesAll = [];
+        snap.forEach(d => examEntriesAll.push({ id: d.id, ...d.data() }));
 
-        // 3. Show switcher only if exam entries exist
-        if (examEntriesCache.length > 0) {
-          document.getElementById("routineSwitcher").classList.remove("hidden");
-        }
+        // 3. Keep only the current/upcoming exam session; show the switcher only if one exists
+        const hasActiveExam = refreshExamVisibility();
+
+        // Re-check every minute so the exam routine vanishes on its own
+        // after the last exam day, even if the page was left open.
+        setInterval(refreshExamVisibility, 60000);
 
         // 4. Apply admin's default view (no sessionStorage — resets on every reload)
-        if (isExamMode) {
+        //    Exam view is only used while there is an active (not finished) exam session.
+        if (isExamMode && hasActiveExam) {
           showExamView();
           renderExamEntries();
           setTimeout(() => {
@@ -2550,6 +2606,8 @@
       }
     });
   </script>
+  <!-- Glassmorphism redesign (visual layer only). Remove this line to roll back. -->
+  <link rel="stylesheet" href="glass.css" />
 </body>
 
 </html>

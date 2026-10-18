@@ -5,6 +5,8 @@ const ASSETS = [
   "/index.html",
   "/style.css",
   "/script.js",
+  "/glass.css",
+  "/admin-glass.css",
   "/effects.css",
   "/UULogo.webp",
   "/y.png",

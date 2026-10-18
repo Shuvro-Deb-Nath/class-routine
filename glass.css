@@ -1,0 +1,978 @@
+/* ==========================================================================
+   glass.css  –  Glassmorphism redesign for Class Routine (index.html)
+   --------------------------------------------------------------------------
+   • Loads AFTER style.css / effects.css / the inline <style> blocks, so it
+     overrides them without editing a single line of those files.
+   • Pure visual layer: no IDs, classes, markup or JavaScript are changed.
+   • style.css is shared with S_Dev.html (admin) – this file is NOT linked
+     there, so the admin page is unaffected.
+   • To roll back: delete the <link href="glass.css"> line in index.html.
+   ========================================================================== */
+
+/* ───────────────────────── 1. DESIGN TOKENS ───────────────────────── */
+:root {
+  --g-font: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+
+  --g-bg: #060a18;
+  --g-a: #1f6bff;           /* aurora light 1 */
+  --g-b: #6c3bff;           /* aurora light 2 */
+  --g-c: #0fb9c9;           /* aurora light 3 */
+
+  --g-text: #eaf1ff;
+  --g-muted: #9fb0d6;
+  --g-acc: #3ee0e8;         /* accent (cyan) */
+  --g-blue: #4f9bff;
+
+  --g-s1: rgba(255, 255, 255, 0.12);   /* glass top-left */
+  --g-s2: rgba(255, 255, 255, 0.04);   /* glass bottom-right */
+  --g-fill: rgba(255, 255, 255, 0.06); /* flat tile */
+  --g-edge: rgba(255, 255, 255, 0.14);
+  --g-edge-top: rgba(255, 255, 255, 0.32);
+  --g-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+
+  --g-live: #34e3a0;
+  --g-next: #ffb84d;
+  --g-stop: #ff6b8a;
+  --g-radius: 22px;
+}
+
+/* Theme picker (🎨) – the existing setTheme() already sets [data-theme] */
+[data-theme="amoled"] {
+  --g-bg: #000; --g-a: #0b3d91; --g-b: #2a1470; --g-c: #064e57;
+}
+[data-theme="glass"] {
+  --g-bg: #04101f; --g-a: #0ea5e9; --g-b: #3b82f6; --g-c: #22d3ee;
+  --g-acc: #7de8ff;
+}
+[data-theme="matrix"] {
+  --g-bg: #000a04; --g-a: #00a63e; --g-b: #00692a; --g-c: #00e08a;
+  --g-text: #d6ffe6; --g-muted: #7fd6a3; --g-acc: #3dff9a; --g-blue: #3dff9a;
+}
+[data-theme="cyberpunk"] {
+  --g-bg: #0d0016; --g-a: #ff00aa; --g-b: #6a00ff; --g-c: #00d5ff;
+  --g-acc: #ff6ad5; --g-blue: #b47bff;
+}
+[data-theme="light"] {
+  --g-bg: #e9f1ff; --g-a: #8ec5ff; --g-b: #c3b0ff; --g-c: #9ff0f0;
+  --g-text: #0f1b3a; --g-muted: #46557d; --g-acc: #1d6fe8; --g-blue: #1d6fe8;
+  --g-s1: rgba(255, 255, 255, 0.78); --g-s2: rgba(255, 255, 255, 0.42);
+  --g-fill: rgba(255, 255, 255, 0.55);
+  --g-edge: rgba(255, 255, 255, 0.9); --g-edge-top: #fff;
+  --g-shadow: 0 14px 40px rgba(40, 70, 140, 0.18);
+}
+
+/* ───────────────────────── 2. PAGE BACKGROUND ───────────────────────── */
+html body {
+  font-family: var(--g-font);
+  color: var(--g-text);
+  background:
+    radial-gradient(900px 640px at 0% 0%, color-mix(in srgb, var(--g-a) 70%, transparent), transparent 62%),
+    radial-gradient(820px 620px at 100% 24%, color-mix(in srgb, var(--g-b) 55%, transparent), transparent 62%),
+    radial-gradient(900px 700px at 35% 100%, color-mix(in srgb, var(--g-c) 45%, transparent), transparent 62%),
+    var(--g-bg) !important;
+  background-attachment: fixed !important;
+  background-size: auto !important;
+  letter-spacing: 0;
+}
+/* old decorative layers (dot pattern + radial haze) are replaced by the gradient above */
+html body::before,
+html body::after { display: none !important; }
+
+html body ::-webkit-scrollbar { width: 10px; height: 10px; }
+html body ::-webkit-scrollbar-track { background: transparent; }
+html body ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 99px;
+  box-shadow: none;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+html body ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); background-clip: padding-box; }
+
+/* ───────────────────────── 3. SHARED GLASS SURFACE ───────────────────────── */
+.hero,
+.routine-switcher,
+.today-date-section,
+.class-duration-timer,
+.notice,
+.next-class,
+.exam-countdown,
+.day-progress,
+.features-info,
+.routine-table,
+#examRoutineSection,
+footer,
+.theme-menu,
+.dark-toggle-btn,
+.export-toolbar button,
+.install-banner,
+.toast:not(.success):not(.error):not(.warning):not(.info),
+.calendar-shell {
+  background: linear-gradient(145deg, var(--g-s1), var(--g-s2)) !important;
+  border: 1px solid var(--g-edge) !important;
+  border-top-color: var(--g-edge-top) !important;
+  box-shadow: var(--g-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+  color: var(--g-text);
+}
+
+/* ───────────────────────── 4. HERO ───────────────────────── */
+.hero {
+  max-width: 1320px;
+  margin: 22px auto 0 !important;
+  padding: 18px 28px !important;
+  border-radius: var(--g-radius);
+  overflow: hidden;
+}
+.hero::before, .hero::after { display: none !important; }
+.hero-top { gap: 20px; min-height: 96px; }
+
+.logo, .banner {
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.35)) !important;
+  animation: none !important;
+  border-radius: 18px;
+}
+.logo { height: 76px; }
+.banner { height: 110px; }
+.logo:hover, .banner:hover { transform: scale(1.04) !important; animation: none !important; }
+
+.title {
+  letter-spacing: -0.4px !important;
+  text-shadow: none !important;
+  animation: none !important;
+  color: var(--g-text) !important;
+}
+.title:hover { transform: translateX(-50%) !important; letter-spacing: -0.4px !important; text-shadow: none !important; }
+.title .line1 {
+  font-size: 38px;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--g-text), color-mix(in srgb, var(--g-acc) 55%, var(--g-text)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.title .line2 { font-size: 16px; font-weight: 600; color: var(--g-muted) !important; }
+
+.effective {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px !important;
+  padding: 8px 16px 8px 14px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  background: var(--g-fill) !important;
+  border: 1px solid var(--g-edge) !important;
+  box-shadow: none !important;
+  color: var(--g-text) !important;
+  overflow: visible;
+}
+.effective::after { display: none !important; }
+.effective::before {
+  content: "" !important;
+  position: static !important;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--g-acc);
+  box-shadow: 0 0 10px var(--g-acc);
+  transform: none !important;
+  animation: none !important;
+  flex: none;
+}
+.effective b { padding-left: 0 !important; font-weight: 700; }
+.effective:hover { transform: translateX(-50%) !important; background: var(--g-fill) !important; box-shadow: none !important; }
+
+/* ───────────────────────── 5. ROUTINE SWITCHER ───────────────────────── */
+.routine-switcher {
+  width: fit-content;
+  max-width: calc(100% - 28px);
+  margin: 18px auto 20px !important;
+  padding: 5px !important;
+  gap: 4px !important;
+  flex-wrap: nowrap !important;
+  border-radius: 999px !important;
+}
+.switcher-btn {
+  font-family: var(--g-font);
+  padding: 11px 26px !important;
+  white-space: nowrap;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: var(--g-muted) !important;
+  font-weight: 700;
+  font-size: 14px !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.switcher-btn:hover { transform: none !important; color: var(--g-text) !important; background: var(--g-fill) !important; }
+.switcher-btn.active {
+  color: #fff !important;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--g-blue) 90%, transparent), color-mix(in srgb, var(--g-acc) 75%, transparent)) !important;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--g-blue) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+/* ───────────────────────── 6. MAIN CONTAINER ───────────────────────── */
+.table-container {
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 28px 8px !important;
+  animation: none !important;
+  overflow-x: visible;
+}
+#examRoutineSection.table-container { padding: 0 !important; }
+
+/* ───────────────────────── 7. TODAY'S DATE CARD ───────────────────────── */
+.today-date-section {
+  padding: 24px 30px !important;
+  margin-bottom: 18px !important;
+  border-radius: var(--g-radius) !important;
+  color: var(--g-text) !important;
+}
+.today-date-section::before { opacity: 0.07 !important; filter: grayscale(1); }
+.date-main { justify-content: flex-start !important; font-size: 28px !important; font-weight: 800; letter-spacing: -0.4px; }
+.date-main #dayName { color: var(--g-acc); font-size: 17px; letter-spacing: 3px; font-weight: 700; }
+.date-separator { color: var(--g-muted); opacity: 1 !important; }
+.date-secondary { justify-content: flex-start !important; font-size: 17px !important; color: var(--g-text); opacity: 1 !important; }
+.special-event {
+  background: var(--g-fill) !important;
+  border: 1px solid var(--g-edge) !important;
+  color: var(--g-text);
+  font-weight: 600 !important;
+}
+
+/* ───────────────────────── 8. LIVE CLASS TIMER ───────────────────────── */
+.class-duration-timer {
+  padding: 22px 26px !important;
+  border-radius: var(--g-radius) !important;
+  border-color: color-mix(in srgb, var(--g-live) 55%, transparent) !important;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--g-live) 22%, transparent), color-mix(in srgb, var(--g-live) 4%, transparent) 60%, rgba(255, 255, 255, 0.03)) !important;
+  box-shadow: var(--g-shadow), 0 0 56px color-mix(in srgb, var(--g-live) 20%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  color: var(--g-text) !important;
+  animation: none !important;
+}
+.class-duration-timer.ending-soon {
+  border-color: color-mix(in srgb, var(--g-stop) 65%, transparent) !important;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--g-stop) 26%, transparent), color-mix(in srgb, var(--g-stop) 5%, transparent) 60%, rgba(255, 255, 255, 0.03)) !important;
+  box-shadow: var(--g-shadow), 0 0 56px color-mix(in srgb, var(--g-stop) 28%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  animation: gUrgent 1.2s ease-in-out infinite !important;
+}
+.timer-icon { animation: none !important; font-size: 34px; }
+.timer-info h3 { font-size: 26px !important; font-weight: 800; letter-spacing: -0.3px; }
+.timer-info p { opacity: 0.85 !important; font-weight: 600; }
+.timer-body {
+  background: var(--g-fill) !important;
+  border: 1px solid var(--g-edge);
+  border-radius: 16px !important;
+  backdrop-filter: none !important;
+}
+#timerMinutes { text-shadow: none !important; font-weight: 800; letter-spacing: -0.5px; }
+.progress-bar-container { height: 9px !important; background: rgba(255, 255, 255, 0.14) !important; }
+.progress-bar {
+  background: linear-gradient(90deg, var(--g-live), #b6ffe0) !important;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--g-live) 70%, transparent) !important;
+}
+.class-duration-timer.ending-soon .progress-bar { background: linear-gradient(90deg, var(--g-stop), #ffc2cf) !important; }
+
+/* ───────────────────────── 9. NOTICE BOARD ───────────────────────── */
+#noticeBoard { max-width: none !important; margin: 0 0 18px !important; gap: 12px; }
+#noticeBoard:empty { margin: 0 !important; }
+.notice {
+  position: relative;
+  margin: 0 !important;
+  padding: 16px 44px 16px 22px !important;
+  border-radius: 18px !important;
+  border-left: 1px solid var(--g-edge) !important;
+  overflow: hidden;
+  color: var(--g-text) !important;
+}
+.notice::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 14px; bottom: 14px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--g-blue);
+  box-shadow: 0 0 14px var(--g-blue);
+}
+.notice.warning::before { background: var(--g-next); box-shadow: 0 0 14px var(--g-next); }
+.notice.urgent::before  { background: var(--g-stop); box-shadow: 0 0 14px var(--g-stop); }
+.notice h4 { color: var(--g-text) !important; font-weight: 800; font-size: 15px; }
+.notice p  { color: var(--g-muted) !important; line-height: 1.5; }
+.notice .close { color: var(--g-muted) !important; }
+.notice:hover { transform: none !important; }
+.notice::after { display: none !important; }
+
+/* ───────────────────────── 10. EXPORT TOOLBAR ───────────────────────── */
+.export-toolbar { margin: 4px 0 18px !important; gap: 10px !important; }
+.export-toolbar button {
+  font-family: var(--g-font);
+  padding: 11px 18px !important;
+  border-radius: 14px !important;
+  font-weight: 700 !important;
+  font-size: 13.5px;
+  color: var(--g-text) !important;
+  background: var(--g-fill) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.export-toolbar button:hover { transform: translateY(-2px) !important; border-color: var(--g-acc) !important; }
+
+/* ───────────────────────── 11. COUNTDOWN PILLS ───────────────────────── */
+/* original design = small centred pills; kept, now as glass chips */
+#countdownStack {
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 4px auto 20px !important;
+}
+.next-class,
+#examCountdownBox {
+  color: var(--g-text) !important;
+  text-shadow: none !important;
+  animation: none !important;
+}
+.next-class {
+  padding: 10px 20px 10px 16px !important;
+  border-radius: 999px !important;
+  gap: 10px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+/* coloured status dot */
+.next-class::before {
+  content: "";
+  flex: none;
+  position: static !important;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--g-blue);
+  box-shadow: 0 0 12px var(--g-blue);
+}
+.next-class.assignment-countdown::before, .next-class.orange::before { background: var(--g-next); box-shadow: 0 0 12px var(--g-next); }
+.next-class.exam-countdown::before,       .next-class.red::before    { background: var(--g-stop); box-shadow: 0 0 12px var(--g-stop); }
+.next-class:hover { transform: none !important; filter: brightness(1.1); }
+
+/* wrappers that also carry .next-class must not draw a second frame around the pill inside */
+#assignmentCountdown.next-class,
+#examCountdown.next-class {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  align-items: center;
+}
+#assignmentCountdown.next-class::before,
+#examCountdown.next-class::before { display: none !important; }
+
+/* exam countdown box (separate, outside the stack) */
+#examCountdownBox { border-radius: 18px !important; margin: 0 auto 20px; max-width: 1264px; text-align: center; padding: 18px 24px !important; }
+#examCountdownBox:not(.hidden) { display: block; }
+#examCountdownBox h3 { color: var(--g-text) !important; font-weight: 800; }
+#examTitle { color: var(--g-muted) !important; }
+#examTimer { color: var(--g-acc) !important; font-weight: 800; letter-spacing: 1px; text-shadow: none !important; font-variant-numeric: tabular-nums; }
+.exam-progress { background: rgba(255, 255, 255, 0.12) !important; border-radius: 99px; overflow: hidden; }
+#examProgressFill { background: linear-gradient(90deg, var(--g-blue), var(--g-acc)) !important; box-shadow: 0 0 14px color-mix(in srgb, var(--g-acc) 60%, transparent); }
+#examProgressText { color: var(--g-muted) !important; }
+
+/* ───────────────────────── 12. ROUTINE TABLE ───────────────────────── */
+.table-container > .routine-table { margin-bottom: 20px; }
+.routine-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: separate !important;
+  border-spacing: 8px !important;
+  border-radius: var(--g-radius) !important;
+  border: 1px solid var(--g-edge) !important;
+  animation: none !important;
+  overflow: hidden;
+  color: var(--g-text);
+}
+.routine-table::before, .routine-table::after { display: none !important; }
+
+.routine-table th {
+  padding: 14px 8px !important;
+  border: 1px solid var(--g-edge) !important;
+  border-radius: 14px !important;
+  background: var(--g-fill) !important;
+  color: var(--g-text) !important;
+  font-size: 13px;
+  font-weight: 700;
+  text-shadow: none !important;
+  white-space: nowrap;
+  letter-spacing: 0 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.routine-table th::before, .routine-table th::after { display: none !important; }
+.routine-table th:hover { background: var(--g-fill) !important; transform: none !important; box-shadow: none !important; letter-spacing: 0 !important; }
+
+/* generic cell = quiet glass tile */
+table.routine-table tbody tr td {
+  height: 92px;
+  padding: 10px 8px !important;
+  border: 1px solid var(--g-edge) !important;
+  border-radius: 16px !important;
+  color: var(--g-text);
+  font-size: 14px;
+  vertical-align: middle;
+  overflow: hidden;
+  cursor: default;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+table.routine-table tbody tr td::after { display: none !important; }
+table.routine-table tbody tr td strong { display: block; font-size: 15px; font-weight: 800; color: inherit !important; letter-spacing: 0.2px; }
+table.routine-table tbody tr td small  { display: block; margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--g-muted) !important; opacity: 1; }
+table.routine-table tbody tr td:hover  { transform: translateY(-2px) !important; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3) !important; animation: none !important; z-index: 2; }
+.routine-table tbody tr:hover { background: transparent !important; }
+
+table.routine-table tbody tr td strong + br { display: none; }
+
+table.routine-table tbody tr td:not([style*="background"]) { background: var(--g-fill) !important; }
+
+/* cells that carry an admin-chosen inline gradient keep their own colour */
+table.routine-table tbody tr td[style*="background"] {
+  background-blend-mode: normal;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+table.routine-table tbody tr td[style*="background"] small { color: rgba(255, 255, 255, 0.85) !important; }
+
+/* day column */
+table.routine-table tbody tr td.day {
+  display: table-cell !important;
+  width: 104px;
+  text-align: center;
+  font-weight: 800;
+  background: var(--g-fill) !important;
+  transform: none !important;
+}
+table.routine-table tbody tr td.day::before { display: none !important; }
+table.routine-table tbody tr td.day:hover { transform: none !important; color: var(--g-text); letter-spacing: 0; box-shadow: none !important; }
+.day-name { display: block; font-size: 15px; font-weight: 800; letter-spacing: 1.5px; }
+.day-date { display: block; margin-top: 3px; font-size: 12px; font-weight: 600; color: var(--g-muted) !important; letter-spacing: 0; }
+
+/* break column (header + JS-generated cells) */
+.routine-table th.break-header,
+table.routine-table tbody tr td.break-cell {
+  background: repeating-linear-gradient(135deg, rgba(255, 184, 77, 0.13) 0 8px, rgba(255, 184, 77, 0.05) 8px 16px) !important;
+  border: 1px solid rgba(255, 184, 77, 0.32) !important;
+  color: #ffd9a0 !important;
+  text-shadow: none !important;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-size: 12.5px;
+  cursor: default;
+  transform: none !important;
+  animation: none !important;
+}
+[data-theme="light"] .routine-table th.break-header,
+[data-theme="light"] table.routine-table tbody tr td.break-cell { color: #8a5200 !important; }
+.break-header::before, .break-cell::before { display: none !important; }
+.break-header:hover, .break-cell:hover { box-shadow: none !important; transform: none !important; background: repeating-linear-gradient(135deg, rgba(255, 184, 77, 0.13) 0 8px, rgba(255, 184, 77, 0.05) 8px 16px) !important; }
+
+/* ── course colours: your original hues, now as tinted glass ── */
+table.routine-table tbody tr td.TLS { --h: 250, 204, 21; }
+table.routine-table tbody tr td.DSI { --h: 255, 92, 112; }
+table.routine-table tbody tr td.DMA { --h: 112, 118, 255; }
+table.routine-table tbody tr td.TZW { --h: 200, 90, 255; }
+table.routine-table tbody tr td.TLS,
+table.routine-table tbody tr td.DSI,
+table.routine-table tbody tr td.DMA,
+table.routine-table tbody tr td.TZW {
+  background: linear-gradient(145deg, rgba(var(--h), 0.34), rgba(var(--h), 0.1)) !important;
+  border-color: rgba(var(--h), 0.55) !important;
+  box-shadow: inset 3px 0 0 rgb(var(--h)), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  color: var(--g-text);
+}
+table.routine-table tbody tr td.TLS::before,
+table.routine-table tbody tr td.DSI::before,
+table.routine-table tbody tr td.DMA::before,
+table.routine-table tbody tr td.TZW::before { display: none !important; }   /* hover emoji badges */
+table.routine-table tbody tr td.TLS:hover,
+table.routine-table tbody tr td.DSI:hover,
+table.routine-table tbody tr td.DMA:hover,
+table.routine-table tbody tr td.TZW:hover {
+  transform: translateY(-2px) !important;
+  animation: none !important;
+  filter: brightness(1.12);
+  box-shadow: inset 3px 0 0 rgb(var(--h)), 0 10px 28px rgba(var(--h), 0.35) !important;
+}
+
+/* ── TODAY: only the day cell is highlighted; the row's cells keep their own look ── */
+table.routine-table tbody tr.today-row td.day {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255, 184, 77, 0.38), rgba(255, 184, 77, 0.1)) !important;
+  border-color: rgba(255, 184, 77, 0.7) !important;
+  color: var(--g-text) !important;
+  box-shadow: 0 0 24px rgba(255, 184, 77, 0.28) !important;
+  animation: none !important;
+}
+table.routine-table tbody tr.today-row td.day::before {
+  display: block !important;
+  content: "TODAY";
+  position: absolute;
+  top: 6px; right: 7px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #3a2300;
+  background: var(--g-next);
+  box-shadow: none;
+  animation: none;
+  left: auto; width: auto; height: auto; transform: none;
+}
+table.routine-table tbody tr.today-row td:not(.day)::before { content: none; }
+table.routine-table tbody tr.today-row td:not(.day) { animation: none !important; }
+table.routine-table tbody tr.today-row td:not(.day):hover { filter: none; }
+
+/* ── LIVE class ── */
+table.routine-table tbody tr td.active-class {
+  border: 1.5px solid var(--g-live) !important;
+  font-size: inherit !important;
+  overflow: hidden !important;
+  animation: gLive 2.4s ease-in-out infinite !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--g-live) 16%, transparent), 0 0 34px color-mix(in srgb, var(--g-live) 45%, transparent), inset 3px 0 0 rgb(var(--h, 52, 227, 160)) !important;
+}
+table.routine-table tbody tr td.active-class::after { display: none !important; }
+table.routine-table tbody tr td.active-class:not(.TLS):not(.DSI):not(.DMA):not(.TZW):not([style*="background"]) {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--g-live) 32%, transparent), color-mix(in srgb, var(--g-live) 8%, transparent)) !important;
+}
+.live-badge {
+  top: 8px !important; right: 8px !important;
+  padding: 3px 9px !important;
+  border-radius: 999px !important;
+  background: var(--g-live) !important;
+  color: #052e1c !important;
+  font-size: 10px !important;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  animation: none !important;
+  box-shadow: none !important;
+}
+.live-countdown { color: color-mix(in srgb, var(--g-live) 70%, var(--g-text)) !important; font-weight: 700; font-size: 12px; }
+
+/* ── NEXT class ── */
+table.routine-table tbody tr td.upcoming-class {
+  border: 1.5px dashed var(--g-next) !important;
+  animation: none !important;
+  box-shadow: 0 0 26px color-mix(in srgb, var(--g-next) 26%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+table.routine-table tbody tr td.upcoming-class:not(.TLS):not(.DSI):not(.DMA):not(.TZW):not([style*="background"]) {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--g-next) 26%, transparent), color-mix(in srgb, var(--g-next) 6%, transparent)) !important;
+}
+table.routine-table tbody tr td.upcoming-class::before {
+  content: "NEXT" !important;
+  display: block !important;
+  position: absolute;
+  top: 8px; right: 8px; left: auto;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--g-next);
+  color: #3a2300;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  transform: none;
+  opacity: 1;
+  width: auto; height: auto;
+}
+.upcoming-countdown { color: var(--g-next) !important; text-shadow: none !important; font-weight: 700; font-size: 12px; }
+
+[data-theme="light"] .upcoming-countdown { color: #a85f00 !important; }
+
+/* ── DONE ── */
+table.routine-table tbody tr td.done-class {
+  opacity: 0.55;
+  filter: saturate(0.5);
+  border: 1px dashed var(--g-edge) !important;
+  box-shadow: none !important;
+}
+table.routine-table tbody tr td.done-class:hover { opacity: 0.95; filter: saturate(0.9); transform: translateY(-2px) !important; border-style: solid !important; }
+table.routine-table tbody tr td.done-class strong,
+table.routine-table tbody tr td.done-class small { opacity: 1; }
+.done-label {
+  background: var(--g-fill) !important;
+  color: var(--g-text) !important;
+  border: 1px solid var(--g-edge);
+  box-shadow: none !important;
+  font-weight: 700;
+}
+
+/* ── CANCELLED ── */
+table.routine-table tbody tr td.cancelled-class {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--g-stop) 24%, transparent), color-mix(in srgb, var(--g-stop) 6%, transparent)) !important;
+  border: 1.5px dashed color-mix(in srgb, var(--g-stop) 70%, transparent) !important;
+  box-shadow: none !important;
+  filter: none;
+  opacity: 1;
+}
+table.routine-table tbody tr td.cancelled-class { padding: 24px 8px 24px !important; }
+table.routine-table tbody tr td.cancelled-class strong,
+table.routine-table tbody tr td.cancelled-class small { text-decoration: line-through; opacity: 0.55; }
+table.routine-table tbody tr td.cancelled-class:hover { box-shadow: 0 0 26px color-mix(in srgb, var(--g-stop) 40%, transparent) !important; }
+.cancelled-badge {
+  top: 8px !important; right: 8px !important;
+  padding: 3px 9px !important;
+  background: var(--g-stop) !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  box-shadow: none !important;
+}
+.cancel-reason {
+  background: transparent !important;
+  color: color-mix(in srgb, var(--g-stop) 55%, var(--g-text)) !important;
+  font-size: 10.5px !important;
+  bottom: 6px !important;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0 !important;
+}
+
+/* ── HOLIDAY / VACATION ── */
+table.routine-table tbody tr td.holiday-class {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.24), rgba(16, 185, 129, 0.06)) !important;
+  border: 1.5px dashed rgba(16, 185, 129, 0.6) !important;
+  box-shadow: none !important;
+  filter: none;
+  opacity: 1;
+}
+table.routine-table tbody tr td.holiday-class strong,
+table.routine-table tbody tr td.holiday-class small { opacity: 0.7; }
+.holiday-label {
+  background: rgba(16, 185, 129, 0.9) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+/* ── EXAM OVERRIDE ── */
+table.routine-table tbody tr td.exam-override-class {
+  background: linear-gradient(145deg, rgba(168, 85, 247, 0.26), rgba(168, 85, 247, 0.06)) !important;
+  border: 1.5px dashed rgba(168, 85, 247, 0.65) !important;
+  box-shadow: none !important;
+  filter: none;
+  opacity: 1;
+}
+table.routine-table tbody tr td.exam-override-class strong,
+table.routine-table tbody tr td.exam-override-class small { opacity: 0.7; }
+.exam-override-label {
+  background: rgba(168, 85, 247, 0.9) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+/* exam-week day marker */
+.exam-day td:first-child { box-shadow: inset 0 0 0 1.5px var(--g-stop) !important; }
+.exam-slot-badge { border-radius: 999px !important; }
+
+/* ───────────────────────── 13. DAY / WEEK PROGRESS ───────────────────────── */
+.day-progress {
+  max-width: 1264px;
+  margin: 0 auto 16px;
+  padding: 18px 22px !important;
+  border-radius: 18px !important;
+}
+.day-progress:not(.hidden) { display: block; }
+.day-progress:hover { transform: none !important; }
+.day-progress-header { color: var(--g-text) !important; font-weight: 700; font-size: 14px; margin-bottom: 12px; }
+.day-progress-header span { color: var(--g-acc); font-weight: 800; }
+.day-progress-bar { height: 10px !important; border-radius: 99px !important; background: rgba(255, 255, 255, 0.12) !important; overflow: hidden; }
+.day-progress-fill {
+  height: 100%;
+  border-radius: 99px !important;
+  background: linear-gradient(90deg, var(--g-blue), var(--g-acc)) !important;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--g-acc) 60%, transparent);
+}
+
+/* ───────────────────────── 14. CALENDAR (FullCalendar wrapper) ───────────────────────── */
+.calendar-shell { margin: 0 auto 20px; padding: 16px; border-radius: var(--g-radius) !important; max-width: 1264px; }
+.calendar-shell .fc { color: var(--g-text); --fc-border-color: var(--g-edge); --fc-page-bg-color: transparent; --fc-neutral-bg-color: var(--g-fill); --fc-today-bg-color: color-mix(in srgb, var(--g-next) 16%, transparent); }
+
+/* ───────────────────────── 15. EXAM ROUTINE (cyber → glass) ───────────────────────── */
+#examRoutineSection { border-radius: var(--g-radius) !important; overflow: hidden; }
+#examRoutineHeader {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--g-blue) 35%, transparent), color-mix(in srgb, var(--g-acc) 18%, transparent)) !important;
+  animation: none !important;
+  border-bottom: 1px solid var(--g-edge);
+}
+#examRoutineHeader::before { display: none !important; }
+#examRoutineHeader::after { background: linear-gradient(90deg, transparent, var(--g-acc), transparent) !important; animation: none !important; opacity: 0.7 !important; height: 2px !important; }
+.exam-header-icon { animation: none !important; filter: none !important; }
+.exam-header-title { text-shadow: none !important; letter-spacing: 3px !important; color: var(--g-text) !important; }
+.exam-header-sub { color: var(--g-muted) !important; font-family: var(--g-font) !important; }
+
+#examRoutineTable { border-collapse: separate !important; border-spacing: 0 8px !important; margin-top: 8px !important; }
+#examRoutineTable thead tr { background: transparent !important; animation: none !important; }
+#examRoutineTable th {
+  background: var(--g-fill) !important;
+  color: var(--g-text) !important;
+  font-family: var(--g-font) !important;
+  border: 0 !important;
+  letter-spacing: 1px !important;
+}
+#examRoutineTable th::after { display: none !important; }
+#examRoutineTable th:first-child { border-radius: 14px 0 0 14px; }
+#examRoutineTable th:last-child { border-radius: 0 14px 14px 0; }
+#examRoutineTable tbody tr td,
+#examRoutineTable tbody tr:nth-child(odd) td,
+#examRoutineTable tbody tr:nth-child(even) td {
+  background: var(--g-fill) !important;
+  border: 0 !important;
+  border-top: 1px solid var(--g-edge) !important;
+  border-bottom: 1px solid var(--g-edge) !important;
+  color: var(--g-text);
+}
+#examRoutineTable tbody tr td:first-child { border-left: 1px solid var(--g-edge) !important; border-radius: 14px 0 0 14px; }
+#examRoutineTable tbody tr td:last-child { border-right: 1px solid var(--g-edge) !important; border-radius: 0 14px 14px 0; }
+#examRoutineTable tbody tr:hover td { transform: none !important; box-shadow: none !important; background: var(--g-s1) !important; }
+.exam-serial { color: var(--g-acc) !important; text-shadow: none !important; font-family: var(--g-font) !important; }
+.exam-date-val { color: var(--g-text) !important; }
+.exam-day-val  { color: var(--g-muted) !important; font-family: var(--g-font) !important; }
+.exam-course-name { color: var(--g-text) !important; text-shadow: none !important; }
+#examRoutineTable tbody tr:hover .exam-course-name { color: var(--g-acc); text-shadow: none; }
+.exam-code {
+  background: color-mix(in srgb, var(--g-blue) 30%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--g-blue) 55%, transparent);
+  animation: none !important;
+  box-shadow: none !important;
+  font-family: var(--g-font) !important;
+  color: var(--g-text) !important;
+}
+.exam-time, .exam-room { color: var(--g-muted) !important; font-family: var(--g-font) !important; }
+#examRoutineTable tbody tr.exam-today-row td {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--g-next) 28%, transparent), color-mix(in srgb, var(--g-next) 8%, transparent)) !important;
+  border-left-color: var(--g-next) !important;
+  animation: none !important;
+  box-shadow: none !important;
+}
+#examRoutineTable tbody tr.exam-today-row td:first-child { border-left: 4px solid var(--g-next) !important; }
+.exam-today-row .exam-course-name, .exam-today-row .exam-serial { color: var(--g-text) !important; text-shadow: none !important; }
+.exam-today-badge { background: var(--g-next) !important; color: #3a2300 !important; border-radius: 999px !important; }
+#examRoutineBody .empty-msg { color: var(--g-muted) !important; font-family: var(--g-font) !important; }
+
+/* ───────────────────────── 16. HOW THIS ROUTINE WORKS ───────────────────────── */
+.features-info {
+  max-width: 1264px !important;
+  padding: 30px !important;
+  margin: 28px auto 24px !important;
+  border-radius: var(--g-radius) !important;
+}
+.features-info h2 { color: var(--g-text) !important; text-shadow: none !important; font-weight: 800; font-size: 22px; letter-spacing: -0.2px; }
+.feature-list { gap: 16px !important; }
+.feature-item {
+  background: var(--g-fill) !important;
+  border: 1px solid var(--g-edge);
+  border-top-color: var(--g-edge-top);
+  border-radius: 18px !important;
+  box-shadow: none !important;
+  padding: 20px !important;
+}
+.feature-item::after { display: none !important; }
+.feature-item:hover { transform: translateY(-3px) !important; background: var(--g-s1) !important; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.25) !important; }
+.feature-badge { font-size: 12px !important; letter-spacing: 1px; color: var(--g-text) !important; box-shadow: none !important; }
+.today-demo .feature-badge   { background: rgba(255, 184, 77, 0.26) !important; }
+.current-demo .feature-badge { background: rgba(52, 227, 160, 0.26) !important; }
+.upcoming-demo .feature-badge{ background: rgba(255, 184, 77, 0.26) !important; }
+.auto-demo .feature-badge    { background: rgba(79, 155, 255, 0.28) !important; }
+.feature-item p, .feature-item:hover p { color: var(--g-muted) !important; line-height: 1.55; }
+.feature-item p b { color: var(--g-text); }
+
+/* ───────────────────────── 17. FOOTER ───────────────────────── */
+footer {
+  max-width: 1264px;
+  margin: 0 auto 28px !important;
+  padding: 20px !important;
+  border-radius: 20px !important;
+  color: var(--g-muted) !important;
+  text-shadow: none !important;
+  font-weight: 600;
+  cursor: default;
+}
+footer::before { display: none !important; }
+footer:hover { transform: none !important; background: linear-gradient(145deg, var(--g-s1), var(--g-s2)) !important; box-shadow: var(--g-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important; }
+
+/* ───────────────────────── 18. FLOATING CONTROLS ───────────────────────── */
+.dark-toggle-btn {
+  position: fixed !important;
+  top: auto !important;
+  right: 22px !important;
+  bottom: 92px !important;
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 50% !important;
+  font-size: 22px !important;
+  color: var(--g-text) !important;
+}
+.dark-toggle-btn:hover { transform: scale(1.08) rotate(8deg) !important; }
+
+.theme-menu { border-radius: 22px !important; }
+.theme-menu::before { display: none; }
+.theme-menu button {
+  font-family: var(--g-font);
+  color: var(--g-text) !important;
+  background: var(--g-fill) !important;
+  border: 1px solid var(--g-edge) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+.theme-menu button:hover { background: var(--g-s1) !important; transform: translateY(-2px) !important; }
+
+.install-btn {
+  right: 22px !important;
+  bottom: 22px !important;
+  padding: 13px 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--g-blue) 95%, transparent), color-mix(in srgb, var(--g-acc) 80%, transparent)) !important;
+  color: #fff !important;
+  font-family: var(--g-font);
+  font-weight: 800 !important;
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--g-blue) 50%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+}
+
+/* ───────────────────────── 19. INSTALL BANNER, TOASTS, SPLASH ───────────────────────── */
+.install-banner { padding: 12px 20px !important; border-radius: 0 0 22px 22px !important; border-top: 0 !important; }
+.banner-install-btn {
+  background: linear-gradient(135deg, var(--g-blue), var(--g-acc)) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--g-blue) 45%, transparent);
+}
+.banner-dismiss-btn { background: var(--g-fill) !important; color: var(--g-text) !important; border: 1px solid var(--g-edge) !important; }
+
+.toast {
+  border-radius: 16px !important;
+  font-family: var(--g-font);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--g-edge);
+}
+.toast.success { background: linear-gradient(135deg, color-mix(in srgb, var(--g-live) 85%, #000), color-mix(in srgb, var(--g-live) 55%, #000)) !important; }
+.toast.error   { background: linear-gradient(135deg, color-mix(in srgb, var(--g-stop) 85%, #000), color-mix(in srgb, var(--g-stop) 55%, #000)) !important; }
+.toast.warning { background: linear-gradient(135deg, color-mix(in srgb, var(--g-next) 85%, #000), color-mix(in srgb, var(--g-next) 55%, #000)) !important; }
+.toast.info    { background: linear-gradient(135deg, color-mix(in srgb, var(--g-blue) 85%, #000), color-mix(in srgb, var(--g-blue) 55%, #000)) !important; }
+
+.splash-screen {
+  background:
+    radial-gradient(700px 500px at 15% 10%, color-mix(in srgb, var(--g-a) 70%, transparent), transparent 65%),
+    radial-gradient(700px 500px at 90% 90%, color-mix(in srgb, var(--g-b) 60%, transparent), transparent 65%),
+    var(--g-bg) !important;
+}
+.splash-title { font-family: var(--g-font); letter-spacing: -0.5px; text-shadow: none !important; }
+
+.skeleton { border-radius: 18px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)) !important; background-size: 200% 100% !important; }
+
+/* ───────────────────────── 20. KEYFRAMES ───────────────────────── */
+@keyframes gLive {
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--g-live) 14%, transparent), 0 0 24px color-mix(in srgb, var(--g-live) 35%, transparent), inset 3px 0 0 rgb(var(--h, 52, 227, 160)); }
+  50%      { box-shadow: 0 0 0 6px color-mix(in srgb, var(--g-live) 22%, transparent), 0 0 42px color-mix(in srgb, var(--g-live) 55%, transparent), inset 3px 0 0 rgb(var(--h, 52, 227, 160)); }
+}
+@keyframes gUrgent {
+  0%, 100% { box-shadow: var(--g-shadow), 0 0 40px color-mix(in srgb, var(--g-stop) 25%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+  50%      { box-shadow: var(--g-shadow), 0 0 70px color-mix(in srgb, var(--g-stop) 50%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+}
+
+/* ───────────────────────── 21. TABLET / MOBILE ─────────────────────────
+   Your style.css deliberately drops blur & heavy effects on phones for
+   performance. Same idea here: glass surfaces become denser, solid frosted
+   panels (no backdrop-filter) so scrolling stays smooth on low-end devices. */
+@media (max-width: 768px) {
+  html body {
+    background:
+      radial-gradient(520px 420px at 0% 0%, color-mix(in srgb, var(--g-a) 65%, transparent), transparent 65%),
+      radial-gradient(520px 420px at 100% 40%, color-mix(in srgb, var(--g-b) 50%, transparent), transparent 65%),
+      var(--g-bg) !important;
+    background-attachment: scroll !important;
+  }
+
+  .hero,
+  .routine-switcher,
+  .today-date-section,
+  .class-duration-timer,
+  .notice,
+  .next-class,
+  .exam-countdown,
+  .day-progress,
+  .features-info,
+  .routine-table,
+  #examRoutineSection,
+  footer,
+  .theme-menu,
+  .dark-toggle-btn,
+  .export-toolbar button,
+  .install-banner,
+  .toast,
+  .calendar-shell {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  /* denser fills compensate for the missing blur */
+  .hero, .today-date-section, .notice, .next-class, .exam-countdown, .day-progress, .features-info, footer, .calendar-shell {
+    background: linear-gradient(145deg, rgba(30, 42, 84, 0.78), rgba(18, 26, 56, 0.72)) !important;
+  }
+  [data-theme="light"] .hero, [data-theme="light"] .today-date-section, [data-theme="light"] .notice,
+  [data-theme="light"] .next-class, [data-theme="light"] .exam-countdown, [data-theme="light"] .day-progress,
+  [data-theme="light"] .features-info, [data-theme="light"] footer, [data-theme="light"] .calendar-shell {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(240, 246, 255, 0.86)) !important;
+  }
+  .routine-table, #examRoutineSection { background: rgba(14, 20, 44, 0.78) !important; }
+  [data-theme="light"] .routine-table, [data-theme="light"] #examRoutineSection { background: rgba(255, 255, 255, 0.85) !important; }
+
+  .hero { margin: 12px 12px 0 !important; padding: 16px !important; border-radius: 20px; }
+  .hero-top { flex-direction: column; min-height: 0; }
+  .logo { height: 60px; }
+  .banner { height: 80px; }
+  .title .line1 { font-size: 28px; }
+  .title .line2 { font-size: 14px; }
+  .effective { margin-top: 8px !important; }
+  .switcher-btn { padding: 10px 16px !important; font-size: 13px !important; }
+
+  .table-container { padding: 0 12px 8px !important; overflow-x: auto; }
+  #examRoutineSection.table-container { padding: 0 !important; }
+  .date-main { font-size: 20px !important; }
+  .date-secondary { font-size: 15px !important; }
+  .today-date-section, .class-duration-timer { padding: 18px !important; }
+  .timer-info h3 { font-size: 20px !important; }
+
+  .routine-table { min-width: 760px; border-spacing: 6px !important; }
+  table.routine-table tbody tr td { height: 78px; padding: 8px 6px !important; font-size: 12.5px; }
+  table.routine-table tbody tr td strong { font-size: 13.5px; }
+  table.routine-table tbody tr td.day { width: 80px; }
+  .features-info { margin: 20px 12px !important; padding: 20px !important; }
+  .day-progress, #examCountdownBox, footer { margin-left: 12px; margin-right: 12px; }
+  .dark-toggle-btn { width: 48px !important; height: 48px !important; bottom: 84px !important; right: 16px !important; }
+  .install-btn { right: 16px !important; bottom: 16px !important; }
+}
+
+/* slow phones: keep only the single "live" pulse off as well */
+@media (max-width: 480px) {
+  table.routine-table tbody tr td.active-class,
+  .class-duration-timer.ending-soon { animation: none !important; }
+  table.routine-table tbody tr td { transition: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  table.routine-table tbody tr td.active-class,
+  .class-duration-timer.ending-soon { animation: none !important; }
+}
+
+@media print {
+  html body { background: #fff !important; color: #111 !important; }
+  .hero, .routine-table, .today-date-section, .notice, .next-class, .features-info, footer {
+    background: #fff !important; box-shadow: none !important; backdrop-filter: none !important; color: #111 !important;
+  }
+  .dark-toggle-btn, .install-btn, .theme-switcher { display: none !important; }
+}
