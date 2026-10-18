@@ -103,7 +103,9 @@ async function loadBreakSlot() {
 ========================= */
 async function loadRoutine() {
   try {
-    const snap = await getDocs(collection(window.db, "routine"));
+    const snap = await getDocsFromServer(
+  collection(window.db, "routine")
+);
     routineDays = [];
 
     snap.forEach(doc => {
@@ -178,7 +180,9 @@ async function loadEvents() {
 ========================= */
 async function loadCancelled() {
   try {
-    const snap = await getDocs(collection(window.db, "cancelled"));
+    const snap = await getDocsFromServer(
+  collection(window.db, "cancelled")
+);
     cancelledClasses = snap.docs.map(d => d.data());
     localStorage.setItem("cancelled", JSON.stringify(cancelledClasses));
   } catch (e) {
