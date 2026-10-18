@@ -1,24 +1,40 @@
-const CACHE_NAME = "routine-v27";
+const CACHE_NAME = "routine-v30";
 
 const ASSETS = [
   "/",
   "/index.html",
-  "/style.css",
-  "/script.js",
-  "/glass.css",
-  "/admin-glass.css",
-  "/effects.css",
+  "/style.css?v=30",
+  "/script.js?v=30",
+  "/glass.css?v=30",
+  "/admin-glass.css?v=30",
+  "/effects.css?v=30",
   "/UULogo.webp",
   "/y.png",
   "/manifest.json"
 ];
 
 self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
 
-  self.skipWaiting();
+    await Promise.all(
+      ASSETS.map(async asset => {
+        try {
+          const response = await fetch(asset, {
+            cache: "reload"
+          });
+
+          if (response.ok) {
+            await cache.put(asset, response);
+          }
+        } catch (error) {
+          console.warn("Could not cache asset:", asset);
+        }
+      })
+    );
+
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener("activate", event => {
@@ -34,37 +50,58 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  if (!event.request.url.startsWith(self.location.origin)) {
-    return;
-  }
+  const request = event.request;
+  const url = new URL(request.url);
 
-  // HTML, JS and CSS → NETWORK FIRST
   if (
-    event.request.destination === "document" ||
-    event.request.destination === "script" ||
-    event.request.destination === "style"
+    url.origin !== self.location.origin ||
+    request.method !== "GET"
   ) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          const copy = response.clone();
+    return;
+  }
 
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, copy);
-          });
+  // Always try the network for the app shell and code.
+  const isAppFile =
+    request.mode === "navigate" ||
+    /\.(html|js|css|json)$/i.test(url.pathname);
 
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
+  if (isAppFile) {
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(request, {
+          cache: "no-store"
+        });
+
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, response.clone());
+        }
+
+        return response;
+      } catch (error) {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+
+        if (request.mode === "navigate") {
+          const home = await caches.match("/index.html");
+          if (home) return home;
+        }
+
+        return new Response("Offline and no cached copy available.", {
+          status: 503,
+          headers: { "Content-Type": "text/plain" }
+        });
+      }
+    })());
 
     return;
   }
 
-  // Images/assets → CACHE FIRST
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      return cached || fetch(event.request);
-    })
-  );
+  // Other static assets: cache first, then network.
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+
+    return fetch(request);
+  })());
 });
