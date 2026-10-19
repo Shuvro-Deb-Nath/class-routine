@@ -1,13 +1,18 @@
-const CACHE_NAME = "routine-v30";
+const CACHE_NAME = "routine-v3";
 
 const ASSETS = [
   "/",
   "/index.html",
-  "/style.css?v=30",
-  "/script.js?v=30",
-  "/glass.css?v=30",
-  "/admin-glass.css?v=30",
-  "/effects.css?v=30",
+  "/style.css?v=32",
+  "/script.js?v=32",
+  "/glass.css?v=32",
+  "/admin-glass.css?v=32",
+  "/effects.css?v=32",
+  "/admin-enhance.js?v=32",
+  "/shapes.js?v=32",
+  "/shapes.css?v=32",
+  "/enhance.js?v=32",
+  "/plus-core.js?v=32",
   "/UULogo.webp",
   "/y.png",
   "/manifest.json"

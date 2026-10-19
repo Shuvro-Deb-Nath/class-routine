@@ -575,6 +575,8 @@ updateGradientPreview();
                 dropdown.appendChild(opt);
               }
             });
+            // fill subject / room / colours for the slot that is now selected
+            loadSlotDetails();
           } else {
             dropdown.innerHTML = '<option>No slots configured</option>';
           }
@@ -1498,6 +1500,11 @@ updateGradientPreview();
                 await deleteDoc(doc(db, "vacations", v.id));
                 showToast({ title: "Deleted", message: `"${v.reason}" vacation removed.`, type: "success" });
                 loadVacationList();
+                offerUndo({
+                  title: "Vacation deleted",
+                  message: v.reason || "",
+                  restore: async () => { const { id, ...rest } = v; await setDoc(doc(db, "vacations", v.id), rest); loadVacationList(); }
+                });
               } catch (e) {
                 showToast({ title: "Error", message: e.message, type: "error" });
               }
@@ -1511,6 +1518,128 @@ updateGradientPreview();
           container.innerHTML = `<div style="color:#f87171; font-family:monospace;">❌ Error: ${e.message}</div>`;
         }
       }
+
+      /* ==========================================
+         UNDO FOR DELETES  (additive block)
+         Wraps the existing delete functions: it remembers what was deleted and
+         shows an "Undo" toast for 8 seconds. The original delete logic is
+         called unchanged. Remove this whole block to remove the feature.
+      ========================================== */
+      function offerUndo({ title, message, restore }) {
+        const container = document.getElementById("toastContainer");
+        if (!container) return;
+
+        const toast = document.createElement("div");
+        toast.className = "toast warning undo-toast";
+        toast.innerHTML =
+          '<div class="toast-icon">↩</div>' +
+          '<div class="toast-content"><div class="toast-title"></div><p class="toast-message"></p></div>' +
+          '<button class="toast-undo-btn" type="button">Undo</button>' +
+          '<button class="toast-close" type="button">×</button>' +
+          '<div class="toast-progress"></div>';
+        // textContent (not innerHTML) so deleted titles can never inject markup
+        toast.querySelector(".toast-title").textContent = title;
+        toast.querySelector(".toast-message").textContent = message || "";
+        toast.querySelector(".toast-progress").style.animationDuration = "8s";
+        container.appendChild(toast);
+
+        let done = false;
+        const dismiss = () => {
+          if (done) return;
+          done = true;
+          toast.classList.add("hiding");
+          setTimeout(() => toast.remove(), 400);
+        };
+        const timer = setTimeout(dismiss, 8000);
+
+        toast.querySelector(".toast-close").addEventListener("click", () => { clearTimeout(timer); dismiss(); });
+        toast.querySelector(".toast-undo-btn").addEventListener("click", async (e) => {
+          if (done) return;
+          e.target.disabled = true;
+          clearTimeout(timer);
+          try {
+            await restore();
+            dismiss();
+            showToast({ title: "Restored ✓", message: "The deleted item is back.", type: "success" });
+          } catch (err) {
+            console.error("Undo failed:", err);
+            dismiss();
+            showToast({ title: "Undo failed", message: err.message || "Could not restore.", type: "error" });
+          }
+        });
+      }
+
+      // wraps window[name](id) for deletes that remove one Firestore document
+      function withUndo(name, coll, reload, describe) {
+        const original = window[name];
+        if (typeof original !== "function") return;
+        window[name] = async function (id, ...rest) {
+          let data = null;
+          try {
+            const snap = await getDoc(doc(db, coll, id));
+            if (snap.exists()) data = snap.data();
+          } catch (e) { /* capture is best-effort */ }
+
+          const result = await original.call(this, id, ...rest);
+
+          if (data) {
+            try {
+              const after = await getDoc(doc(db, coll, id));
+              if (!after.exists()) {          // really deleted (not cancelled at a confirm())
+                const d = describe(data);
+                offerUndo({
+                  title: d.title,
+                  message: d.message,
+                  restore: async () => { await setDoc(doc(db, coll, id), data); reload(); }
+                });
+              }
+            } catch (e) { /* no undo offered */ }
+          }
+          return result;
+        };
+      }
+
+      withUndo("deleteNotice", "notices", () => loadNoticesList(),
+        (d) => ({ title: "Notice deleted", message: d.title || "" }));
+      withUndo("deleteEvent", "events", () => loadEventList(),
+        (d) => ({ title: "Event deleted", message: [d.title, d.course].filter(Boolean).join(" · ") }));
+      withUndo("deleteCancel", "cancelled", () => loadCancelledList(),
+        (d) => ({ title: "Cancellation removed", message: [d.day, d.time].filter(Boolean).join(" · ") }));
+      withUndo("deleteExamEntry", "examRoutine", () => loadExamEntryList(),
+        (d) => ({ title: "Exam entry deleted", message: [d.courseName, d.date].filter(Boolean).join(" · ") }));
+
+      // routine slot delete edits an array inside one document, so it is wrapped separately
+      (function () {
+        const original = window.deleteSlot;
+        if (typeof original !== "function") return;
+        window.deleteSlot = async function () {
+          const day = document.getElementById("editDay").value;
+          let before = null;
+          try {
+            const snap = await getDoc(doc(db, "routine", day));
+            if (snap.exists()) before = snap.data().classes || [];
+          } catch (e) { /* best-effort */ }
+
+          const result = await original.apply(this, arguments);
+
+          if (before) {
+            try {
+              const snap = await getDoc(doc(db, "routine", day));
+              const now = snap.exists() ? snap.data().classes || [] : [];
+              if (now.length < before.length) {
+                const removed = before.filter((c) => !now.some((n) => n.time === c.time));
+                offerUndo({
+                  title: "Slot removed",
+                  message: removed.map((c) => c.subject).join(", ") + " · " + day,
+                  restore: async () => { await updateDoc(doc(db, "routine", day), { classes: before }); }
+                });
+              }
+            } catch (e) { /* no undo offered */ }
+          }
+          return result;
+        };
+      })();
     </script>
+    <script src="admin-enhance.js" defer></script>
   </body>
 </html>

@@ -7,9 +7,8 @@
   <meta name="theme-color" content="#2196f3" />
   <title>Class Routine</title>
 
-  <link rel="stylesheet" href="/style.css?v=30" />
-  <link rel="stylesheet" href="effects.css?v=30" />
-  <link rel="stylesheet" href="/glass.css?v=30" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="effects.css" />
   <link rel="icon" href="y.png" type="image/png" sizes="32x32" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -177,6 +176,15 @@
       <div id="classCountdown" class="next-class hidden"></div>
       <div id="assignmentCountdown" class="next-class hidden"></div>
       <div id="examCountdown" class="next-class hidden"></div>
+    </div>
+
+    <!-- Shown instead of the normal routine while it is exam time -->
+    <div id="examTimeNotice" class="exam-time-notice" hidden>
+      <div class="etn-icon">📝</div>
+      <h2 class="etn-title">Exam Time</h2>
+      <p class="etn-text">Regular classes are not running during the exam period.</p>
+      <p class="etn-range" id="examTimeRange"></p>
+      <button type="button" class="etn-btn" onclick="switchToExam()">View Exam Routine →</button>
     </div>
 
     <table class="routine-table">
@@ -658,7 +666,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
   
- <script type="module" src="/script.js?v=30"></script>
+  <script type="module" src="script.js"></script>
 
   <script type="module">
     // Load effective date from Firebase
@@ -1117,21 +1125,10 @@
   </script>
 
   <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async () => {
-      try {
-        const registration = await navigator.serviceWorker.register(
-          "/service-worker.js",
-          { updateViaCache: "none" }
-        );
-
-        await registration.update();
-      } catch (error) {
-        console.error("Service worker update failed:", error);
-      }
-    });
-  }
-</script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js");
+    }
+  </script>
 
   <script>
     let deferredPrompt;
@@ -1312,31 +1309,129 @@
       }
     });
   </script>
+  <style>
+    /* ========== EXAM TIME NOTICE (replaces the normal routine) ========== */
+    .exam-time-notice {
+      text-align: center;
+      padding: 40px 20px;
+      margin: 10px 0 20px;
+      border-radius: 20px;
+      color: #e0f2fe;
+      background: linear-gradient(135deg, #0a0f1e 0%, #0d1b2a 50%, #0a1628 100%);
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      box-shadow: 0 0 0 1px rgba(0, 255, 255, 0.1), 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 60px rgba(0, 200, 255, 0.1);
+    }
+
+    .exam-time-notice[hidden] {
+      display: none !important;
+    }
+
+    .etn-icon {
+      font-size: 54px;
+      animation: iconFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.7));
+    }
+
+    .etn-title {
+      margin: 10px 0 8px;
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.9), 0 0 30px rgba(0, 200, 255, 0.5);
+    }
+
+    .etn-text {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: #bae6fd;
+    }
+
+    .etn-range {
+      margin: 0 0 18px;
+      font-family: monospace;
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: #38bdf8;
+    }
+
+    .etn-range:empty {
+      display: none;
+    }
+
+    .etn-btn {
+      border: none;
+      cursor: pointer;
+      padding: 12px 26px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.45);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .etn-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(14, 165, 233, 0.65);
+    }
+
+    /* while it is exam time, hide the class-only widgets */
+    body.exam-time .export-toolbar,
+    body.exam-time #todayOverview,
+    body.exam-time #subjectLegend,
+    body.exam-time #shapesRow,
+    body.exam-time #dayProgressBox,
+    body.exam-time #weekProgressBox {
+      display: none !important;
+    }
+  </style>
+
   <script type="module">
     /* ==========================================
-       EXAM ROUTINE MODE DETECTION + SWITCHER
+       EXAM ROUTINE MODE – AUTOMATIC
+       • During an exam period the EXAM routine is the main view.
+       • The normal routine is replaced by an "Exam Time" notice.
+       • Exam time starts on the first exam date and ends after the last one.
+         (Admin "Launch Exam Routine" still forces it on early.)
     ========================================== */
 
     let examEntriesCache = [];   // entries of the CURRENT exam session only
     let examEntriesAll = [];     // everything stored in Firestore (may include old terms)
+    let forcedByAdmin = false;   // settings/examMode.active
+    let currentView = "main";    // "main" | "exam"
+    let lastExamTime = null;
 
-    /* ---- auto show/hide helpers ----
-       Entries have no "term" field, so exams are grouped into sessions:
-       dates less than EXAM_SESSION_GAP_DAYS apart belong to one exam period.
-       The page shows the first session whose LAST exam date has not passed.
-       When that session is over it disappears by itself; when new exams
-       (e.g. Fall 2026) are added, they become the active session. */
+    /* Entries have no "term" field, so exams are grouped into sessions:
+       dates less than EXAM_SESSION_GAP_DAYS apart belong to one exam period. */
     const EXAM_SESSION_GAP_DAYS = 21;
+    // Show exam time this many days BEFORE the first exam (0 = starts on the first exam day)
+    const EXAM_LEAD_DAYS = 0;
 
-    function localTodayStr() {
-      const d = new Date();
-      return d.getFullYear() + "-" +
-        String(d.getMonth() + 1).padStart(2, "0") + "-" +
-        String(d.getDate()).padStart(2, "0");
+    function pad2(n) { return String(n).padStart(2, "0"); }
+
+    function ymd(d) {
+      return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+    }
+
+    function localTodayStr() { return ymd(new Date()); }
+
+    function addDays(dateStr, n) {
+      const d = new Date(dateStr + "T00:00:00");
+      d.setDate(d.getDate() + n);
+      return ymd(d);
     }
 
     function dayDiff(a, b) {
       return (new Date(a + "T00:00:00") - new Date(b + "T00:00:00")) / 86400000;
+    }
+
+    function prettyDate(dateStr) {
+      return new Date(dateStr + "T00:00:00").toLocaleDateString("en-GB", {
+        day: "numeric", month: "short", year: "numeric"
+      });
     }
 
     function pickActiveExamSession(entries) {
@@ -1357,41 +1452,74 @@
       return sessions.find(s => s[s.length - 1].date >= today) || [];
     }
 
-    // Recompute which session is active and show/hide the switcher accordingly
+    function isExamTimeNow() {
+      if (!examEntriesCache.length) return false;
+      if (forcedByAdmin) return true;
+      const first = examEntriesCache[0].date;
+      const last = examEntriesCache[examEntriesCache.length - 1].date;
+      const today = localTodayStr();
+      return today >= addDays(first, -EXAM_LEAD_DAYS) && today <= last;
+    }
+
+    function fillNotice() {
+      const el = document.getElementById("examTimeRange");
+      if (!el || !examEntriesCache.length) return;
+      const first = examEntriesCache[0].date;
+      const last = examEntriesCache[examEntriesCache.length - 1].date;
+      el.textContent = first === last
+        ? ">_ " + prettyDate(first)
+        : ">_ " + prettyDate(first) + "  →  " + prettyDate(last);
+    }
+
+    /* One place that decides what is on screen */
+    function applyView(view) {
+      currentView = view;
+      const examTime = isExamTimeNow();
+      lastExamTime = examTime;
+      const showExam = view === "exam";
+
+      const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
+      const examSection = document.getElementById("examRoutineSection");
+      const notice = document.getElementById("examTimeNotice");
+
+      // normal routine disappears in exam view AND during exam time (notice takes its place)
+      const hideRoutine = showExam || examTime;
+      if (mainTable) {
+        mainTable.querySelectorAll(".routine-table, #classDurationTimer, #countdownStack")
+          .forEach(el => el.style.display = hideRoutine ? "none" : "");
+      }
+      if (examSection) examSection.style.display = showExam ? "block" : "none";
+      if (notice) {
+        notice.hidden = !(examTime && !showExam);
+        if (!notice.hidden) fillNotice();
+      }
+
+      document.body.classList.toggle("exam-time", examTime);
+      document.getElementById("switchMain").classList.toggle("active", !showExam);
+      document.getElementById("switchExam").classList.toggle("active", showExam);
+    }
+
+    function showMainView() { applyView("main"); }
+    function showExamView() { applyView("exam"); }
+
+    // Recompute the active session and the exam-time state; switch view automatically
+    // when exam time starts or ends.
     function refreshExamVisibility() {
       examEntriesCache = pickActiveExamSession(examEntriesAll);
       const hasActive = examEntriesCache.length > 0;
       const switcher = document.getElementById("routineSwitcher");
       if (switcher) switcher.classList.toggle("hidden", !hasActive);
-      if (!hasActive) {
-        const examSection = document.getElementById("examRoutineSection");
-        if (examSection && examSection.style.display !== "none") showMainView();
-      }
-      return hasActive;
-    }
 
-    function showMainView() {
-      const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
-      const examSection = document.getElementById("examRoutineSection");
-      if (mainTable) {
-        mainTable.querySelectorAll(".routine-table, #classDurationTimer, #countdownStack")
-          .forEach(el => el.style.display = "");
+      const examTime = isExamTimeNow();
+      if (examTime !== lastExamTime) {
+        // exam time began or ended → go to the right default view
+        if (examTime) { applyView("exam"); renderExamEntries(); }
+        else applyView("main");
+      } else {
+        applyView(currentView);
+        if (currentView === "exam") renderExamEntries();
       }
-      if (examSection) examSection.style.display = "none";
-      document.getElementById("switchMain").classList.add("active");
-      document.getElementById("switchExam").classList.remove("active");
-    }
-
-    function showExamView() {
-      const mainTable = document.querySelector(".table-container:not(#examRoutineSection)");
-      const examSection = document.getElementById("examRoutineSection");
-      if (mainTable) {
-        mainTable.querySelectorAll(".routine-table, #classDurationTimer, #countdownStack")
-          .forEach(el => el.style.display = "none");
-      }
-      if (examSection) examSection.style.display = "block";
-      document.getElementById("switchMain").classList.remove("active");
-      document.getElementById("switchExam").classList.add("active");
+      return examTime;
     }
 
     function renderExamEntries() {
@@ -1442,11 +1570,11 @@
         const getDocsFn = window._fbGetDocs;
         const collectionFn = window._fbCollection;
 
-        // 1. Fetch admin's default mode
+        // 1. Admin's manual switch (can force exam time on before the first exam)
         const modeSnap = await getDocFn(docFn(db, "settings", "examMode"));
-        const isExamMode = modeSnap.exists() && modeSnap.data().active === true;
+        forcedByAdmin = modeSnap.exists() && modeSnap.data().active === true;
 
-        // 1b. Fetch admin-configurable exam page header text
+        // 1b. Admin-configurable exam page header text
         try {
           const labelSnap = await getDocFn(docFn(db, "settings", "examLabel"));
           if (labelSnap.exists() && labelSnap.data().text) {
@@ -1457,36 +1585,30 @@
           console.log("Could not load exam header text, using default", e);
         }
 
-        // 2. Pre-load exam entries into cache
+        // 2. Load exam entries
         const snap = await getDocsFn(collectionFn(db, "examRoutine"));
         examEntriesAll = [];
         snap.forEach(d => examEntriesAll.push({ id: d.id, ...d.data() }));
 
-        // 3. Keep only the current/upcoming exam session; show the switcher only if one exists
-        const hasActiveExam = refreshExamVisibility();
+        // 3. Pick the current exam session and decide automatically
+        lastExamTime = null;               // force the first decision
+        const examTime = refreshExamVisibility();
 
-        // Re-check every minute so the exam routine vanishes on its own
-        // after the last exam day, even if the page was left open.
-        setInterval(refreshExamVisibility, 60000);
-
-        // 4. Apply admin's default view (no sessionStorage — resets on every reload)
-        //    Exam view is only used while there is an active (not finished) exam session.
-        if (isExamMode && hasActiveExam) {
-          showExamView();
-          renderExamEntries();
+        if (examTime) {
           setTimeout(() => {
             if (window.showToast) {
               window.showToast({
-                title: "📝 Exam Routine Active",
-                message: "Showing exam schedule — good luck!",
+                title: "📝 Exam Time",
+                message: "Showing the exam routine — good luck!",
                 type: "info",
                 duration: 4000
               });
             }
           }, 2000);
-        } else {
-          showMainView();
         }
+
+        // 4. Re-check every minute (starts / ends by itself, even if the page stays open)
+        setInterval(refreshExamVisibility, 60000);
 
       } catch (err) {
         console.error("Exam mode check failed:", err);
@@ -2619,7 +2741,10 @@
     });
   </script>
   <!-- Glassmorphism redesign (visual layer only). Remove this line to roll back. -->
-
+  <link rel="stylesheet" href="glass.css" />
+  <link rel="stylesheet" href="shapes.css" />
+  <script src="enhance.js" defer></script>
+  <script src="shapes.js" defer></script>
 </body>
 
 </html>
