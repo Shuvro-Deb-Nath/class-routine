@@ -9,6 +9,7 @@
 ========================= */
 import {
   getDocs,
+  getDocsFromServer,
   collection,
   enableIndexedDbPersistence,
   addDoc,
@@ -897,7 +898,7 @@ function checkCurrentClass() {
       const badge = document.createElement("div");
       badge.className = "cancelled-badge";
       badge.textContent = "❌ CANCELLED";
-      cell.appendChild(badge);
+      cell.insertBefore(badge, cell.firstChild);
 
       const reason = document.createElement("div");
       reason.className = "cancel-reason";
@@ -933,7 +934,7 @@ const percent = Math.max(0, Math.min(((now - startTime) / (endTime - startTime))
   const badge = document.createElement("div");
   badge.className = "live-badge";
   badge.textContent = "🔴 LIVE";
-  cell.appendChild(badge);
+  cell.insertBefore(badge, cell.firstChild);
 
   // Countdown
   const cd = document.createElement("div");
